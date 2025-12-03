@@ -1,6 +1,5 @@
 package github.thelawf.gensokyoontology.api.util;
 
-import com.sun.scenario.effect.Color4f;
 
 public class Color4i {
     public final int r;
@@ -32,7 +31,7 @@ public class Color4i {
         return new Color4i(this.r, this.g, this.b, this.a);
     }
 
-    public Color4f toColor4f() {
-        return new Color4f(this.r / 255F, this.g / 255F, this.b / 255F, this.a / 255F);
+    public Color4f toColor4f(){
+        return new Color4f(r / 255F, g / 255F, b / 255F, a / 255F);
     }
 }

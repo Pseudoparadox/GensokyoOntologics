@@ -8,6 +8,7 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
+/*
 public abstract class ExpressionType<E extends IExpressionType> extends ForgeRegistryEntry<IExpressionType> implements IExpressionType, IForgeRegistryEntry<IExpressionType> {
 
     // public static final Codec<IExpressionType> CODEC = Expressions.EXP_KEY.REGISTRY.byNameCodec().dispatch(
@@ -45,3 +46,5 @@ public abstract class ExpressionType<E extends IExpressionType> extends ForgeReg
     // }
 
 }
+
+ */

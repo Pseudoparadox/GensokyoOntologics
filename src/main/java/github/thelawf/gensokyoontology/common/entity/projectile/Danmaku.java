@@ -8,7 +8,6 @@ import github.thelawf.gensokyoontology.common.util.GSKODamageSource;
 import github.thelawf.gensokyoontology.common.util.math.*;
 import github.thelawf.gensokyoontology.core.init.EntityRegistry;
 import github.thelawf.gensokyoontology.core.init.ItemRegistry;
-import github.thelawf.gensokyoontology.data.expression.IExpressionType;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.entity.*;
@@ -66,7 +65,6 @@ public class Danmaku extends ProjectileItemEntity{
 
     // public static final EntityDataAccessor<ClosureExpression> DATA_SPELL = SynchedEntityData.defineId(
     //         Danmaku.class, GSKOSerializers.EXP_SERIALIZER.get());
-    public Map<String, IExpressionType> varMap = new HashMap<>();
     public Consumer<EntityRayTraceResult> onHit;
     public Consumer<Danmaku> onTick;
 
