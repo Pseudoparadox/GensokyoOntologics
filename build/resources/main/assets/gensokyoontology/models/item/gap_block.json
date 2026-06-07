@@ -1,0 +1,29 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "gensokyoontology:item/gap"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "scale": [2, 1, 1]
+    },
+    "thirdperson_lefthand": {
+      "scale": [2, 1, 1]
+    },
+    "firstperson_righthand": {
+      "scale": [2, 1, 1]
+    },
+    "firstperson_lefthand": {
+      "scale": [2, 1, 1]
+    },
+    "ground": {
+      "scale": [2, 1, 1]
+    },
+    "gui": {
+      "scale": [2, 1, 1]
+    },
+    "fixed": {
+      "scale": [2, 1, 1]
+    }
+  }
+}

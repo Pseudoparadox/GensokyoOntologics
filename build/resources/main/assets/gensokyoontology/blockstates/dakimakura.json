@@ -1,0 +1,10 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {},
+    "model": "gensokyoontology:dakimakura.obj"
+  },
+  "variants": {
+    "": {"model": "gensokyoontology:dakimakura.obj"}
+  }
+}

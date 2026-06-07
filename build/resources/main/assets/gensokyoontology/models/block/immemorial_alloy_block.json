@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "gensokyoontology:block/immemorial_alloy_top",
+    "side": "gensokyoontology:block/immemorial_alloy_side"
+  }
+}

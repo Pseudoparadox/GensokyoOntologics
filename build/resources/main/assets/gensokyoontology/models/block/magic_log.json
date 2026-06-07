@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "gensokyoontology:block/magic_log_top",
+    "side": "gensokyoontology:block/magic_log_side"
+  }
+}

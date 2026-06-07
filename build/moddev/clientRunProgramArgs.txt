@@ -1,0 +1,12 @@
+# Main Class
+net.neoforged.fml.startup.Client
+
+# NeoForge Run-Type Program Arguments
+--version
+26.1.2.59-beta
+--assetIndex
+30
+--assetsDir
+C:\\Users\\IdealOntology\\.gradle\\caches\\neoformruntime\\assets
+
+# User Supplied Program Arguments

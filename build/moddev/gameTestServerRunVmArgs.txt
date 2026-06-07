@@ -1,0 +1,11 @@
+--sun-misc-unsafe-memory-access=allow
+--enable-native-access=ALL-UNNAMED
+--add-opens
+java.base/java.lang.invoke=ALL-UNNAMED
+--add-exports
+jdk.naming.dns/com.sun.jndi.dns=java.naming
+-Dlog4j2.configurationFile=E:\\Files\\TheLawF\\ACGN\\Codes\\Java\\project\\ModProject\\GSKO-1.17+\\gensokyoontology-template-26.1.2\\build\\moddev\\gameTestServerLog4j2.xml
+-Djava.net.preferIPv6Addresses=system
+-Dneoforge.enableGameTest=true
+-Dneoforge.enabledGameTestNamespaces=gensokyoontology
+-Dforge.logging.markers=REGISTRIES

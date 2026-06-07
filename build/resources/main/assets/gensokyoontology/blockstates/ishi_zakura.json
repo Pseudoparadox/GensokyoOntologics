@@ -1,0 +1,10 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {},
+    "model": "gensokyoontology:block/ishi_zakura.obj"
+  },
+  "variants": {
+    "": {"model": "gensokyoontology:block/ishi_zakura.obj"}
+  }
+}

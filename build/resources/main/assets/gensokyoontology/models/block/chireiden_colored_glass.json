@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "gensokyoontology:block/chireiden_colored_glass"
+  }
+}

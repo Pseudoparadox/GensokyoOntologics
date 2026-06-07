@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "can_collide=true,can_activate=true,existed=true": {
+      "model": "gensokyoontology:block/predicate_block_green"
+    },
+    "can_collide=true,can_activate=true,existed=false": {
+      "model": "gensokyoontology:block/predicate_block_black"
+    },
+    "can_collide=true,can_activate=false,existed=true": {
+      "model": "gensokyoontology:block/predicate_block_red"
+    },
+    "can_collide=true,can_activate=false,existed=false": {
+      "model": "gensokyoontology:block/predicate_block_transparent"
+    },
+    "can_collide=false,can_activate=true,existed=true": {
+      "model": "gensokyoontology:block/predicate_block_white"
+    },
+    "can_collide=false,can_activate=true,existed=false": {
+      "model": "gensokyoontology:block/predicate_block_transparent"
+    },
+    "can_collide=false,can_activate=false,existed=true": {
+      "model": "gensokyoontology:block/predicate_block_white"
+    },
+    "can_collide=false,can_activate=false,existed=false": {
+      "model": "gensokyoontology:block/predicate_block_black"
+    }
+  }
+}

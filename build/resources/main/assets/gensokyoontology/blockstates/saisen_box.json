@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "gensokyoontology:block/saisen_box",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "gensokyoontology:block/saisen_box"
+    },
+    "facing=south": {
+      "model": "gensokyoontology:block/saisen_box",
+      "y": 270
+    },
+    "facing=west": {
+      "model": "gensokyoontology:block/saisen_box",
+      "y": 180
+    }
+  }
+}

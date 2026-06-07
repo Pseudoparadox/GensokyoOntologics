@@ -1,0 +1,17 @@
+# Main Class
+net.neoforged.fml.startup.DataClient
+
+# NeoForge Run-Type Program Arguments
+--assetIndex
+30
+--assetsDir
+C:\\Users\\IdealOntology\\.gradle\\caches\\neoformruntime\\assets
+
+# User Supplied Program Arguments
+--mod
+gensokyoontology
+--all
+--output
+E:\\Files\\TheLawF\\ACGN\\Codes\\Java\\project\\ModProject\\GSKO-1.17+\\gensokyoontology-template-26.1.2\\src\\generated\\resources
+--existing
+E:\\Files\\TheLawF\\ACGN\\Codes\\Java\\project\\ModProject\\GSKO-1.17+\\gensokyoontology-template-26.1.2\\src\\main\\resources

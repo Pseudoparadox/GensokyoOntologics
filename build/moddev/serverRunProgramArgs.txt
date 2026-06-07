@@ -1,0 +1,7 @@
+# Main Class
+net.neoforged.fml.startup.Server
+
+# NeoForge Run-Type Program Arguments
+
+# User Supplied Program Arguments
+--nogui

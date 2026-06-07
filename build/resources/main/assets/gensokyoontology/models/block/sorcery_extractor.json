@@ -1,0 +1,25 @@
+{
+  "parent": "gensokyoontology:block/sorcery_extractor.obj",
+  "textures": {
+    "particle": "gensokyoontology:block/sorcery_extractor"
+  },
+  "display": {
+    "fixed": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "scale": [
+        0,
+        0,
+        0
+      ]
+    }
+  }
+}

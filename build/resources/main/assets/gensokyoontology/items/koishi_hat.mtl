@@ -1,0 +1,7 @@
+# Blender 3.6.11 MTL File: 'KoishiHat.blend'
+# www.blender.org
+newmtl HatMTL
+map_Kd gensokyoontology:item/koishi_hat
+
+newmtl RibbonMTL
+map_Kd gensokyoontology:item/koishi_hat_ribbon

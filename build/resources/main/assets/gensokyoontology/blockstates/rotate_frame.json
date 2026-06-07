@@ -1,0 +1,10 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {},
+    "model": "gensokyoontology:rotate_frame.obj"
+  },
+  "variants": {
+    "": {"model": "gensokyoontology:rotate_frame.obj"}
+  }
+}

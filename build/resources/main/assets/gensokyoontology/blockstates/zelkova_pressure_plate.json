@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "gensokyoontology:block/zelkova_pressure_plate"
+    },
+    "powered=true": {
+      "model": "gensokyoontology:block/zelkova_pressure_plate_down"
+    }
+  }
+}
