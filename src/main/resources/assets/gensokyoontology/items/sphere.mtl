@@ -1,0 +1,10 @@
+# Made in Blockbench 4.9.4
+newmtl m_78acff7c-d348-3e8b-9565-636c71cc6163
+Ns 150.083542
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd gensokyoontology:entity/sphere_effect_transparent

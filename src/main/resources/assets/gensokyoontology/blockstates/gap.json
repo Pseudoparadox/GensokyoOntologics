@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "gensokyoontology:block/gap_block"
+    },
+    "facing=south": {
+      "model": "gensokyoontology:block/gap_block"
+    },
+    "facing=west": {
+      "model": "gensokyoontology:block/gap_block"
+    },
+    "facing=north": {
+      "model": "gensokyoontology:block/gap_block"
+    }
+  }
+}

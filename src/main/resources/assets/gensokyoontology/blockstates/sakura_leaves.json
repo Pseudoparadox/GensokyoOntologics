@@ -1,0 +1,10 @@
+{
+  "variants": {
+    ",bloomed=true": {
+      "model": "gensokyoontology:block/sakura_blossom_leaves"
+    },
+    ",bloomed=false": {
+      "model": "gensokyoontology:block/sakura_leaves"
+    }
+  }
+}
