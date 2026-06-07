@@ -1,0 +1,6 @@
+{
+  "parent": "block/block",
+  "loader": "forge:obj",
+  "model": "gensokyoontology:models/block/sorcery_extractor.obj",
+  "flip-v": true
+}

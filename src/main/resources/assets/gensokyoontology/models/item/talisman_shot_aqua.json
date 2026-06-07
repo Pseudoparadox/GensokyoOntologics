@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "gensokyoontology:item/talisman_shot_aqua"
+  }
+}

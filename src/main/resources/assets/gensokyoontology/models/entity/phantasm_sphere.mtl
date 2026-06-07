@@ -1,0 +1,12 @@
+# Blender MTL File: 'fantasm_sphere.blend'
+# Material Count: 1
+
+newmtl tex.001
+Ns 1.171749
+Ka 1.000000 1.000000 1.000000
+Kd 0.012501 0.000707 0.071598
+Ks 0.324742 0.324742 0.324742
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2

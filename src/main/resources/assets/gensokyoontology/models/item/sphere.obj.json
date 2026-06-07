@@ -1,0 +1,14 @@
+{
+  "loader": "forge:obj",
+  "model": "gensokyoontology:models/item/sphere.obj",
+  "flip-v": true,
+  "gui_light": "front",
+  "display": {
+    "ground": {
+      "translation": [8, 16, 8]
+    },
+    "gui": {
+      "translation": [8, 8, 0]
+    }
+  }
+}

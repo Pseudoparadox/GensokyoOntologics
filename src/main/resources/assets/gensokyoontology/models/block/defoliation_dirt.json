@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "particle": "minecraft:block/dirt",
+    "bottom": "minecraft:block/dirt",
+    "top": "gensokyoontology:block/defoliation_dirt_top",
+    "side": "gensokyoontology:block/defoliation_dirt_side"
+  }
+}

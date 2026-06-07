@@ -1,0 +1,5 @@
+{
+  "loader": "forge:obj",
+  "model": "gensokyoontology:models/entity/rotate_frame.obj",
+  "flip-v": true
+}

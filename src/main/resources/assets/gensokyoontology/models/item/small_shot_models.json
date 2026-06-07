@@ -1,0 +1,50 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "minecraft:item/large_shot_red"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "custom_model_data": 0
+      },
+      "model": "gensokyoontology:item/large_shot_red"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 1
+      },
+      "model": "gensokyoontology:item/large_shot_aqua"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 2
+      },
+      "model": "gensokyoontology:item/large_shot_blue"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 3
+      },
+      "model": "gensokyoontology:item/large_shot_yellow"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 4
+      },
+      "model": "gensokyoontology:item/large_shot_purple"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 5
+      },
+      "model": "gensokyoontology:item/large_shot_pink"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 6
+      },
+      "model": "gensokyoontology:item/large_shot_green"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "loader": "forge:obj",
+  "model": "gensokyoontology:models/item/laevatein.obj",
+  "flip-v": true,
+  "gui_light": "front",
+  "display": {
+    "thirdperson_righthand": {
+      "translation": [8, 0.75, 10]
+    },
+    "thirdperson_lefthand": {
+      "translation": [-8, 0.75, 10]
+    },
+    "firstperson_righthand": {
+      "rotation": [-25.75, 20, 0],
+      "translation": [7.5, -0.75, 0]
+    },
+    "firstperson_lefthand": {
+      "rotation": [-18.75, 0, 0],
+      "translation": [4, 0, -2.5]
+    },
+    "ground": {
+      "translation": [7, 3.5, 7]
+    },
+    "gui": {
+      "translation": [14, -5, 0],
+      "rotation": [0, 90, 0],
+      "scale": [2, 2, 2]
+    },
+    "fixed": {
+      "rotation": [0, -90, 0],
+      "translation": [-10, -4.25, 5],
+      "scale": [1.2, 1.2, 1.2]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "loader": "forge:obj",
+  "model": "gensokyoontology:models/item/koishi_hat.obj",
+  "flip-v": true,
+  "gui_light": "front",
+  "display": {
+    "thirdperson_righthand": {
+    },
+    "thirdperson_lefthand": {
+    },
+    "firstperson_righthand": {
+    },
+    "firstperson_lefthand": {
+    },
+    "ground": {
+    },
+    "gui": {
+    },
+    "fixed": {
+    }
+  }
+}
