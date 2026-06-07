@@ -1,3 +1,0 @@
-/time set minecraft:day
-/summon gensokyoontology:danmaku -25.83 71.81 12.13
-/time set minecraft:day
