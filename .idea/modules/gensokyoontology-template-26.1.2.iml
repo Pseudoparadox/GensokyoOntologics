@@ -2,6 +2,7 @@
 <module version="4">
   <component name="AdditionalModuleElements">
     <content url="file://$MODULE_DIR$/../.." dumb="true">
+      <excludeFolder url="file://$MODULE_DIR$/../../run" />
       <excludeFolder url="file://$MODULE_DIR$/../../run/defaultconfigs" />
       <excludeFolder url="file://$MODULE_DIR$/../../run/logs/telemetry" />
       <excludeFolder url="file://$MODULE_DIR$/../../run/mods" />
