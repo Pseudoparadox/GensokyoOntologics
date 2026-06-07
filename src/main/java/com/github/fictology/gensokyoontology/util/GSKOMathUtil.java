@@ -177,7 +177,6 @@ public class GSKOMathUtil {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static Vec3 bezier2(Vec3 start, Vec3 end, Vec3 p, float time) {
         return lerp(time, lerp(time, start, p), lerp(time, p, end));
     }

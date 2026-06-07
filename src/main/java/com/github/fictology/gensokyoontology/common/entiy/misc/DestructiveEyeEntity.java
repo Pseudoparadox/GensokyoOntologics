@@ -20,11 +20,8 @@ import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
-@OnlyIn(value = Dist.CLIENT, _interface = ItemSupplier.class)
 public class DestructiveEyeEntity extends AffiliatedEntity implements ItemSupplier, IDamageHandler {
     public final int MAX_LIVING_TICK = 50;
-    @OnlyIn(Dist.CLIENT)
-    public float prevScale;
 
     public DestructiveEyeEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);

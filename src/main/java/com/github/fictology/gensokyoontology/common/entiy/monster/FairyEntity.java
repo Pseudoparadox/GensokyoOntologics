@@ -24,14 +24,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
-@OnlyIn(value = Dist.CLIENT, _interface = ItemSupplier.class)
 public class FairyEntity extends RetreatableEntity implements FlyingAnimal {
 
     private static final int MAX_LIVING_TICK = 3000;
