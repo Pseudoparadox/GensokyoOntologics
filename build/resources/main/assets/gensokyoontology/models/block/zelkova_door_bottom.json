@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/door_bottom",
-  "textures": {
-    "top": "gensokyoontology:block/zelkova_door_top",
-    "bottom": "gensokyoontology:block/zelkova_door_bottom"
-  }
-}

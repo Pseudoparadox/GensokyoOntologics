@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/template_single_face",
-  "textures": {
-    "texture": "gensokyoontology:block/blue_mushroom_block"
-  }
-}

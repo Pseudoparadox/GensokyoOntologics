@@ -1,6 +1,0 @@
-{
-  "loader": "forge:obj",
-  "model": "gensokyoontology:models/item/sphere_effect.obj",
-  "flip-v": true,
-  "gui_light": "front"
-}

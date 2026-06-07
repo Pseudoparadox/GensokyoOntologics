@@ -1,6 +1,0 @@
-{
-  "parent": "gensokyoontology:block/crop",
-  "textures": {
-    "crop": "gensokyoontology:block/onion_crop_03"
-  }
-}

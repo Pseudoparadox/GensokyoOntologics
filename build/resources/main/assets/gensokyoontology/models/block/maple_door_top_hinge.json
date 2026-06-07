@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/door_top_rh",
-  "textures": {
-    "top": "gensokyoontology:block/maple_door_top",
-    "bottom": "gensokyoontology:block/maple_door_bottom"
-  }
-}

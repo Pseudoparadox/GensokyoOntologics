@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/stairs",
-  "textures": {
-    "bottom": "gensokyoontology:block/maple_planks",
-    "top": "gensokyoontology:block/maple_planks",
-    "side": "gensokyoontology:block/maple_planks"
-  }
-}

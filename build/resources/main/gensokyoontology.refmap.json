@@ -1,6 +1,0 @@
-{
-  "mappings": {
-    "net/minecraft/client/renderer/LevelRenderer::addSkyPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/FogParameter;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;)V": "b",
-    "net/minecraft/client/multiplayer/ClientLevel::getSkyColor(net.minecraft.world.phys.Vec3,float)": "a"
-  }
-}
