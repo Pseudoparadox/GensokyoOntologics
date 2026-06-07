@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/template_orientable_trapdoor_top",
-  "textures": {
-    "texture": "gensokyoontology:block/zelkova_door_top"
-  }
-}

@@ -1,6 +1,0 @@
-{
-  "parent": "gensokyoontology:item/ishi_zakura_fragment.obj",
-  "textures": {
-    "particle": "gensokyoontology:block/ishi_zakura"
-  }
-}

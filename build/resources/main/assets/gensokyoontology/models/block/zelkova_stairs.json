@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/stairs",
-  "textures": {
-    "bottom": "gensokyoontology:block/zelkova_planks",
-    "top": "gensokyoontology:block/zelkova_planks",
-    "side": "gensokyoontology:block/zelkova_planks"
-  }
-}

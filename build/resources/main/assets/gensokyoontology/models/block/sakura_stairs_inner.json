@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/inner_stairs",
-  "textures": {
-    "bottom": "gensokyoontology:block/sakura_planks",
-    "top": "gensokyoontology:block/sakura_planks",
-    "side": "gensokyoontology:block/sakura_planks"
-  }
-}

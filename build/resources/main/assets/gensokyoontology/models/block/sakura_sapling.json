@@ -1,6 +1,0 @@
-{
-  "parent": "gensokyoontology:block/cross",
-  "textures": {
-    "cross": "gensokyoontology:block/sakura_sapling"
-  }
-}
