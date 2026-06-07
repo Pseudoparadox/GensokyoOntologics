@@ -1,0 +1,54 @@
+package com.github.fictology.gensokyoontology.common.entiy.monster;
+
+import com.github.fictology.gensokyoontology.common.combat.SpellBehaviors;
+import com.github.fictology.gensokyoontology.common.entiy.ai.goal.SpellCardAttackGoal;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+
+public class RemiliaScarletEntity extends YoukaiEntity {
+    public RemiliaScarletEntity(EntityType<? extends TamableAnimal> type, Level worldIn) {
+        super(type, worldIn);
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(2, new SitWhenOrderedToGoal(this));
+        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1D, true));
+        this.goalSelector.addGoal(4, new SpellCardAttackGoal(this, SpellBehaviors.REMILIA_LASER_SPIRAL));
+        this.goalSelector.addGoal(5, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
+        this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.4f));
+        this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 0.8f));
+        this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+
+        this.targetSelector.addGoal(1, (new HurtByTargetGoal(this, Mob.class)));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, TsumiBukuroEntity.class, true));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, true));
+    }
+
+    @Override
+    public void danmakuAttack(LivingEntity target) {
+
+    }
+
+    public void laserSpiral(Level level, YoukaiEntity youkai, Integer tickCount) {
+
+    }
+
+    @Override
+    public boolean isFood(ItemStack itemStack) {
+        return false;
+    }
+
+    @Nullable
+    @Override
+    public AgeableMob getBreedOffspring(ServerLevel serverLevel, AgeableMob ageableMob) {
+        return null;
+    }
+}
