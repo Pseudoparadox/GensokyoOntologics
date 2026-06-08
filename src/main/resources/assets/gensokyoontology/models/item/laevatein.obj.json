@@ -1,5 +1,5 @@
 {
-  "loader": "forge:obj",
+  "loader": "neoforge:obj",
   "model": "gensokyoontology:models/item/laevatein.obj",
   "flip-v": true,
   "gui_light": "front",

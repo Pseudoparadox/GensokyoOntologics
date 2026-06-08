@@ -44,37 +44,14 @@ public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceRead
         if (tickCount >= 120) this.setRemoved(RemovalReason.DISCARDED);
         if (tickCount < 40) return;
         if (level().isClientSide()) return;
-        ServerLevel serverLevel = (ServerLevel) this.level();
-        List<Entity> entities = rayTrace(serverLevel, this, DISTANCE, new Vec3(0, 0, 0));
-        List<Vec3> startList = DanmakuUtil.spheroidPos(1.5, 10);
+        var serverLevel = (ServerLevel) this.level();
+        var entities = rayTrace(serverLevel, this, DISTANCE, new Vec3(0, 0, 0));
+        var startList = DanmakuUtil.spheroidPos(1.5, 10);
 
         startList.forEach(vector3d -> entities.addAll(rayTrace(serverLevel, this, DISTANCE, vector3d)));
         Predicate<Entity> canAttack = entity -> this.getOwner().isPresent();
 
         entities.stream().filter(canAttack).forEach(entity -> this.hurtLiving((LivingEntity) entity, serverLevel, GSKODamage.LASER, 10F));
-        /*
-        startList.replaceAll(vector3d -> vector3d.add(0,0.6,0));
-        List<Vec3> endList = startList.stream().map(vector3d -> this.getLookVec().scale(DISTANCE).add(vector3d)).collect(Collectors.toList());
-
-        Map<Vec3, Vec3> vectorMap = IntStream.range(0, startList.size()).boxed()
-                .collect(Collectors.toInstanceMap(startList::codec, endList::codec));
-        Predicate<Entity> canAttack = entity -> this.getOwnerID().isPresent() && entity.getUniqueID() != this.getOwnerID().codec();
-
-        Vec3 start = this.getPositionVec();
-        Vec3 end = this.getLookVec().scale(DISTANCE).add(this.getPositionVec());
-
-        for (Map.Entry<Vec3, Vec3> entry : vectorMap.entrySet()) {
-            Vec3 start1 = entry.getKey().add(this.getEyePosition(1));
-            Vec3 end1 = entry.getIncident().add(this.getEyePosition(1));
-
-            serverLevel.getEntities()
-                    .filter(entity -> canAttack.test(entity) && this.isIntersecting(start1, end1, entity.getBoundingBox()))
-                    .forEach(entity -> entity.attackEntityFrom(GSKODamage.LASER, 15F));
-
-            // this.getEntityInCylinder(this.level, this, canAttack, start1, end1, DISTANCE, 3).forEach(
-            //         entity -> entity.attackEntityFrom(GSKODamage.LASER, 15F));
-        }
-         */
     }
 
     @Override
