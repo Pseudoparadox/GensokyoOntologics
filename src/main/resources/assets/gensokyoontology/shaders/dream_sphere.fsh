@@ -156,10 +156,10 @@ void main() {
     combinedPattern = clamp(combinedPattern, 0.0, 1.0);
 
     // 颜色计算
-    vec3 baseColor = spherColor.xyz * combinedPattern;
+    vec3 baseColor = sphereColor.xyz * combinedPattern;
 
     // 菲涅尔辉光叠加
-    vec3 glowColor = spherColor.xyz * fresnelFactor * 0.8;
+    vec3 glowColor = sphereColor.xyz * fresnelFactor * 0.8;
     vec3 finalColor = baseColor + glowColor;
 
     // 动态透明度：中心较透明，边缘较不透明
@@ -171,7 +171,7 @@ void main() {
     finalColor *= pulse;
 
     if (density == 0.0F) {
-        fragColor = vec4(spherColor.xyz, 0.76F);
+        fragColor = vec4(sphereColor.xyz, 0.76F);
     } else {
         fragColor = vec4(finalColor, alpha);
     }

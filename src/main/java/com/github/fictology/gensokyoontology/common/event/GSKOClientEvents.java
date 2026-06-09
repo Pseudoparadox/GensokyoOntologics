@@ -2,21 +2,42 @@ package com.github.fictology.gensokyoontology.common.event;
 
 import com.github.fictology.gensokyoontology.GensokyoOntology;
 import com.github.fictology.gensokyoontology.client.renderer.NormalVectorRenderer;
+import com.github.fictology.gensokyoontology.client.renderer.vfx.MasterSparkRenderer;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
+import com.github.fictology.gensokyoontology.registry.PipelineRegistry;
+import com.github.fictology.gensokyoontology.registry.RenderRegistry;
+import com.github.fictology.gensokyoontology.util.GSKOUtil;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.shaders.UniformType;
+import com.mojang.blaze3d.textures.TextureFormat;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormatElement;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterEntitySpectatorShadersEvent;
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import org.lwjgl.glfw.GLFW;
 
 @EventBusSubscriber(modid = GensokyoOntology.MODID, value = Dist.CLIENT)
 public class GSKOClientEvents {
 
+
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(EntityRegistry.DANMAKU.get(), NormalVectorRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.MASTER_SPARK_ENTITY.get(), ctx ->
+                new MasterSparkRenderer(ctx, RenderRegistry.MASTER_SPARK));
+    }
+
+    @SubscribeEvent
+    public static void registerPipelines(RegisterRenderPipelinesEvent event){
+        event.registerPipeline(PipelineRegistry.OBJ);
+
     }
 
     /**

@@ -19,7 +19,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
-public class EntityRegistry {
+public final class EntityRegistry {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, GensokyoOntology.MODID);
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.createEntities(GensokyoOntology.MODID);
 

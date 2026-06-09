@@ -14,6 +14,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -58,13 +60,17 @@ public class DreamSealEntity extends Danmaku implements IRayTraceReader, IDamage
     // /tp -19 70.0 -164
     @Override
     public void tick() {
-        super.tick();
+
         if (tickCount % 3 == 0) return;
         if (this.getOwner() != null && this.getTarget() != null) {
             Vec3 aimedVec = this.getAimedVec((LivingEntity) this.getOwner(), this.getTarget());
             float offset = 0.3f / this.getTarget().getEyeHeight();
             this.shoot(aimedVec.x, aimedVec.y - offset, aimedVec.z, 1.6f, 0f);
         }
+//        if (this.onGround()){
+//            ProjectileDeflection.REVERSE.deflect(this, this.getOwner(), this.random);
+//        }
+        super.tick();
     }
 
     private Entity getTarget() {
