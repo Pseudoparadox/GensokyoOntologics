@@ -2,13 +2,11 @@ package com.github.fictology.gensokyoontology.common.entiy.misc;
 
 import com.github.fictology.gensokyoontology.common.entiy.AffiliatedEntity;
 import com.github.fictology.gensokyoontology.registry.DataRegistry;
-import com.llamalad7.mixinextras.lib.antlr.runtime.misc.Utils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Util;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
@@ -31,6 +29,7 @@ public class DreamSphere extends AffiliatedEntity {
     public DreamSphere(EntityType<?> entityTypeIn, Level worldIn) {
         super(entityTypeIn, worldIn);
         this.setData(DataRegistry.NBT_DATA, new CompoundTag());
+        this.putIntTag(this, DataRegistry.NBT_DATA.get(), "size", 1);
     }
 
     @Override
@@ -42,12 +41,12 @@ public class DreamSphere extends AffiliatedEntity {
     @Override
     protected void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
-        compound.putInt("index", this.getIntData(this.entityData, DATA_INDEX));
+        this.addToSyncData("index", compound, this.entityData, DATA_INDEX);
     }
 
     @Override
     protected void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setIntData(this.entityData, DATA_INDEX, compound.getIntOr("index", 0));
+        this.setFromSyncData("index", compound, this.entityData, DATA_INDEX);
     }
 }

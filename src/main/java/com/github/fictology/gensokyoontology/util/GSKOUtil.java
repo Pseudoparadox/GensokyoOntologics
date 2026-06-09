@@ -11,6 +11,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +31,7 @@ public final class GSKOUtil {
     public static void showMsg(Player p, Object msg, boolean actionBar) {
         p.sendSystemMessage(Component.literal(msg.toString()));
     }
+
 
     public static void showMsg(Player p, String prefix, String suffix, boolean actionBar) {
         p.sendSystemMessage(Component.translatable(affixKey(prefix, suffix).toLanguageKey()));

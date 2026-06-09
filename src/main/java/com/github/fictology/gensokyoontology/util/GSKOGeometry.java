@@ -12,7 +12,7 @@ import java.util.List;
 public final class GSKOGeometry {
     public static void renderSphere(VertexConsumer builder, Matrix4f matrix4f, int latitudeBands, int longitudeBands, float radius,
                                     Vector4i vertColor) {
-        var sphere = SphereMesh.create(latitudeBands, longitudeBands, radius);
+        var sphere = sphereMesh(latitudeBands, longitudeBands, radius);
 
         for (int i = 0; i < sphere.indices.size(); i += 3) {
             int i1 = sphere.indices.get(i);
@@ -25,6 +25,61 @@ public final class GSKOGeometry {
                     sphere.vertices.get(i3), sphere.normals.get(i3), sphere.uvs.get(i3),
                     vertColor);
         }
+    }
+
+    public static SphereMesh sphereMesh(int latitudeBands, int longitudeBands, float radius) {
+        List<Vector3f> vertices = new ArrayList<>();
+        List<Vector3f> normals = new ArrayList<>();
+        List<Vector2f> uvs = new ArrayList<>();
+        List<Integer> indices = new ArrayList<>();
+
+        for (int latNumber = 0; latNumber <= latitudeBands; latNumber++) {
+            float theta = (float) (latNumber * Math.PI / latitudeBands);
+            float sinTheta = (float) Math.sin(theta);
+            float cosTheta = (float) Math.cos(theta);
+
+            for (int longNumber = 0; longNumber <= longitudeBands; longNumber++) {
+                float phi = (float) (longNumber * 2 * Math.PI / longitudeBands);
+                float sinPhi = (float) Math.sin(phi);
+                float cosPhi = (float) Math.cos(phi);
+
+                // 球面坐标转笛卡尔坐标
+                float x = cosPhi * sinTheta;
+                float y = cosTheta;
+                float z = sinPhi * sinTheta;
+
+                // 顶点位置
+                vertices.add(new Vector3f(radius * x, radius * y, radius * z));
+
+                // 法线（单位向量）
+                normals.add(new Vector3f(x, y, z).normalize());
+
+                // 墨卡托投影UV
+                float u = phi / (2 * (float) Math.PI);
+                float v = (float) latNumber / latitudeBands;
+                uvs.add(new Vector2f(u, v));
+            }
+        }
+
+        // 生成索引
+        for (int latNumber = 0; latNumber < latitudeBands; latNumber++) {
+            for (int longNumber = 0; longNumber < longitudeBands; longNumber++) {
+                int first = (latNumber * (longitudeBands + 1)) + longNumber;
+                int second = first + longitudeBands + 1;
+
+                // 第一个三角形
+                indices.add(first);
+                indices.add(second);
+                indices.add(first + 1);
+
+                // 第二个三角形
+                indices.add(second);
+                indices.add(second + 1);
+                indices.add(first + 1);
+            }
+        }
+
+        return new SphereMesh(vertices, normals, uvs, indices);
     }
 
     private static void renderTriangle(Matrix4f matrix, VertexConsumer vertexBuilder, float[] v1, float[] v2, float[] v3,
@@ -69,7 +124,7 @@ public final class GSKOGeometry {
                 .setUv(uv.x, uv.y);
     }
 
-    public static class SphereMesh {
+    private static class SphereMesh {
         final List<Vector3f> vertices;
         final List<Vector3f> normals;
         final List<Vector2f> uvs;
@@ -81,60 +136,6 @@ public final class GSKOGeometry {
             this.normals = normals;
             this.uvs = uvs;
             this.indices = indices;
-        }
-        public static SphereMesh create(int latitudeBands, int longitudeBands, float radius) {
-            List<Vector3f> vertices = new ArrayList<>();
-            List<Vector3f> normals = new ArrayList<>();
-            List<Vector2f> uvs = new ArrayList<>();
-            List<Integer> indices = new ArrayList<>();
-
-            for (int latNumber = 0; latNumber <= latitudeBands; latNumber++) {
-                float theta = (float) (latNumber * Math.PI / latitudeBands);
-                float sinTheta = (float) Math.sin(theta);
-                float cosTheta = (float) Math.cos(theta);
-
-                for (int longNumber = 0; longNumber <= longitudeBands; longNumber++) {
-                    float phi = (float) (longNumber * 2 * Math.PI / longitudeBands);
-                    float sinPhi = (float) Math.sin(phi);
-                    float cosPhi = (float) Math.cos(phi);
-
-                    // 球面坐标转笛卡尔坐标
-                    float x = cosPhi * sinTheta;
-                    float y = cosTheta;
-                    float z = sinPhi * sinTheta;
-
-                    // 顶点位置
-                    vertices.add(new Vector3f(radius * x, radius * y, radius * z));
-
-                    // 法线（单位向量）
-                    normals.add(new Vector3f(x, y, z).normalize());
-
-                    // 墨卡托投影UV
-                    float u = phi / (2 * (float) Math.PI);
-                    float v = (float) latNumber / latitudeBands;
-                    uvs.add(new Vector2f(u, v));
-                }
-            }
-
-            // 生成索引
-            for (int latNumber = 0; latNumber < latitudeBands; latNumber++) {
-                for (int longNumber = 0; longNumber < longitudeBands; longNumber++) {
-                    int first = (latNumber * (longitudeBands + 1)) + longNumber;
-                    int second = first + longitudeBands + 1;
-
-                    // 第一个三角形
-                    indices.add(first);
-                    indices.add(second);
-                    indices.add(first + 1);
-
-                    // 第二个三角形
-                    indices.add(second);
-                    indices.add(second + 1);
-                    indices.add(first + 1);
-                }
-            }
-
-            return new SphereMesh(vertices, normals, uvs, indices);
         }
     }
 }
