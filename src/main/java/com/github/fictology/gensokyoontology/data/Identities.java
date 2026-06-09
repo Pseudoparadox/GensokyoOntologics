@@ -1,7 +1,6 @@
 package com.github.fictology.gensokyoontology.data;
 
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
-import com.github.fictology.gensokyoontology.util.Incident;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

@@ -1,6 +1,6 @@
 package com.github.fictology.gensokyoontology.util;
 
-public class EnumUtil {
+public final class EnumUtil {
     public static <T extends Enum<T>> T switchEnum(Class<T> enumClass, T value) {
         var values = enumClass.getEnumConstants();
         var nextIndex = (value.ordinal() + 1) % values.length;

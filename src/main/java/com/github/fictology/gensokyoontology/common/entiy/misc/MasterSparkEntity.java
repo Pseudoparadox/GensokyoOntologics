@@ -10,6 +10,7 @@ import com.github.fictology.gensokyoontology.util.api.IRayTraceReader;
 import com.github.fictology.gensokyoontology.util.api.IResourceGetter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -64,5 +65,10 @@ public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceRead
     public void hurtLiving(LivingEntity hurtLiving, Level level, ResourceKey<DamageType> damageType, float amount) {
         if (level instanceof ServerLevel serverLevel)
             hurtLiving.hurtServer(serverLevel, createDamage(level, damageType), amount);
+    }
+
+    @Override
+    public Identifier getTexture() {
+        return null;
     }
 }

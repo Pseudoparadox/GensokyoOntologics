@@ -1,5 +1,6 @@
-package com.github.fictology.gensokyoontology.util;
+package com.github.fictology.gensokyoontology.data;
 
+import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import net.minecraft.util.StringRepresentable;
 import net.neoforged.fml.common.asm.enumextension.IExtensibleEnum;
 import net.neoforged.fml.common.asm.enumextension.NamedEnum;

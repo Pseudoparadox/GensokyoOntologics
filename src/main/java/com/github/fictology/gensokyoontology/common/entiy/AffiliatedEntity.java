@@ -1,7 +1,6 @@
 package com.github.fictology.gensokyoontology.common.entiy;
 
-import com.github.fictology.gensokyoontology.util.IDataSetterGetter;
-import net.minecraft.nbt.CompoundTag;
+import com.github.fictology.gensokyoontology.util.api.IDataSetterGetter;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;

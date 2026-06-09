@@ -1,6 +1,6 @@
 package com.github.fictology.gensokyoontology.util.api;
 
-import com.github.fictology.gensokyoontology.util.Incident;
+import com.github.fictology.gensokyoontology.data.Incident;
 import com.mojang.datafixers.util.Pair;
 
 public class NamedEntry<A, B> {

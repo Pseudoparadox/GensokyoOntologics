@@ -1,4 +1,4 @@
-package com.github.fictology.gensokyoontology.util;
+package com.github.fictology.gensokyoontology.util.api;
 
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;

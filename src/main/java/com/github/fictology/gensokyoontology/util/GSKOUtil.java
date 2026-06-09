@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 import java.util.Objects;
 
-public class GSKOUtil {
+public final class GSKOUtil {
     public static <T> ResourceKey<T> resource(ResourceKey<? extends Registry<T>> parent, String name) {
         return ResourceKey.create(parent, key(name));
     }
