@@ -12,10 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class GSKOMathUtil {
+public final class GSKOMathUtil {
 
-    private GSKOMathUtil() {
-    }
 
     /**
      * 数值周期约束算法，比一般的约束算法多了一个判断周期的条件。周期的判定如下：<br>

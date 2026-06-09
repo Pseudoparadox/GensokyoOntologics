@@ -17,6 +17,11 @@ const int RETURN_DISTANCE_SUB = 2;
 const int RETURN_DISTANCE_DIV = 3;
 const int RETURN_CELL_VALUE = 4;
 
+float fresnel(vec3 viewDir, vec3 normal, float power) {
+    float cosTheta = abs(dot(viewDir, normal));
+    return pow(1.0 - cosTheta, power);
+}
+
 // 快速 2D 哈希函数
 vec2 hash22(vec2 p) {
     vec3 p3 = fract(vec3(p.xyx) * vec3(0.1031, 0.1030, 0.0973));
@@ -154,9 +159,26 @@ vec3 generateColorStrip(vec2 uv){
 void main() {
     vec2 uv = vec2(texCoord0.x + offset.x, texCoord0.y + offset.y);
     float noise = cellular2DFBM(uv, RETURN_DISTANCE, density, 4, 2.0F, 2.0F);
-    vec3 color = generateColorStrip(uv);
-    fragColor = vec4(color.xyz * noise, 0.8F);
-    if(density == 0.0F) {
+
+    // 计算菲涅尔效应
+    vec3 viewDir = normalize(view);
+    vec3 norm = normalize(normal);
+    float fresnelFactor = fresnel(viewDir, norm, 3.0); // 3.0控制边缘锐度
+
+    // 基础颜色与噪声结合
+    vec3 baseColor = beamColor.xyz * noise;
+
+    // 菲涅尔辉光叠加（边缘更亮）
+    vec3 glowColor = beamColor.xyz * fresnelFactor * 0.8; // 0.8控制辉光强度
+    vec3 finalColor = baseColor + glowColor;
+
+    // 透明度处理：噪声+菲涅尔共同决定
+    float alpha = noise * (0.5 + fresnelFactor * 0.5); // 边缘更不透明
+    alpha = clamp(alpha, 0.0, 0.9); // 限制最大透明度
+
+    if (density == 0.0F) {
         fragColor = vec4(beamColor.xyz, 0.76F);
+    } else {
+        fragColor = vec4(finalColor, alpha);
     }
 }

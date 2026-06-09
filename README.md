@@ -1,26 +1,33 @@
+幻想存有论 Teacon 2026 主题：不华丽就不是幻想乡了！
+==========
+## 玩法
+选择不同的角色能力组，在核爆试验场地红魔馆（雾）中来打出最高的连段伤害吧！小心红魔馆里那些妖精的弹幕，不要在红魔馆里面乱逛，不然你可能会与一些人类友好度极低的妖怪碰面哦。
 
-Installation information
-=======
+## 生物
+- 妖精
+- 露米娅
+- 芙兰 (时间不够会砍掉)
+## 技术性实体
+- 弹幕
+- 激光
+- 极限火花
+- 八方龙杀阵
+- 二重结界（时间不够会砍掉）
+- 消弹结界（时间不够会砍掉）
+- 隙间（时间不够会砍掉）
+- 核爆蘑菇云（时间不够会砍掉）
+- 天狗神风（时间不够会砍掉）
+## 物品
+不同角色会给你发不同的道具物品，弄丢了记得去门口重新要回来。使用alt+滚轮切换技能
+- 博丽的御币
+- 八卦炉
+- 隙间物品（时间不够会砍掉）
+- 冈戈尼尔（时间不够会砍掉）
+- 扭曲的钟楼指针（时间不够会砍掉）
+## 世界生成
+- 红魔馆（时间不够会砍掉）
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
-
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
-
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
-
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
-
-技能
-===========
+## 技能
 - 梦想封印：发射独立的六颗光球追踪最近的敌人
 - 梦想天生：生成六个带有体术的环绕阴阳玉5s，如果六个阴阳玉在此期间全部都命中了则自人物中心处多次释放环状冲击波
 - 八方龙杀阵：在自身处释放一道巨型光柱造成巨量伤害
@@ -52,6 +59,12 @@ https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
 - 【红符】恶女置乱：蕾米高高跃起，向一个方向突进，对落点造成魔法伤害
 - 【命运】痛苦的宿命：蕾米生成锁链捆绑敌人，这个锁链会在结束时禁锢敌人并造成魔法伤害
 - 【神枪】冈戈尼尔：蕾米蓄力向一个方向投掷巨型冈戈尼尔之枪
+- 
+- 被动：捉迷藏啊捉迷藏，芙兰在敌人丢失视野的情况下发动的攻击和技能会100%暴击敌人
+- 禁忌【莱瓦汀】：芙兰将钟楼指针变成红色向目标劈砍，造成法强加成的法术爆发伤害
+- 禁弹【折反射】：芙兰向一个方向发射吸血鬼血弹，如果命中敌人则血弹迸裂成血雾对目标周围造成溅射伤害。
+- 秘弹【之后就一个人都没有了吗】：芙兰的移速提高100%并变为不可选中状态，恢复自身5%（法强加成）的生命值
+- 禁忌【四重存在】：芙兰像幻术师那样召唤出3个分身，自身生命值下降为原先的四分之一，并对指定的目标施加血魔法，如果在分身持续期间消灭了敌人，自身回复（技能释放时损失的生命值+自适应生命值）点生命值
 - 
 - 被动-通向无寿国的期票：幽幽子的技能会标记敌人，标记达到3层时引爆印记并造成伤害
 - 华胥的永眠：幽幽子释放一圈蝴蝶向周围扩散，造成魔法伤害和10%减速

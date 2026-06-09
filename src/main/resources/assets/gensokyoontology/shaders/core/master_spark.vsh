@@ -10,7 +10,6 @@ uniform mat4 ProjMat;
 uniform float CellDensity;
 uniform vec2 Offset;
 uniform vec2 Tilling;
-uniform vec4 BeamColor;
 
 out float density;
 out vec2 offset;

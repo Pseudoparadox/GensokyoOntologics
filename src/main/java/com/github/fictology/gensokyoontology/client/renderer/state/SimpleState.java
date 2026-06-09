@@ -1,4 +1,4 @@
-package com.github.fictology.gensokyoontology.client.renderer;
+package com.github.fictology.gensokyoontology.client.renderer.state;
 
 import com.github.fictology.gensokyoontology.util.api.IResourceGetter;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;

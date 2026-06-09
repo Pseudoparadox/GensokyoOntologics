@@ -1,5 +1,6 @@
 package com.github.fictology.gensokyoontology.client.renderer;
 
+import com.github.fictology.gensokyoontology.client.renderer.state.SimpleState;
 import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
