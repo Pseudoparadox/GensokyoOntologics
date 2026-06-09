@@ -1,6 +1,8 @@
 package com.github.fictology.gensokyoontology.client.renderer;
 
 import com.github.fictology.gensokyoontology.util.api.IResourceGetter;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -19,4 +21,8 @@ public abstract class ShaderedRenderer<E extends Entity, S extends EntityRenderS
         this.renderType = renderType;
     }
 
+    @Override
+    public void render(PoseStack.Pose pose, VertexConsumer vertexConsumer) {
+
+    }
 }

@@ -1,7 +1,9 @@
 package com.github.fictology.gensokyoontology.common.event;
 
 import com.github.fictology.gensokyoontology.GensokyoOntology;
+import com.github.fictology.gensokyoontology.client.renderer.EmptyRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.NormalVectorRenderer;
+import com.github.fictology.gensokyoontology.client.renderer.vfx.DreamSphereRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.MasterSparkRenderer;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.PipelineRegistry;
@@ -24,12 +26,16 @@ public class GSKOClientEvents {
         event.registerEntityRenderer(EntityRegistry.DANMAKU.get(), NormalVectorRenderer::new);
         event.registerEntityRenderer(EntityRegistry.MASTER_SPARK_ENTITY.get(), ctx ->
                 new MasterSparkRenderer(ctx, RenderTypeRegistry.MASTER_SPARK));
+
+        event.registerEntityRenderer(EntityRegistry.DREAM_SEAL.get(), EmptyRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.DREAM_SPHERE.get(), ctx ->
+                new DreamSphereRenderer(ctx, RenderTypeRegistry.DREAM_SPHERE));
     }
 
     @SubscribeEvent
     public static void registerPipelines(RegisterRenderPipelinesEvent event){
-        event.registerPipeline(PipelineRegistry.OBJ);
-
+        event.registerPipeline(PipelineRegistry.MASTER_SPARK);
+        event.registerPipeline(PipelineRegistry.DREAM_SPHERE);
     }
 
     /**

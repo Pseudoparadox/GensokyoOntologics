@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.entity.Entity;
 
 public class EmptyRenderer<E extends Entity & IResourceGetter> extends EntityRenderer<E, SimpleState<E>> {
-    protected EmptyRenderer(EntityRendererProvider.Context context) {
+    public EmptyRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
 

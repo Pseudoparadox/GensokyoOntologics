@@ -15,7 +15,7 @@ import org.joml.Vector4i;
 
 public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphereState> {
 
-    protected DreamSphereRenderer(EntityRendererProvider.Context context, RenderType renderType) {
+    public DreamSphereRenderer(EntityRendererProvider.Context context, RenderType renderType) {
         super(context, renderType);
     }
 
@@ -30,6 +30,7 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
         state.latitudes = 16;
         state.longitudes = 16;
         state.size = (float) entity.getBoundingBox().getSize();
+        state.mainColor = DreamSphere.INDEX_2_COLOR.get(entity.getIntSyncData(entity.getEntityData(), DreamSphere.DATA_INDEX));
     }
 
     @Override
@@ -44,8 +45,4 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
                 new Vector4i(1,1,1,1));
     }
 
-    @Override
-    public void render(PoseStack.Pose pose, VertexConsumer vertexConsumer) {
-
-    }
 }

@@ -36,6 +36,8 @@ public final class EntityRegistry {
             MasterSparkEntity::new, MobCategory.MISC, 3.5f, 3.5f);
     public static final Supplier<EntityType<DreamSealEntity>> DREAM_SEAL = register("dream_seal",
             DreamSealEntity::new, MobCategory.MISC, 1f, 1f);
+    public static final Supplier<EntityType<DreamSphere>> DREAM_SPHERE = register("dream_sphere",
+            DreamSphere::new, MobCategory.MISC, 1f, 1f);
     public static final Supplier<EntityType<FairyEntity>> FAIRY_ENTITY = register(
             "fairy", FairyEntity::new, MobCategory.MONSTER, 0.54f, 1.5f);
     public static final Supplier<EntityType<TsumiBukuroEntity>> TSUMI_BUKURO_ENTITY = register(
