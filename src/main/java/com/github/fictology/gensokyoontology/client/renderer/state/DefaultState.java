@@ -1,4 +1,4 @@
-package com.github.fictology.gensokyoontology.client.model.state;
+package com.github.fictology.gensokyoontology.client.renderer.state;
 
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 

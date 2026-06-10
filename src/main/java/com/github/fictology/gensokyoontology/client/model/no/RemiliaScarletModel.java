@@ -1,4 +1,4 @@
-package com.github.fictology.gensokyoontology.client.model;
+package com.github.fictology.gensokyoontology.client.model.no;
 /*
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;

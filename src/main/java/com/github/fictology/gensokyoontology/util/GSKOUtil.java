@@ -18,6 +18,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector4f;
 import org.joml.Vector4i;
 
 import java.util.Map;
@@ -26,6 +27,10 @@ import java.util.Objects;
 public final class GSKOUtil {
     public static <T> ResourceKey<T> resource(ResourceKey<? extends Registry<T>> parent, String name) {
         return ResourceKey.create(parent, key(name));
+    }
+
+    public static Vector4f wrapColor(Vector4i color4i){
+        return new Vector4f(color4i.x / 255F, color4i.y / 255F, color4i.z / 255F, color4i.w / 255F);
     }
 
     public static void setUniformVec4i(MappableRingBuffer buffer, Vector4i v4i){

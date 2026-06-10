@@ -4,7 +4,7 @@ package com.github.fictology.gensokyoontology.client.model;
 // Paste this class into your mod and generate all required imports
 
 
-import com.github.fictology.gensokyoontology.client.model.state.FairyRenderState;
+import com.github.fictology.gensokyoontology.client.renderer.state.FairyRenderState;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import net.minecraft.client.animation.AnimationChannel;
 import net.minecraft.client.animation.AnimationDefinition;
@@ -18,7 +18,6 @@ import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
-import net.minecraft.world.entity.AnimationState;
 
 public class FairyModel extends HumanoidModel<FairyRenderState> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(GSKOUtil.key("fairy_layer"), "main");

@@ -1,4 +1,4 @@
-package com.github.fictology.gensokyoontology.client.model;
+package com.github.fictology.gensokyoontology.client.model.no;
 /*
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;

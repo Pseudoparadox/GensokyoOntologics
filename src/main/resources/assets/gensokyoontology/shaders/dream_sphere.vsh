@@ -6,7 +6,6 @@ uniform mat4 ProjMat;
 layout(std140) uniform SphereData {
   vec4  Color;       // rgb, a
   vec3  Center;      // world-space center of this shell
-  float Time;
   vec2  Tilling;
   vec2  Offset;
   float CellDensity;
@@ -19,7 +18,6 @@ layout(location = 2) in vec3 Normal;
 
 out vec3 vWorldPos;
 out vec3 vNormal;
-out float vTime;
 out vec2 vUV;
 
 void main() {
@@ -32,7 +30,6 @@ void main() {
 
   vWorldPos = worldPos;
   vNormal   = Normal;
-  vTime     = Time;
   // UV from sphere-normal（无 UV 的 OBJ 也适用）
   vec3 n = normalize(Normal);
   float u = atan(n.z, n.x) * 0.15915494309189535 + 0.5;

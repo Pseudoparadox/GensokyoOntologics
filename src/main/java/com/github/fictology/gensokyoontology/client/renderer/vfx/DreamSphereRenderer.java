@@ -1,38 +1,22 @@
 package com.github.fictology.gensokyoontology.client.renderer.vfx;
 
 import com.github.fictology.gensokyoontology.client.renderer.ShaderedRenderer;
+import com.github.fictology.gensokyoontology.client.renderer.queue.DreamSphereQueue;
 import com.github.fictology.gensokyoontology.client.renderer.state.MagicSphereState;
 import com.github.fictology.gensokyoontology.common.entiy.misc.DreamSphere;
-import com.github.fictology.gensokyoontology.registry.PipelineRegistry;
+import com.github.fictology.gensokyoontology.common.event.RenderingEvents;
 import com.github.fictology.gensokyoontology.registry.RenderTypeRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOGeometry;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.Std140Builder;
-import com.mojang.blaze3d.buffers.Std140SizeCalculator;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MappableRingBuffer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import org.joml.Vector4i;
-
-import java.util.OptionalInt;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Vector2f;
 
 public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphereState> {
-
-    private final MappableRingBuffer ubo = new MappableRingBuffer(
-            () -> "SphereData",
-            GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_MAP_WRITE,
-            new Std140SizeCalculator()
-                    .putVec4()
-                    .putVec2()
-                    .putVec2()
-                    .putFloat().get());
 
     public DreamSphereRenderer(EntityRendererProvider.Context context, RenderType renderType) {
         super(context, renderType);
@@ -46,6 +30,7 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
     @Override
     public void extractRenderState(DreamSphere entity, MagicSphereState state, float partialTicks) {
         super.extractRenderState(entity, state, partialTicks);
+        state.entity = entity;
         state.latitudes = 16;
         state.longitudes = 16;
         state.size = (float) entity.getBoundingBox().getSize();
@@ -56,6 +41,19 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
     @Override
     public void submit(MagicSphereState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         super.submit(state, poseStack, submitNodeCollector, camera);
+        var entry = new DreamSphereQueue.Entry();
+        var mesh = GSKOGeometry.sphereMesh(18, 18, 2);
+
+        entry.sphereColor = GSKOUtil.wrapColor(state.mainColor);
+        entry.worldPos = new Vec3(state.x, state.y, state.z);
+        entry.offset.x = state.partialTick + state.entity.tickCount;
+        entry.tilling = new Vector2f(1F, 1F);
+
+        entry.buffer = mesh.toByteBuffer();
+        entry.vertexCount = mesh.vertexCount();
+
+        var queue = RenderingEvents.getRenderingQueue(RenderTypeRegistry.DREAM_SPHERE);
+        queue.add(entry);
     }
 
 }
