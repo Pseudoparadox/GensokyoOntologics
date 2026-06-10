@@ -3,9 +3,8 @@ package com.github.fictology.gensokyoontology.common.event;
 import com.github.fictology.gensokyoontology.GensokyoOntology;
 import com.github.fictology.gensokyoontology.client.renderer.EmptyRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.NormalVectorRenderer;
-import com.github.fictology.gensokyoontology.client.renderer.state.DreamSphereQueue;
-import com.github.fictology.gensokyoontology.client.renderer.state.RenderingQueue;
 import com.github.fictology.gensokyoontology.client.renderer.state.MagicSphereState;
+import com.github.fictology.gensokyoontology.client.renderer.state.RenderingQueue;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.DreamSphereRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.MasterSparkRenderer;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
@@ -27,7 +26,10 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
 
 @EventBusSubscriber(modid = GensokyoOntology.MODID, value = Dist.CLIENT)
 public class RenderingEvents {
@@ -46,13 +48,14 @@ public class RenderingEvents {
 
     // 不能直接将泛型通配符作为map的键或者值，但是可以作为键值自身的通配符类型
     private static final Map<Identifier, RenderingQueue> RENDERING_QUEUES = new HashMap<>();
+    private static final Map<Identifier, MappableRingBuffer> BUFFER_MAP = new HashMap<>();
     static {
-        registerRenderingQueue(PipelineRegistry.DREAM_SPHERE.getLocation(), new DreamSphereQueue());
+        registerRenderingPass(PipelineRegistry.DREAM_SPHERE.getLocation(), new MagicSphereState.Queue(), SPHERE_BUFFER);
     }
 
-
-    public static <Q extends RenderingQueue> void registerRenderingQueue(Identifier id, Q queue){
+    public static <Q extends RenderingQueue> void registerRenderingPass(Identifier id, Q queue, MappableRingBuffer buffer){
         RENDERING_QUEUES.put(id, queue);
+        BUFFER_MAP.put(id, buffer);
     }
 
     public static RenderingQueue getRenderingQueue(RenderType renderType){
@@ -79,21 +82,22 @@ public class RenderingEvents {
     @SubscribeEvent
     public static void onCreateRenderPass(RenderLevelStageEvent event){
         if (!(event instanceof RenderLevelStageEvent.AfterTranslucentParticles)) return;
-        RENDERING_QUEUES.values().forEach(queue -> {
-            var entries = queue.takeSnapshot();
+        RENDERING_QUEUES.forEach((key, value) -> {
+            var entries = value.takeSnapshot();
             var renderTarget = Minecraft.getInstance().getMainRenderTarget();
             if (entries.isEmpty()) return;
-            try(var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                    () -> "Dream Sphere VFX",
+            try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+                    key::toString,
                     renderTarget.getColorTextureView(),
                     OptionalInt.empty(),
                     renderTarget.getDepthTextureView(),
-                    OptionalDouble.empty())){
+                    OptionalDouble.empty())) {
+
                 pass.setPipeline(PipelineRegistry.DREAM_SPHERE);
                 RenderSystem.bindDefaultUniforms(pass);
-                for (var e : entries){
-                    SPHERE_BUFFER.rotate();
-                    pass.setUniform("SphereData", SPHERE_BUFFER.currentBuffer());
+                for (var e : entries) {
+                    BUFFER_MAP.get(key).rotate();
+                    pass.setUniform(e.uniformName(), SPHERE_BUFFER.currentBuffer());
                     pass.setVertexBuffer(0, e.getVBO("Sphere Geometry"));
                     pass.draw(0, e.getVertexCount());
                 }

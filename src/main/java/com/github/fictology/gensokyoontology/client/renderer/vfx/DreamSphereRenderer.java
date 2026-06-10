@@ -1,7 +1,7 @@
 package com.github.fictology.gensokyoontology.client.renderer.vfx;
 
 import com.github.fictology.gensokyoontology.client.renderer.ShaderedRenderer;
-import com.github.fictology.gensokyoontology.client.renderer.state.DreamSphereQueue;
+import com.github.fictology.gensokyoontology.client.renderer.state.DreamSphereEntry;
 import com.github.fictology.gensokyoontology.client.renderer.state.MagicSphereState;
 import com.github.fictology.gensokyoontology.common.entiy.misc.DreamSphere;
 import com.github.fictology.gensokyoontology.common.event.RenderingEvents;
@@ -42,8 +42,9 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
     public void submit(MagicSphereState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         super.submit(state, poseStack, submitNodeCollector, camera);
 
-        var entry = new DreamSphereQueue.Entry();
+        var entry = new DreamSphereEntry();
         var mesh = GSKOGeometry.sphereMesh(18, 18, 2);
+        var queue = RenderingEvents.getRenderingQueue(RenderTypeRegistry.DREAM_SPHERE);
 
         entry.sphereColor = GSKOUtil.wrapColor(state.mainColor);
         entry.worldPos = new Vec3(state.x, state.y, state.z);
@@ -53,7 +54,6 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
         entry.buffer = mesh.toByteBuffer();
         entry.vertexCount = mesh.vertexCount();
 
-        var queue = RenderingEvents.getRenderingQueue(RenderTypeRegistry.DREAM_SPHERE);
         queue.add(entry);
     }
 

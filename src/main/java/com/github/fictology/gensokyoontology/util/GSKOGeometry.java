@@ -1,5 +1,7 @@
 package com.github.fictology.gensokyoontology.util;
 
+import com.github.fictology.gensokyoontology.client.renderer.state.IRenderingEntry;
+import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -187,5 +189,6 @@ public final class GSKOGeometry {
         public int vertexCount() { return indices.size(); }
         public int stridePosNorm()    { return 24; }
         public int stridePosNormUv() { return 32; }
+
     }
 }

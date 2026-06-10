@@ -1,14 +1,16 @@
 package com.github.fictology.gensokyoontology.client.renderer.state;
 
+import com.mojang.blaze3d.systems.RenderPass;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RenderingQueue {
+public class RenderingQueue {
     // 我们用两个缓冲：building（本帧 submit 在填）和 snapshot（AfterLevel 在消费）
     private final List<IRenderingEntry> building = new ArrayList<>();
+
     private @Nullable List<IRenderingEntry> snapshot = null;
     /** 由 EntityRenderer.submit() 调用（仍在渲染线程，但算"submission phase"） */
     public void add(IRenderingEntry e) {
