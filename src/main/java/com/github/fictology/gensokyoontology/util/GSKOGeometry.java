@@ -6,6 +6,8 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4i;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,18 +126,66 @@ public final class GSKOGeometry {
                 .setUv(uv.x, uv.y);
     }
 
-    private static class SphereMesh {
-        final List<Vector3f> vertices;
-        final List<Vector3f> normals;
-        final List<Vector2f> uvs;
-        final List<Integer> indices;
+    public static class SphereMesh {
+        public final List<Vector3f> vertices;
+        public final List<Vector3f> normals;
+        public final List<Vector2f> uvs;
+        public final List<Integer> indices; // 已经是“flat index refs”（非索引draw时可当 vertexCount）
 
         SphereMesh(List<Vector3f> vertices, List<Vector3f> normals,
                    List<Vector2f> uvs, List<Integer> indices) {
             this.vertices = vertices;
-            this.normals = normals;
-            this.uvs = uvs;
-            this.indices = indices;
+            this.normals  = normals;
+            this.uvs      = uvs;
+            this.indices  = indices;
         }
+
+        // =========================================================
+        // ① POSITION_NORMAL = 24B/vert  (no UV attribute)
+        // stride = 24, layout: P@0(3f) N@12(3f)
+        // vertexCount = indices.size()  （你的 indices 已经是 per-vertex-ref 列表）
+        // =========================================================
+        public ByteBuffer toByteBufferNoUV() {
+            int stride = 24; // 6 floats * 4
+            var bb = ByteBuffer.allocateDirect(indices.size() * stride)
+                    .order(ByteOrder.nativeOrder());
+
+            for (int idx : indices) {
+                Vector3f p = vertices.get(idx);
+                Vector3f n = normals.get(idx);
+                bb.putFloat(p.x); bb.putFloat(p.y); bb.putFloat(p.z);
+                bb.putFloat(n.x); bb.putFloat(n.y); bb.putFloat(n.z);
+            }
+            bb.rewind();
+            return bb;
+        }
+
+        // =========================================================
+        // ② POSITION_NORMAL_UV = 32B/vert  (P@0 N@12 UV@24)
+        // 用墨卡托 UV（或你其它算法）填 UV slot
+        // stride = 32, layout: P@0(3f) N@12(3f) UV@24(2f)
+        // =========================================================
+        public ByteBuffer toByteBuffer() {
+            int stride = 32; // 8 floats * 4
+            if (uvs.isEmpty())
+                throw new IllegalStateException("SphereMesh.uvs is empty — use toBytesNoUV() instead.");
+            var bb = ByteBuffer.allocateDirect(indices.size() * stride)
+                    .order(ByteOrder.nativeOrder());
+
+            for (int idx : indices) {
+                Vector3f p = vertices.get(idx);
+                Vector2f t = uvs.get(idx);
+                Vector3f n = normals.get(idx);
+                bb.putFloat(p.x); bb.putFloat(p.y); bb.putFloat(p.z);
+                bb.putFloat(t.x); bb.putFloat(t.y);
+                bb.putFloat(n.x); bb.putFloat(n.y); bb.putFloat(n.z);
+            }
+            bb.rewind();
+            return bb;
+        }
+
+        public int vertexCount() { return indices.size(); }
+        public int stridePosNorm()    { return 24; }
+        public int stridePosNormUv() { return 32; }
     }
 }

@@ -1,8 +1,11 @@
 package com.github.fictology.gensokyoontology.util;
 
 import com.github.fictology.gensokyoontology.GensokyoOntology;
+import com.mojang.blaze3d.buffers.Std140Builder;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.client.renderer.MappableRingBuffer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -15,6 +18,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector4i;
 
 import java.util.Map;
 import java.util.Objects;
@@ -22,6 +26,14 @@ import java.util.Objects;
 public final class GSKOUtil {
     public static <T> ResourceKey<T> resource(ResourceKey<? extends Registry<T>> parent, String name) {
         return ResourceKey.create(parent, key(name));
+    }
+
+    public static void setUniformVec4i(MappableRingBuffer buffer, Vector4i v4i){
+        buffer.rotate();
+        try (var view = RenderSystem.getDevice().createCommandEncoder().mapBuffer(buffer.currentBuffer(), false, true)){
+            Std140Builder.intoBuffer(view.data())
+                    .putVec4(v4i.x, v4i.y, v4i.z, v4i.w);
+        }
     }
 
     public static void showMsg(Player p, String msg, boolean actionBar) {

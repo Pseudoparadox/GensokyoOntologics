@@ -11,6 +11,8 @@ import org.joml.Vector3f;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -92,6 +94,44 @@ public class ObjMesh implements SubmitNodeCollector.CustomGeometryRenderer {
         }
 
         return mesh;
+    }
+
+    public ByteBuffer toByteBufferPosNormTex() {
+        final int FLOATS_PER_VERT = 8; // 3+3+2
+        final int STRIDE = FLOATS_PER_VERT * 4; // 32
+        var bb = ByteBuffer.allocateDirect(trises.size() * 3 * STRIDE)
+                .order(ByteOrder.nativeOrder());
+
+        for (Triangle tri : trises) {
+            for (int i = 0; i < 3; i++) {
+                Vector3f p = tri.v[i];
+                Vector3f n = tri.n;          // 你加载时已经算好了面法线
+                Vector2f u = tri.t[i];
+
+                // P
+                bb.putFloat(p.x);
+                bb.putFloat(p.y);
+                bb.putFloat(p.z);
+                // UV
+                bb.putFloat(u.x);
+                bb.putFloat(u.y);
+                // N
+                bb.putFloat(n.x);
+                bb.putFloat(n.y);
+                bb.putFloat(n.z);
+
+            }
+        }
+        bb.rewind();
+        return bb;
+    }
+
+    public int vertexCount() {
+        return trises.size() * 3;
+    }
+
+    public int stride() {
+        return 32;
     }
 
     // ============================================================

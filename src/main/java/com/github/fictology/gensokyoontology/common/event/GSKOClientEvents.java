@@ -14,6 +14,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import org.lwjgl.glfw.GLFW;
 
@@ -37,6 +38,7 @@ public class GSKOClientEvents {
         event.registerPipeline(PipelineRegistry.MASTER_SPARK);
         event.registerPipeline(PipelineRegistry.DREAM_SPHERE);
     }
+
 
     /**
      * key code请查看GLFW类，key code 从 GLFW_KEY_0 开始

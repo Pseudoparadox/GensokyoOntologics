@@ -1,37 +1,42 @@
-#version 150
-
-in vec3 Position;
-in vec2 UV0;
-in vec3 Normal;
+#version 150 core
 
 uniform mat4 ModelViewMat;
 uniform mat4 ProjMat;
 
-uniform float CellDensity;
-uniform vec2 Offset;
-uniform vec2 Tilling;
-uniform vec4 SphereColor;
+layout(std140) uniform SphereData {
+  vec4  Color;       // rgb, a
+  vec3  Center;      // world-space center of this shell
+  float Time;
+  vec2  Tilling;
+  vec2  Offset;
+  float CellDensity;
+  float Radius;
+};
 
-out float density;
-out vec2 offset;
-out vec2 tilling;
-out vec4 sphereColor;
+layout(location = 0) in vec3 Position; // unit-sphere OR obj-vertex in LOCAL space
+layout(location = 1) in vec2 UV0;
+layout(location = 2) in vec3 Normal;
 
-out vec3 view;
-out vec3 normal;
-out vec2 texCoord0;
+out vec3 vWorldPos;
+out vec3 vNormal;
+out float vTime;
+out vec2 vUV;
 
 void main() {
+  // Position 是 local → 变世界坐标
+  vec3 worldPos = Center + Position * Radius;
 
-  vec3 pos = Position;
+  gl_Position = ProjMat * ModelViewMat * vec4(worldPos, 1.0);
+  // 对 glow/additive shell：轻微 bias 远离表面防 z-fight
+  gl_Position.z -= 0.00006 * gl_Position.w;
 
-  gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
-  gl_Position.z = gl_Position.z * 0.999;  // 轻微偏移，避免深度冲突
-
-  normal = Normal;
-  offset = Offset;
-  density = CellDensity;
-  tilling = Tilling;
-  sphereColor = SphereColor;
-  texCoord0 = UV0;
+  vWorldPos = worldPos;
+  vNormal   = Normal;
+  vTime     = Time;
+  // UV from sphere-normal（无 UV 的 OBJ 也适用）
+  vec3 n = normalize(Normal);
+  float u = atan(n.z, n.x) * 0.15915494309189535 + 0.5;
+  float v = acos(clamp(n.y,-1.0,1.0)) * 0.3183098861837907;
+  vUV = fract((u * Tilling.x + Offset.x) * 1.0) * 1.0;
+  vUV.y = fract((v * Tilling.y + Offset.y) * 1.0);
 }

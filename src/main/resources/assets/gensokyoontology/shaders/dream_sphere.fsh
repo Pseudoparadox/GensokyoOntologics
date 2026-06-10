@@ -1,4 +1,4 @@
-#version 150
+#version 150 core
 
 in float density;
 in vec2 offset;
