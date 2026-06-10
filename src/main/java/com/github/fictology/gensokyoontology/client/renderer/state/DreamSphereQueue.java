@@ -1,5 +1,9 @@
-package com.github.fictology.gensokyoontology.client.renderer.queue;
+package com.github.fictology.gensokyoontology.client.renderer.state;
 
+import com.github.fictology.gensokyoontology.common.event.RenderingEvents;
+import com.github.fictology.gensokyoontology.registry.RenderTypeRegistry;
+import com.github.fictology.gensokyoontology.util.GSKOGeometry;
+import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.world.phys.Vec3;
@@ -8,10 +12,7 @@ import org.joml.Vector4f;
 
 import java.nio.ByteBuffer;
 
-/** 一个非常轻量的、渲染线程内的收集容器。 */
-public class DreamSphereQueue extends RenderingQueue {
-
-
+public class DreamSphereQueue extends RenderingQueue{
     /** ── 每帧一条记录 ──────────────────────────────────────────
      * 模型视图 / proj 你需要在 mini-pass 里从别处拿
      * 这里只存 world-space 的定位数据

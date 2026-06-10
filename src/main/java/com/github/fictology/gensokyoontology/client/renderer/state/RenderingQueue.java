@@ -1,4 +1,6 @@
-package com.github.fictology.gensokyoontology.client.renderer.queue;
+package com.github.fictology.gensokyoontology.client.renderer.state;
+
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

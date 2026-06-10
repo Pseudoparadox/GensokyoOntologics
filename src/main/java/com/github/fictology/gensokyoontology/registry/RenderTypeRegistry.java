@@ -8,4 +8,5 @@ public final class RenderTypeRegistry {
             PipelineRegistry.MASTER_SPARK).createRenderSetup());
     public static final RenderType DREAM_SPHERE = RenderType.create("dream_sphere", RenderSetup.builder(
             PipelineRegistry.DREAM_SPHERE).createRenderSetup());
+
 }

@@ -1,15 +1,10 @@
 package com.github.fictology.gensokyoontology.registry;
 
-import com.github.fictology.gensokyoontology.client.renderer.queue.IRenderingEntry;
-import com.github.fictology.gensokyoontology.client.renderer.queue.RenderingQueue;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
-import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.shaders.UniformType;
-import com.mojang.blaze3d.textures.TextureFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
-import net.minecraft.resources.Identifier;
 
 public final class PipelineRegistry {
 

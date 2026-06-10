@@ -1,7 +1,7 @@
 package com.github.fictology.gensokyoontology.client.renderer.vfx;
 
 import com.github.fictology.gensokyoontology.client.renderer.ShaderedRenderer;
-import com.github.fictology.gensokyoontology.client.renderer.queue.DreamSphereQueue;
+import com.github.fictology.gensokyoontology.client.renderer.state.DreamSphereQueue;
 import com.github.fictology.gensokyoontology.client.renderer.state.MagicSphereState;
 import com.github.fictology.gensokyoontology.common.entiy.misc.DreamSphere;
 import com.github.fictology.gensokyoontology.common.event.RenderingEvents;
@@ -41,6 +41,7 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
     @Override
     public void submit(MagicSphereState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         super.submit(state, poseStack, submitNodeCollector, camera);
+
         var entry = new DreamSphereQueue.Entry();
         var mesh = GSKOGeometry.sphereMesh(18, 18, 2);
 
