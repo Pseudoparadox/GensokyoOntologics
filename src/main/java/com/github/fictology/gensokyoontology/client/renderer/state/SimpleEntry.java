@@ -1,8 +1,9 @@
 package com.github.fictology.gensokyoontology.client.renderer.state;
 
+import com.github.fictology.gensokyoontology.util.api.IRenderingEntry;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 
-public abstract class SimpleEntry implements IRenderingEntry{
+public abstract class SimpleEntry implements IRenderingEntry {
     @Override
     public GpuBuffer getVBO(String label) {
         return null;

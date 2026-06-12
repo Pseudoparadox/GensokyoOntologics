@@ -1,13 +1,12 @@
 package com.github.fictology.gensokyoontology.client.renderer.state;
 
-import com.mojang.blaze3d.systems.RenderPass;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import com.github.fictology.gensokyoontology.util.api.IRenderingEntry;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RenderingQueue {
+public class RenderingQueue{
     // 我们用两个缓冲：building（本帧 submit 在填）和 snapshot（AfterLevel 在消费）
     private final List<IRenderingEntry> building = new ArrayList<>();
 

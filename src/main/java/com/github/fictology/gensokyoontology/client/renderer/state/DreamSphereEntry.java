@@ -1,7 +1,13 @@
 package com.github.fictology.gensokyoontology.client.renderer.state;
 
+import com.github.fictology.gensokyoontology.registry.RenderTypeRegistry;
+import com.github.fictology.gensokyoontology.util.api.IRenderingEntry;
+import com.github.fictology.gensokyoontology.util.api.IUniformBuilder;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.renderer.DynamicUniformStorage;
+import net.minecraft.client.renderer.MappableRingBuffer;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
@@ -19,32 +25,30 @@ public class DreamSphereEntry implements IRenderingEntry {
     public Vector2f offset;
     public Vector2f tilling;
     public float cellDensity;
-    private GpuBuffer cachedVbo;
-    public ByteBuffer buffer;
+    private GpuBuffer sharedVbo;
+    public ByteBuffer meshBuffer;
+    public ByteBuffer uniformBuffer;
     public int vertexCount;
-    private boolean dirty;
 
     @Override
     public GpuBuffer getVBO(String label) {
-        if (this.cachedVbo == null || dirty) {
+        if (this.sharedVbo == null) {
             // 2. 创建或重用 VBO
-            if (this.cachedVbo == null) {
-                this.cachedVbo = RenderSystem.getDevice().createBuffer(
-                        () -> label + "_" + System.identityHashCode(this),
-                        GpuBuffer.USAGE_VERTEX | GpuBuffer.USAGE_MAP_WRITE,
-                        this.buffer.remaining()
-                );
-            }
+            this.sharedVbo = RenderSystem.getDevice().createBuffer(
+                    () -> label + "_" + System.identityHashCode(this),
+                    GpuBuffer.USAGE_VERTEX | GpuBuffer.USAGE_MAP_WRITE,
+                    this.meshBuffer.remaining()
+            );
             // 3. 上传数据
             try (var view = RenderSystem.getDevice()
                     .createCommandEncoder()
-                    .mapBuffer(this.cachedVbo, false, true)) {
-                view.data().put(this.buffer);
+                    .mapBuffer(this.sharedVbo, false, true)) {
+                view.data().put(this.meshBuffer);
             }
-            this.dirty = false;
         }
-        return this.cachedVbo;
+        return sharedVbo;
     }
+
 
     @Override
     public int getVertexCount() {
@@ -56,11 +60,21 @@ public class DreamSphereEntry implements IRenderingEntry {
         return "SphereData";
     }
 
+    @Override
+    public RenderType getRenderType() {
+        return RenderTypeRegistry.DREAM_SPHERE;
+    }
+
+    @Override
+    public ByteBuffer getMeshBuffer() {
+        return this.meshBuffer;
+    }
+
     // 清理资源（在实体移除/卸载时调用）
     public void clear() {
-        if (cachedVbo != null) {
-            cachedVbo.close();
-            cachedVbo = null;
+        if (sharedVbo != null) {
+            sharedVbo.close();
+            sharedVbo = null;
         }
     }
 }

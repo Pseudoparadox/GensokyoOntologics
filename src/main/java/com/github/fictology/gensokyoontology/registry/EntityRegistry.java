@@ -40,8 +40,8 @@ public final class EntityRegistry {
             DreamSphere::new, MobCategory.MISC, 1f, 1f);
     public static final Supplier<EntityType<FairyEntity>> FAIRY_ENTITY = register(
             "fairy", FairyEntity::new, MobCategory.MONSTER, 0.54f, 1.5f);
-    public static final Supplier<EntityType<TsumiBukuroEntity>> TSUMI_BUKURO_ENTITY = register(
-            "tsumi_bukuro", TsumiBukuroEntity::new, MobCategory.CREATURE, 0.66f, 1.8f);
+//    public static final Supplier<EntityType<TsumiBukuroEntity>> TSUMI_BUKURO_ENTITY = register(
+//            "tsumi_bukuro", TsumiBukuroEntity::new, MobCategory.CREATURE, 0.66f, 1.8f);
     public static final Supplier<EntityType<LilyWhiteEntity>> LILY_WHITE = register(
             "lily_white", LilyWhiteEntity::new, MobCategory.CREATURE, 0.56f, 1.54f);
     public static final Supplier<EntityType<FlandreScarletEntity>> FLANDRE_SCARLET = register(

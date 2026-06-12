@@ -1,15 +1,17 @@
-#version 150
-
-in vec3 Position;
-in vec2 UV0;
-in vec3 Normal;
+#version 330
 
 uniform mat4 ModelViewMat;
 uniform mat4 ProjMat;
 
-uniform float CellDensity;
-uniform vec2 Offset;
-uniform vec2 Tilling;
+layout(std140) uniform SparkData{
+    vec2 Offset;
+    vec2 Tilling;
+    float CellDensity;
+};
+
+layout(location = 0) in vec3 Position; // unit-sphere OR obj-vertex in LOCAL space
+layout(location = 1) in vec2 UV0;
+layout(location = 2) in vec3 Normal;
 
 out float density;
 out vec2 offset;
@@ -31,6 +33,5 @@ void main() {
     offset = Offset;
     density = CellDensity;
     tilling = Tilling;
-    beamColor = BeamColor;
     texCoord0 = UV0;
 }

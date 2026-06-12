@@ -37,28 +37,6 @@ vec3 hash33(vec3 p) {
     return fract((p.xxy + p.yzz) * p.zyx);
 }
 
-// ==================== 湍流函数 ====================
-float turbulence(vec2 p, float time) {
-    float sum = 0.0;
-    float freq = 1.0;
-    float amp = 1.0;
-    float maxSum = 0.0;
-
-    // 多层噪声叠加创建湍流效果
-    for(int i = 0; i < 5; i++) {
-        // 添加时间动画，使图案向外扩散
-        vec2 q = p * freq + vec2(time * 0.5 * freq, 0.0);
-        float noise = cellular2D(q, RETURN_DISTANCE, 12345.0 + i * 100.0, 1.0);
-
-        // 使用不同的混合模式创建更复杂的图案
-        sum += amp * sin(noise * 6.28318 + time * 2.0);
-        maxSum += amp;
-        freq *= 2.0;
-        amp *= 0.5;
-    }
-
-    return sum / maxSum;
-}
 
 // ==================== 圆形扩散图案 ====================
 float circularPattern(vec2 uv, float time) {
@@ -132,6 +110,29 @@ float cellular2DFBM(vec2 p, int mode, float scale, int octaves, float lacunarity
     if (mode == RETURN_DISTANCE_SUB) return (f1 - f2) / maxValue;
     if (mode == RETURN_DISTANCE_DIV) return f1 / (f2 + 0.001);
     return f1 / maxValue;
+}
+
+// ==================== 湍流函数 ====================
+float turbulence(vec2 p, float time) {
+    float sum = 0.0;
+    float freq = 1.0;
+    float amp = 1.0;
+    float maxSum = 0.0;
+
+    // 多层噪声叠加创建湍流效果
+    for(int i = 0; i < 5; i++) {
+        // 添加时间动画，使图案向外扩散
+        vec2 q = p * freq + vec2(time * 0.5 * freq, 0.0);
+        float noise = cellular2D(q, RETURN_DISTANCE, 12345.0 + i * 100.0, 1.0);
+
+        // 使用不同的混合模式创建更复杂的图案
+        sum += amp * sin(noise * 6.28318 + time * 2.0);
+        maxSum += amp;
+        freq *= 2.0;
+        amp *= 0.5;
+    }
+
+    return sum / maxSum;
 }
 
 void main() {

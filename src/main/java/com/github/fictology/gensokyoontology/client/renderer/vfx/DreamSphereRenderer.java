@@ -3,11 +3,12 @@ package com.github.fictology.gensokyoontology.client.renderer.vfx;
 import com.github.fictology.gensokyoontology.client.renderer.ShaderedRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.state.DreamSphereEntry;
 import com.github.fictology.gensokyoontology.client.renderer.state.MagicSphereState;
+import com.github.fictology.gensokyoontology.client.renderer.state.RenderingQueue;
 import com.github.fictology.gensokyoontology.common.entiy.misc.DreamSphere;
-import com.github.fictology.gensokyoontology.common.event.RenderingEvents;
-import com.github.fictology.gensokyoontology.registry.RenderTypeRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOGeometry;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
+import com.github.fictology.gensokyoontology.util.api.IRenderingEntry;
+import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -31,30 +32,24 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
     public void extractRenderState(DreamSphere entity, MagicSphereState state, float partialTicks) {
         super.extractRenderState(entity, state, partialTicks);
         state.entity = entity;
-        state.latitudes = 16;
-        state.longitudes = 16;
-        state.size = (float) entity.getBoundingBox().getSize();
+        state.offset = new Vector2f(state.partialTick + state.entity.tickCount, 0);
+        state.tilling = new Vector2f(1F, 1F);
+        state.cellDensity = 2f;
         state.mainColor = DreamSphere.INDEX_2_COLOR.get(entity.getIntSyncData(entity.getEntityData(), DreamSphere.DATA_INDEX));
-
     }
 
     @Override
     public void submit(MagicSphereState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         super.submit(state, poseStack, submitNodeCollector, camera);
+        this.createUBO(state);
+    }
 
-        var entry = new DreamSphereEntry();
-        var mesh = GSKOGeometry.sphereMesh(18, 18, 2);
-        var queue = RenderingEvents.getRenderingQueue(RenderTypeRegistry.DREAM_SPHERE);
-
-        entry.sphereColor = GSKOUtil.wrapColor(state.mainColor);
-        entry.worldPos = new Vec3(state.x, state.y, state.z);
-        entry.offset.x = state.partialTick + state.entity.tickCount;
-        entry.tilling = new Vector2f(1F, 1F);
-
-        entry.buffer = mesh.toByteBuffer();
-        entry.vertexCount = mesh.vertexCount();
-
-        queue.add(entry);
+    @Override
+    protected void buildUniform(Std140Builder builder, MagicSphereState state) {
+        builder.putVec4(GSKOUtil.wrapColor(state.mainColor))
+                .putVec2(state.offset)
+                .putVec2(state.tilling)
+                .putFloat(state.cellDensity);
     }
 
 }
