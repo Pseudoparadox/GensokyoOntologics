@@ -1,8 +1,7 @@
 package com.github.fictology.gensokyoontology.common.entiy;
 
-import com.github.fictology.gensokyoontology.util.api.Vector3f;
+import com.github.fictology.gensokyoontology.util.api.V3f;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -19,9 +18,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -40,7 +36,7 @@ public class SpellCardEntity extends Entity implements ItemSupplier {
     /**
      * 初始化设置弹幕的射击方位为X轴正方向，即游戏中的东方
      */
-    protected Vec3 shootAngle = new Vec3(Vector3f.XP.cast());
+    protected Vec3 shootAngle = new Vec3(V3f.XP.cast());
     private int ownerId;
     private BiConsumer<Level, LivingEntity> simpleBehavior;
     private Item spellItem;

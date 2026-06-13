@@ -1,22 +1,18 @@
 package com.github.fictology.gensokyoontology.client.renderer.vfx;
 
-import com.github.fictology.gensokyoontology.client.RenderManager;
 import com.github.fictology.gensokyoontology.client.renderer.ShaderedRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.state.MagicSphereState;
 import com.github.fictology.gensokyoontology.common.entiy.misc.DreamSphere;
-import com.github.fictology.gensokyoontology.util.GSKOGeometry;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
-import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import org.joml.Vector2f;
-
-import java.nio.ByteBuffer;
 
 public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphereState> {
 
@@ -26,7 +22,7 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
 
     @Override
     public MagicSphereState createRenderState() {
-        return new MagicSphereState(GSKOGeometry.sphereMesh(18, 18, 2F));
+        return new MagicSphereState();
     }
 
     @Override
@@ -37,12 +33,13 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
         state.tilling = new Vector2f(1F, 1F);
         state.cellDensity = 2f;
         state.mainColor = DreamSphere.INDEX_2_COLOR.get(entity.getIntSyncData(entity.getEntityData(), DreamSphere.DATA_INDEX));
+        state.buildMesh(this.renderType, 18, 18);
     }
+
 
     @Override
     public void submit(MagicSphereState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         super.submit(state, poseStack, submitNodeCollector, camera);
-        this.submitShader(state);
     }
 
     @Override

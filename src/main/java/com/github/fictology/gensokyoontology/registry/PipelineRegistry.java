@@ -1,11 +1,16 @@
 package com.github.fictology.gensokyoontology.registry;
 
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
+import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
+import net.neoforged.neoforge.client.stencil.StencilPerFaceTest;
+import net.neoforged.neoforge.client.stencil.StencilTest;
 
 public final class PipelineRegistry {
 
@@ -29,5 +34,9 @@ public final class PipelineRegistry {
             .withFragmentShader(GSKOUtil.key("dream_sphere"))
             .withVertexFormat(GSKO_DEFAULT, VertexFormat.Mode.TRIANGLES)
             .withUniform("SphereData", UniformType.UNIFORM_BUFFER)
+            .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false)) // 或 NO_DEPTH_TEST 如果你要纯overlay
+
+            .withCull(false)         // 球体从里面也要看
+            .withColorTargetState(ColorTargetState.DEFAULT)
             .build();
 }

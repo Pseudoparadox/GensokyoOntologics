@@ -11,11 +11,17 @@ import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.PipelineRegistry;
 import com.github.fictology.gensokyoontology.registry.RenderTypeRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOGeometry;
+import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MappableRingBuffer;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.SkyRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -24,10 +30,12 @@ import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.client.event.lifecycle.ClientStartedEvent;
+import org.joml.*;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import java.util.concurrent.atomic.AtomicReference;
 
 @EventBusSubscriber(modid = GensokyoOntology.MODID, value = Dist.CLIENT)
 public class RenderingEvents {
@@ -49,36 +57,50 @@ public class RenderingEvents {
                         .putVec2()
                         .putVec2().get());
 
+        var state = new MagicSphereState();
+        state.buildMesh(RenderTypeRegistry.DREAM_SPHERE, 18, 18);
+
         RenderManager.registerRenderingPass(RenderTypeRegistry.DREAM_SPHERE, PipelineRegistry.DREAM_SPHERE,
-                new MagicSphereState(GSKOGeometry.sphereMesh(18, 18, 2f)), sphereBuf);
+                state, sphereBuf);
         RenderManager.registerRenderingPass(RenderTypeRegistry.MASTER_SPARK, PipelineRegistry.MASTER_SPARK,
-                new MagicSphereState(GSKOGeometry.sphereMesh(18, 18, 2f)), sparkBuf);
+                state, sparkBuf);
     }
 
     @SubscribeEvent
     public static void onCustomDrawCall(RenderLevelStageEvent.AfterTranslucentParticles event){
+        var poseStack = event.getPoseStack();
         var renderTarget = Minecraft.getInstance().getMainRenderTarget();
+        var projMatrix = RenderSystem.getProjectionMatrixBuffer();
+
         RenderManager.renderOnEach((renderType, entry) -> {
-            var buf = RenderManager.getUniformBuffer(renderType);
+
+            var ubo = RenderManager.getUniformBuffer(renderType);
             var vbo = RenderManager.getVertexBuffer(renderType);
             var pipeline = RenderManager.getPipeline(renderType);
 
-            vbo.rotate();
-            buf.rotate();
+            Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
+            matrixStack.pushMatrix();
+            RenderManager.setModelView(renderType, matrixStack);
+
+            var transforms = RenderSystem.getDynamicUniforms().writeTransform(
+                    poseStack.last().pose(),              // <-- 实体 PoseStack pose
+                    new Vector4f(0f,0f,0f,1f),              // ColorModulator
+                    new Vector3f(),
+                    new Matrix4f());
+
+            ubo.rotate();
+            renderType.draw(entry.getMesh());
             try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
                     () -> renderType.pipeline().getLocation().toString(),
                     renderTarget.getColorTextureView(), OptionalInt.empty(),
                     renderTarget.getDepthTextureView(), OptionalDouble.empty())) {
 
                 pass.setPipeline(pipeline);
-                pass.setUniform(entry.uniformName(), buf.currentBuffer());
-                pass.setVertexBuffer(0, vbo.currentBuffer());
+                pass.setUniform(entry.uniformName(), ubo.currentBuffer());
+                pass.setVertexBuffer(0, vbo);
                 pass.draw(0, entry.getVertexCount());
-                RenderSystem.bindDefaultUniforms(pass);
             }
-
-            vbo.close();
-            buf.close();
+            matrixStack.popMatrix();
         });
 
     }

@@ -1,12 +1,15 @@
 package com.github.fictology.gensokyoontology.registry;
 
+import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 
 public final class RenderTypeRegistry {
     public static final RenderType MASTER_SPARK = RenderType.create("master_spark", RenderSetup.builder(
-            PipelineRegistry.MASTER_SPARK).createRenderSetup());
+            PipelineRegistry.MASTER_SPARK)
+            .setOutputTarget(OutputTarget.MAIN_TARGET).createRenderSetup());
     public static final RenderType DREAM_SPHERE = RenderType.create("dream_sphere", RenderSetup.builder(
-            PipelineRegistry.DREAM_SPHERE).createRenderSetup());
+            PipelineRegistry.DREAM_SPHERE)
+            .setOutputTarget(OutputTarget.MAIN_TARGET).createRenderSetup());
 
 }

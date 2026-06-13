@@ -1,6 +1,6 @@
 package com.github.fictology.gensokyoontology.util;
 
-import com.github.fictology.gensokyoontology.util.api.Vector3f;
+import com.github.fictology.gensokyoontology.util.api.V3f;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.ClipboardManager;
@@ -27,7 +27,7 @@ public class AnimeHelper {
 
     public static final Codec<Keyframe> KEYFRAME_CODEC = RecordCodecBuilder.create(keyframeInstance -> keyframeInstance.group(
             Codec.FLOAT.fieldOf("timestamp").forGetter(Keyframe::timestamp),
-            Vector3f.CODEC.fieldOf("target").forGetter(keyframe -> new org.joml.Vector3f(keyframe.postTarget().x(), keyframe.postTarget().y(), keyframe.postTarget().z())),
+            V3f.CODEC.fieldOf("target").forGetter(keyframe -> new org.joml.Vector3f(keyframe.postTarget().x(), keyframe.postTarget().y(), keyframe.postTarget().z())),
             Codec.STRING.fieldOf("interpolation").forGetter(keyframe ->
                     GSKOUtil.getKeyByValueOrDefault(INTERPOLATION_MAP, "", keyframe.interpolation()))
     ).apply(keyframeInstance, (f, v3f, str) -> new KeyFrameWrapper(f, v3f, str).wrap()));

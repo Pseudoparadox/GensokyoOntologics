@@ -4,7 +4,7 @@ import com.github.fictology.gensokyoontology.common.combat.DanmakuUtil;
 import com.github.fictology.gensokyoontology.common.entiy.ai.goal.DamakuAttackGoal;
 import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
-import com.github.fictology.gensokyoontology.util.api.Vector3f;
+import com.github.fictology.gensokyoontology.util.api.V3f;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.AgeableMob;
@@ -19,11 +19,9 @@ import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.ItemSupplier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
@@ -146,7 +144,7 @@ public class FairyEntity extends RetreatableEntity implements FlyingAnimal {
 
     private void spiralShot() {
         for (int i = 0; i < 4; i++) {
-            var shootVec = new Vec3(Vector3f.XP.cast()).yRot((float) Math.PI / 36 * tickCount)
+            var shootVec = new Vec3(V3f.XP.cast()).yRot((float) Math.PI / 36 * tickCount)
                     .xRot((float) Math.PI / 36 * tickCount).yRot((float) Math.PI / 2 * i);
             var danmaku = randomSelect();
             danmaku.shoot(shootVec.x, shootVec.y, shootVec.z, 0.7f, 0f);

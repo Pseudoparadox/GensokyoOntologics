@@ -1,7 +1,13 @@
 #version 330
 
-mat4 ModelViewMat;
-mat4 ProjMat;
+uniform mat4 Projection;
+
+layout(std140) uniform DynamicTransforms {
+  mat4 ModelViewMat;
+  vec4 ColorModulator;
+  vec3 ModelOffset;
+  vec4 TextureMatrix;
+};
 
 layout(std140) uniform SphereData {
   vec4  Color;       // rgb, a
@@ -24,7 +30,7 @@ out vec2 tilling;
 out vec4 sphereColor;
 
 void main() {
-  gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
+  gl_Position = vec4(Position, 1.0);
   // 对 glow/additive shell：轻微 bias 远离表面防 z-fight
   gl_Position.z -= 0.00006 * gl_Position.w;
 

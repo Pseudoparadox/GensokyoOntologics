@@ -20,9 +20,9 @@ public interface IRayTraceReader {
         List<AABB> aabb = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
 
-            Vec3 posRow = new Vec3(rayDirection.x > 0 ? Vector3f.XP.cast() : Vector3f.XN.cast());
-            Vec3 posColumn = new Vec3(rayDirection.z > 0 ? Vector3f.ZP.cast() : Vector3f.ZN.cast());
-            Vec3 posVertical = new Vec3(rayDirection.y > 0 ? Vector3f.YP.cast() : Vector3f.YN.cast());
+            Vec3 posRow = new Vec3(rayDirection.x > 0 ? V3f.XP.cast() : V3f.XN.cast());
+            Vec3 posColumn = new Vec3(rayDirection.z > 0 ? V3f.ZP.cast() : V3f.ZN.cast());
+            Vec3 posVertical = new Vec3(rayDirection.y > 0 ? V3f.YP.cast() : V3f.YN.cast());
 
             Vec3 rayPos = globalPos.add(rayDirection);
 
