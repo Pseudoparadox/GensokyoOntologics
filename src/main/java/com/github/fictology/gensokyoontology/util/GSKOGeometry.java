@@ -1,6 +1,9 @@
 package com.github.fictology.gensokyoontology.util;
 
+import com.github.fictology.gensokyoontology.util.api.render.IBufferedMesh;
+import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MappableRingBuffer;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -126,7 +129,7 @@ public final class GSKOGeometry {
                 .setUv(uv.x, uv.y);
     }
 
-    public static class SphereMesh {
+    public static class SphereMesh implements IBufferedMesh {
         public final List<Vector3f> vertices;
         public final List<Vector3f> normals;
         public final List<Vector2f> uvs;
@@ -184,9 +187,21 @@ public final class GSKOGeometry {
             return bb;
         }
 
+        public MappableRingBuffer toGpuBuffer(String label){
+            var buf = this.toByteBuffer();
+            try(var vbo = new MappableRingBuffer(
+                    () -> label + "_" + "VBO",
+                    GpuBuffer.USAGE_VERTEX | GpuBuffer.USAGE_MAP_WRITE,
+                    this.vertexCount() * this.getStride())){
+                return vbo;
+            }
+        }
+
         public int vertexCount() { return indices.size(); }
         public int stridePosNorm()    { return 24; }
-        public int stridePosNormUv() { return 32; }
+
+        @Override
+        public int getStride() { return 32; }
 
     }
 }

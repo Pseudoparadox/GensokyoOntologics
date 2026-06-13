@@ -4,24 +4,18 @@ import com.github.fictology.gensokyoontology.GensokyoOntology;
 import com.github.fictology.gensokyoontology.client.RenderManager;
 import com.github.fictology.gensokyoontology.client.renderer.EmptyRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.NormalVectorRenderer;
-import com.github.fictology.gensokyoontology.client.renderer.state.DreamSphereEntry;
-import com.github.fictology.gensokyoontology.client.renderer.state.RenderingQueue;
+import com.github.fictology.gensokyoontology.client.renderer.state.MagicSphereState;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.DreamSphereRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.MasterSparkRenderer;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.PipelineRegistry;
 import com.github.fictology.gensokyoontology.registry.RenderTypeRegistry;
-import com.github.fictology.gensokyoontology.util.api.IUniformBuilder;
+import com.github.fictology.gensokyoontology.util.GSKOGeometry;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.DynamicUniformStorage;
-import net.minecraft.client.renderer.DynamicUniforms;
 import net.minecraft.client.renderer.MappableRingBuffer;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -30,11 +24,8 @@ import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.client.event.lifecycle.ClientStartedEvent;
-import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
@@ -52,42 +43,41 @@ public class RenderingEvents {
                         .putFloat().get());
 
         var sparkBuf = new MappableRingBuffer(
-                () -> "SparkData",
+                () -> "SphereData",
                 GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_MAP_WRITE,
                 new Std140SizeCalculator()
                         .putVec2()
-                        .putVec2()
-                        .putFloat().get());
+                        .putVec2().get());
 
-        RenderManager.registerRenderingPass(RenderTypeRegistry.DREAM_SPHERE, PipelineRegistry.DREAM_SPHERE, sphereBuf);
-        RenderManager.registerRenderingPass(RenderTypeRegistry.MASTER_SPARK, PipelineRegistry.MASTER_SPARK, sparkBuf);
+        RenderManager.registerRenderingPass(RenderTypeRegistry.DREAM_SPHERE, PipelineRegistry.DREAM_SPHERE,
+                new MagicSphereState(GSKOGeometry.sphereMesh(18, 18, 2f)), sphereBuf);
+        RenderManager.registerRenderingPass(RenderTypeRegistry.MASTER_SPARK, PipelineRegistry.MASTER_SPARK,
+                new MagicSphereState(GSKOGeometry.sphereMesh(18, 18, 2f)), sparkBuf);
     }
 
     @SubscribeEvent
     public static void onCustomDrawCall(RenderLevelStageEvent.AfterTranslucentParticles event){
-
         var renderTarget = Minecraft.getInstance().getMainRenderTarget();
-
-        RenderManager.renderOnEach((renderType, queue) -> {
-            var entries = queue.takeSnapshot();
-            if (entries.isEmpty()) return;
-
-            var entry = entries.get(0);
+        RenderManager.renderOnEach((renderType, entry) -> {
             var buf = RenderManager.getUniformBuffer(renderType);
-            var vbo = entry.getVBO("Geo");
+            var vbo = RenderManager.getVertexBuffer(renderType);
+            var pipeline = RenderManager.getPipeline(renderType);
 
+            buf.rotate();
             try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
                     () -> renderType.pipeline().getLocation().toString(),
                     renderTarget.getColorTextureView(), OptionalInt.empty(),
                     renderTarget.getDepthTextureView(), OptionalDouble.empty())) {
 
-                pass.setPipeline(RenderManager.getPipeline(renderType));
+                pass.setPipeline(pipeline);
                 pass.setUniform(entry.uniformName(), buf.currentBuffer());
                 pass.setVertexBuffer(0, vbo);
                 pass.draw(0, entry.getVertexCount());
                 RenderSystem.bindDefaultUniforms(pass);
             }
-            queue.clear();
+
+            vbo.close();
+            buf.close();
         });
 
     }

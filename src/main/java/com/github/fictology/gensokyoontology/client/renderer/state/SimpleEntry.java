@@ -1,11 +1,12 @@
 package com.github.fictology.gensokyoontology.client.renderer.state;
 
-import com.github.fictology.gensokyoontology.util.api.IRenderingEntry;
+import com.github.fictology.gensokyoontology.util.api.render.IRenderingEntry;
 import com.mojang.blaze3d.buffers.GpuBuffer;
+import net.minecraft.client.renderer.MappableRingBuffer;
 
 public abstract class SimpleEntry implements IRenderingEntry {
     @Override
-    public GpuBuffer getVBO(String label) {
+    public MappableRingBuffer getBufferedMesh(String label) {
         return null;
     }
 

@@ -9,6 +9,8 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 
+import java.nio.ByteBuffer;
+
 public class MasterSparkRenderer extends ObjVFXRenderer<MasterSparkEntity, SimpleState<MasterSparkEntity>> {
     private static final Identifier MODEL_PATH = GSKOUtil.key("models/entity/beam.obj");
     public MasterSparkRenderer(EntityRendererProvider.Context context, RenderType renderType) {
@@ -19,6 +21,7 @@ public class MasterSparkRenderer extends ObjVFXRenderer<MasterSparkEntity, Simpl
     protected void buildUniform(Std140Builder builder, SimpleState<MasterSparkEntity> state) {
 
     }
+
 
     @Override
     public SimpleState<MasterSparkEntity> createRenderState() {

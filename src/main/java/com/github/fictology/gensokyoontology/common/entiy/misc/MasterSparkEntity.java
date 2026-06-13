@@ -7,8 +7,7 @@ import com.github.fictology.gensokyoontology.common.entiy.AffiliatedEntity;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.util.api.IDamageHandler;
 import com.github.fictology.gensokyoontology.util.api.IRayTraceReader;
-import com.github.fictology.gensokyoontology.util.api.IResourceGetter;
-import net.minecraft.nbt.CompoundTag;
+import com.github.fictology.gensokyoontology.util.api.render.IResourceGetter;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -21,7 +20,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.List;
 import java.util.function.Predicate;
 
 public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceReader, IDamageHandler, IResourceGetter {

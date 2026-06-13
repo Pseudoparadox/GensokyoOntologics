@@ -8,7 +8,6 @@ in vec4 sphereColor;
 in vec3 view;
 in vec3 normal;
 in vec2 texCoord0;
-in float u_time;  // 时间变量，用于动画
 
 out vec4 fragColor;
 
@@ -147,10 +146,10 @@ void main() {
     float baseNoise = cellular2DFBM(uv, RETURN_DISTANCE, density, 4, 2.0F, 2.0F);
 
     // 圆形扩散图案
-    float circlePattern = circularPattern(uv, u_time);
+    float circlePattern = circularPattern(uv, offset.x);
 
     // 湍流效果
-    float turb = turbulence(uv * 3.0, u_time);
+    float turb = turbulence(uv * 3.0, offset.x);
 
     // 组合所有效果
     float combinedPattern = baseNoise * 0.4 + circlePattern * 0.4 + turb * 0.2;
@@ -168,7 +167,7 @@ void main() {
     alpha = clamp(alpha, 0.0, 0.9);
 
     // 添加脉冲效果
-    float pulse = sin(u_time * 2.0) * 0.1 + 0.9;
+    float pulse = sin(offset.x * 2.0) * 0.1 + 0.9;
     finalColor *= pulse;
 
     if (density == 0.0F) {

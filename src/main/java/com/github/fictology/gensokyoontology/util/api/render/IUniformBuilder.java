@@ -1,4 +1,4 @@
-package com.github.fictology.gensokyoontology.util.api;
+package com.github.fictology.gensokyoontology.util.api.render;
 
 import net.minecraft.client.renderer.DynamicUniformStorage;
 

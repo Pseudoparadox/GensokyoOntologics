@@ -2,6 +2,7 @@ package com.github.fictology.gensokyoontology.client.renderer;
 
 import com.github.fictology.gensokyoontology.client.model.ObjMesh;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
+import com.github.fictology.gensokyoontology.util.api.render.IRenderingEntry;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -14,7 +15,7 @@ import net.minecraft.world.entity.Entity;
 
 import java.util.HashMap;
 
-public abstract class ObjVFXRenderer<E extends Entity, S extends EntityRenderState> extends ShaderedRenderer<E, S> {
+public abstract class ObjVFXRenderer<E extends Entity, S extends EntityRenderState & IRenderingEntry> extends ShaderedRenderer<E, S> {
     protected final HashMap<Identifier, ObjMesh> modelMap = new HashMap<>();
     protected final RandomSource randomSource;
     public static final Identifier TRANSPARENT = GSKOUtil.key("textures/transparent.png");

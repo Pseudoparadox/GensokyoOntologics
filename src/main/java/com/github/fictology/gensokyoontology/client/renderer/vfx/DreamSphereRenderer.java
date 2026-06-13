@@ -1,21 +1,22 @@
 package com.github.fictology.gensokyoontology.client.renderer.vfx;
 
+import com.github.fictology.gensokyoontology.client.RenderManager;
 import com.github.fictology.gensokyoontology.client.renderer.ShaderedRenderer;
-import com.github.fictology.gensokyoontology.client.renderer.state.DreamSphereEntry;
 import com.github.fictology.gensokyoontology.client.renderer.state.MagicSphereState;
-import com.github.fictology.gensokyoontology.client.renderer.state.RenderingQueue;
 import com.github.fictology.gensokyoontology.common.entiy.misc.DreamSphere;
 import com.github.fictology.gensokyoontology.util.GSKOGeometry;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
-import com.github.fictology.gensokyoontology.util.api.IRenderingEntry;
+import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.Std140Builder;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2f;
+
+import java.nio.ByteBuffer;
 
 public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphereState> {
 
@@ -25,7 +26,7 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
 
     @Override
     public MagicSphereState createRenderState() {
-        return new MagicSphereState();
+        return new MagicSphereState(GSKOGeometry.sphereMesh(18, 18, 2F));
     }
 
     @Override
@@ -41,7 +42,7 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
     @Override
     public void submit(MagicSphereState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         super.submit(state, poseStack, submitNodeCollector, camera);
-        this.createUBO(state);
+        this.submitShader(state);
     }
 
     @Override
@@ -51,5 +52,4 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
                 .putVec2(state.tilling)
                 .putFloat(state.cellDensity);
     }
-
 }
