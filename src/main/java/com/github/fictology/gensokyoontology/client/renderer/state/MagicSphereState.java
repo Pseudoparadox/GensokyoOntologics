@@ -1,8 +1,8 @@
 package com.github.fictology.gensokyoontology.client.renderer.state;
 
 import com.github.fictology.gensokyoontology.util.GSKOGeometry;
+import com.github.fictology.gensokyoontology.util.api.render.IBufferedMesh;
 import com.github.fictology.gensokyoontology.util.api.render.IRenderingEntry;
-import net.minecraft.client.renderer.MappableRingBuffer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
 import org.joml.Vector2f;
@@ -35,8 +35,8 @@ public class MagicSphereState extends EntityRenderState implements IRenderingEnt
     }
 
     @Override
-    public MappableRingBuffer getBufferedMesh(String label) {
-        return this.mesh.toGpuBuffer(label);
+    public IBufferedMesh getBufferedMesh() {
+        return this.mesh;
     }
 
     @Override

@@ -24,7 +24,8 @@ public final class RenderManager {
         RENDERING_ENTRIES.put(renderType, entry);
         PIPELINE_MAP.put(renderType, pipeline);
         UBO_MAP.put(renderType, uniformBuf);
-        VBO_MAP.put(renderType, entry.getBufferedMesh(renderType.pipeline().getLocation().toString()));
+        VBO_MAP.put(renderType, entry.getBufferedMesh()
+                .toGpuBuffer(renderType.pipeline().getLocation().toString()));
     }
 
     public static IRenderingEntry getRenderEntry(RenderType renderType){

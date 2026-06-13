@@ -5,10 +5,6 @@ import com.mojang.blaze3d.buffers.GpuBuffer;
 import net.minecraft.client.renderer.MappableRingBuffer;
 
 public abstract class SimpleEntry implements IRenderingEntry {
-    @Override
-    public MappableRingBuffer getBufferedMesh(String label) {
-        return null;
-    }
 
     @Override
     public int getVertexCount() {

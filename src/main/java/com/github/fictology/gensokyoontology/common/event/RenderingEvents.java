@@ -63,6 +63,7 @@ public class RenderingEvents {
             var vbo = RenderManager.getVertexBuffer(renderType);
             var pipeline = RenderManager.getPipeline(renderType);
 
+            vbo.rotate();
             buf.rotate();
             try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
                     () -> renderType.pipeline().getLocation().toString(),
@@ -71,7 +72,7 @@ public class RenderingEvents {
 
                 pass.setPipeline(pipeline);
                 pass.setUniform(entry.uniformName(), buf.currentBuffer());
-                pass.setVertexBuffer(0, vbo);
+                pass.setVertexBuffer(0, vbo.currentBuffer());
                 pass.draw(0, entry.getVertexCount());
                 RenderSystem.bindDefaultUniforms(pass);
             }

@@ -38,7 +38,7 @@ public abstract class ShaderedRenderer<E extends Entity, S extends EntityRenderS
         var ubo = RenderManager.getUniformBuffer(this.renderType).currentBuffer();
         try(var view = RenderSystem.getDevice().createCommandEncoder().mapBuffer(ubo, false, true)){
             this.buildUniform(Std140Builder.intoBuffer(view.data()), state);
-            this.buildVertex(view, state.getBufferedMesh(this.renderType.pipeline().getLocation().toString()).toByteBuffer());
+            this.buildVertex(view, state.getBufferedMesh().toByteBuffer());
         }
     }
 

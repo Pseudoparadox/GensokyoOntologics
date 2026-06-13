@@ -1,8 +1,8 @@
 package com.github.fictology.gensokyoontology.client.renderer.state;
 
+import com.github.fictology.gensokyoontology.util.api.render.IBufferedMesh;
 import com.github.fictology.gensokyoontology.util.api.render.IRenderingEntry;
 import com.github.fictology.gensokyoontology.util.api.render.IResourceGetter;
-import net.minecraft.client.renderer.MappableRingBuffer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -29,9 +29,10 @@ public class SimpleState<E extends Entity & IResourceGetter> extends EntityRende
     }
 
     @Override
-    public MappableRingBuffer getBufferedMesh(String label) {
+    public IBufferedMesh getBufferedMesh() {
         return null;
     }
+
 
     @Override
     public void clear() {
