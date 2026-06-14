@@ -24,8 +24,8 @@ out vec2 tilling;
 out vec4 sphereColor;
 
 void main() {
-  gl_Position = projection_from_position(vec4(Position, 1.0f));
-  // gl_Position = ProjMat * vec4(Position, 1.0);
+  // gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0f);
+  gl_Position = vec4(Position, 1.0);
   // 对 glow/additive shell：轻微 bias 远离表面防 z-fight
   gl_Position.z -= 0.00006 * gl_Position.w;
 
