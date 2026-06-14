@@ -89,7 +89,6 @@ public class RenderingEvents {
                     new Matrix4f());
 
             ubo.rotate();
-            renderType.draw(entry.getMesh());
             try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
                     () -> renderType.pipeline().getLocation().toString(),
                     renderTarget.getColorTextureView(), OptionalInt.empty(),

@@ -1,13 +1,7 @@
 #version 330
 
-uniform mat4 Projection;
-
-layout(std140) uniform DynamicTransforms {
-  mat4 ModelViewMat;
-  vec4 ColorModulator;
-  vec3 ModelOffset;
-  vec4 TextureMatrix;
-};
+#moj_import <minecraft:projection.glsl>
+#moj_import <minecraft:dynamictransforms.glsl>
 
 layout(std140) uniform SphereData {
   vec4  Color;       // rgb, a
@@ -16,9 +10,9 @@ layout(std140) uniform SphereData {
   float CellDensity;
 };
 
-layout(location = 0) in vec3 Position; // unit-sphere OR obj-vertex in LOCAL space
-layout(location = 1) in vec2 UV0;
-layout(location = 2) in vec3 Normal;
+in vec3 Position; // unit-sphere OR obj-vertex in LOCAL space
+in vec2 UV0;
+in vec3 Normal;
 
 out vec3 view;
 out vec3 normal;
@@ -30,7 +24,8 @@ out vec2 tilling;
 out vec4 sphereColor;
 
 void main() {
-  gl_Position = vec4(Position, 1.0);
+  gl_Position = projection_from_position(vec4(Position, 1.0f));
+  // gl_Position = ProjMat * vec4(Position, 1.0);
   // 对 glow/additive shell：轻微 bias 远离表面防 z-fight
   gl_Position.z -= 0.00006 * gl_Position.w;
 
