@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -86,19 +87,17 @@ public class LaserSourceEntity extends AffiliatedEntity implements IRayTraceRead
 
         Vec3 start = this.getPosition(0);
         Vec3 end = this.getLookAngle().scale(this.range).add(start);
-        var canAttack = new AtomicReference<Predicate<LivingEntity>>();
-        this.getOwner().ifPresent(ref -> {
-            var entity = ref.getEntity(level(), LivingEntity.class);
-            if (entity == null) return;
-            canAttack.set(attackedEntity -> !entity.getUUID().equals(attackedEntity.getUUID()));
-        });
+        var ref = new AtomicReference<EntityReference<LivingEntity>>();
 
+        if (!this.tryGetOwner(ref)) return;
         if (this.tickCount % 2 == 0 && rayTrace(this.level(), this, start, end).isPresent()) {
             rayTrace(this.level(), this, start, end).ifPresent(entity -> {
-                if (canAttack.get().test((LivingEntity) entity))
+                // 这里检测 ref 里存储的实体所有者是否和射线检测的实体是同一个实体
+                if (!ref.get().matches((LivingEntity) entity))
                     hurtLiving((LivingEntity) entity, level(), GSKODamage.LASER, 5f);
             });
         }
+
     }
 
 

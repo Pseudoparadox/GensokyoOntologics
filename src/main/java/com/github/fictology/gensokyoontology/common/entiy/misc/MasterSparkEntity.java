@@ -34,11 +34,6 @@ public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceRead
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-
-    }
-
-    @Override
     public void tick() {
         super.tick();
         if (tickCount >= 120) this.setRemoved(RemovalReason.DISCARDED);
@@ -49,9 +44,9 @@ public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceRead
         var startList = DanmakuUtil.spheroidPos(1.5, 10);
 
         startList.forEach(vector3d -> entities.addAll(rayTrace(serverLevel, this, DISTANCE, vector3d)));
-        Predicate<Entity> canAttack = entity -> this.getOwner().isPresent();
-
-        entities.stream().filter(canAttack).forEach(entity -> this.hurtLiving((LivingEntity) entity, serverLevel, GSKODamage.LASER, 10F));
+//        Predicate<Entity> canAttack = entity -> this.getOwnerReference().;
+//
+//        entities.stream().filter(canAttack).forEach(entity -> this.hurtLiving((LivingEntity) entity, serverLevel, GSKODamage.LASER, 10F));
     }
 
     @Override
