@@ -31,7 +31,7 @@ public class MagicSphereState extends EntityRenderState implements IRenderingEnt
     }
 
     public void buildMesh(RenderType renderType, int latitudeBands, int longitudeBands){
-        this.vertexBuffer = GSKOGeometry.buildSphereMesh(renderType, new Matrix4f(), latitudeBands, longitudeBands, 1F);
+        this.vertexBuffer = GSKOGeometry.buildSphereMesh(renderType, latitudeBands, longitudeBands, 1F);
         this.vertCount = latitudeBands * longitudeBands * 6; // 每个格子 6 个顶点
     }
 

@@ -7,9 +7,7 @@ import net.neoforged.fml.common.asm.enumextension.NamedEnum;
 import net.neoforged.fml.common.asm.enumextension.NetworkedEnum;
 import org.jetbrains.annotations.NotNull;
 
-@NamedEnum
-@NetworkedEnum(NetworkedEnum.NetworkCheck.BIDIRECTIONAL)
-public enum Incident implements StringRepresentable, IExtensibleEnum {
+public enum Incident {
     NONE(0, "none"),
     SCARLET_MIST(1, "scarlet_mist"),
     SPRING_SNOW(2, "spring_snow"),
@@ -24,9 +22,4 @@ public enum Incident implements StringRepresentable, IExtensibleEnum {
         this.keyName = keyName;
     }
 
-
-    @Override
-    public @NotNull String getSerializedName() {
-        return GSKOUtil.affix("enum", "incidents." + this.keyName);
-    }
 }

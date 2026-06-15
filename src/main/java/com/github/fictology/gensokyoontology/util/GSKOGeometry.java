@@ -91,7 +91,7 @@ public final class GSKOGeometry {
         }
     }
 
-    public static GpuBuffer buildSphereMesh(RenderType renderType, Matrix4f matrix, int latitudeBands, int longitudeBands, float radius) {
+    public static GpuBuffer buildSphereMesh(RenderType renderType, int latitudeBands, int longitudeBands, float radius) {
         GpuBuffer vertexBuffer;
 
         int vertexCount = latitudeBands * longitudeBands * 6; // 每个格子 2 个三角形 × 3 顶点
@@ -139,13 +139,13 @@ public final class GSKOGeometry {
                     float u2 = (float) (longNumber + 1) / longitudeBands;
                     float v2 = (float) (latNumber + 1) / latitudeBands;
 
-                    builder.addVertex(matrix, radius * x1, radius * cosTheta1, radius * z1).setUv(u1, v1).setNormal(x1, cosTheta1, z1);
-                    builder.addVertex(matrix, radius * x3, radius * cosTheta2, radius * z3).setUv(u1, v2).setNormal(x3, cosTheta2, z3);
-                    builder.addVertex(matrix, radius * x2, radius * cosTheta1, radius * z2).setUv(u2, v1).setNormal(x2, cosTheta1, z2);
+                    builder.addVertex(radius * x1, radius * cosTheta1, radius * z1).setUv(u1, v1).setNormal(x1, cosTheta1, z1);
+                    builder.addVertex(radius * x3, radius * cosTheta2, radius * z3).setUv(u1, v2).setNormal(x3, cosTheta2, z3);
+                    builder.addVertex(radius * x2, radius * cosTheta1, radius * z2).setUv(u2, v1).setNormal(x2, cosTheta1, z2);
 
-                    builder.addVertex(matrix, radius * x3, radius * cosTheta2, radius * z3).setUv(u1, v2).setNormal(x3, cosTheta2, z3);
-                    builder.addVertex(matrix, radius * x4, radius * cosTheta2, radius * z4).setUv(u2, v2).setNormal(x4, cosTheta2, z4);
-                    builder.addVertex(matrix, radius * x2, radius * cosTheta1, radius * z2).setUv(u2, v1).setNormal(x2, cosTheta1, z2);
+                    builder.addVertex(radius * x3, radius * cosTheta2, radius * z3).setUv(u1, v2).setNormal(x3, cosTheta2, z3);
+                    builder.addVertex(radius * x4, radius * cosTheta2, radius * z4).setUv(u2, v2).setNormal(x4, cosTheta2, z4);
+                    builder.addVertex(radius * x2, radius * cosTheta1, radius * z2).setUv(u2, v1).setNormal(x2, cosTheta1, z2);
                 }
             }
 
