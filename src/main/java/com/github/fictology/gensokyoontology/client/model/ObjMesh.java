@@ -7,7 +7,9 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4i;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,6 +17,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.List;
 
 /**
  * 极简 Wavefront OBJ 解析器（仅 triangulate后的 .obj，不含smoothing group复杂处理）
@@ -96,7 +99,7 @@ public class ObjMesh implements SubmitNodeCollector.CustomGeometryRenderer {
         return mesh;
     }
 
-    public ByteBuffer toByteBufferPosNormTex() {
+    public ByteBuffer toByteBuffer() {
         final int FLOATS_PER_VERT = 8; // 3+3+2
         final int STRIDE = FLOATS_PER_VERT * 4; // 32
         var bb = ByteBuffer.allocateDirect(trises.size() * 3 * STRIDE)
@@ -146,9 +149,21 @@ public class ObjMesh implements SubmitNodeCollector.CustomGeometryRenderer {
                 vc.addVertex(pose, triangle.v[i].x, triangle.v[i].y, triangle.v[i].z)
                         .setColor(255, 255, 255, 255)
                         .setUv(triangle.t[i].x, triangle.t[i].y)
-                        .setNormal(triangle.n.x, triangle.n.y, triangle.n.z)
-                        .setLight(0xF000F0)          // 全亮（你也可以从packedLight传进来）
-                        .setOverlay(0);
+                        .setNormal(triangle.n.x, triangle.n.y, triangle.n.z);
+            }
+        }
+    }
+
+    public void render(PoseStack.Pose pose, VertexConsumer vc, Vector4i vertColor) {
+        for (Triangle triangle : trises) {
+            for (int i = 0; i < 3; i++) {
+                // VertexConsumer 对应 POSITION_TEX_COLOR layout:
+                // vertex(posX,posY,posZ,  colorRGBA,  u,v,   packedOverlay?)
+                // 下面用最常用的 4-float color=white, overlay=0 的写法
+                vc.addVertex(pose, triangle.v[i].x, triangle.v[i].y, triangle.v[i].z)
+                        .setColor(vertColor.x, vertColor.y, vertColor.z, vertColor.w)
+                        .setUv(triangle.t[i].x, triangle.t[i].y)
+                        .setNormal(triangle.n.x, triangle.n.y, triangle.n.z);
             }
         }
     }

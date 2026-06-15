@@ -13,7 +13,7 @@ import org.joml.Matrix4f;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class SimpleState<E extends Entity & IResourceGetter> extends EntityRenderState implements IRenderingEntry {
+public class SimpleState<E extends Entity & IResourceGetter> extends EntityRenderState {
     public E entity;
     public Vec3 deltaOffset(){
         var end = this.entity.oldPosition().add(this.entity.getDeltaMovement());
@@ -23,44 +23,4 @@ public class SimpleState<E extends Entity & IResourceGetter> extends EntityRende
         return new Vec3(x, y, z).subtract(this.entity.oldPosition());
     }
 
-    @Override
-    public int getVertexCount() {
-        return 0;
-    }
-
-
-    @Override
-    public String uniformName() {
-        return null;
-    }
-
-    @Override
-    public void setVertexBuffer(GpuBuffer buffer) {
-
-    }
-
-    @Override
-    public GpuBuffer getVertexBuffer() {
-        return null;
-    }
-
-    @Override
-    public void setModelView(Matrix4f matrix4f) {
-
-    }
-
-    @Override
-    public MeshData getMesh() {
-        return null;
-    }
-
-    @Override
-    public boolean tryGetModelView(AtomicReference<Matrix4f> ref) {
-        return false;
-    }
-
-    @Override
-    public void clear() {
-
-    }
 }

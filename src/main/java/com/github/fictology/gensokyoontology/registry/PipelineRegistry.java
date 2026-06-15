@@ -1,6 +1,7 @@
 package com.github.fictology.gensokyoontology.registry;
 
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
+import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
@@ -9,9 +10,13 @@ import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.neoforged.neoforge.client.stencil.StencilPerFaceTest;
 import net.neoforged.neoforge.client.stencil.StencilTest;
 
+/**
+ * 新加入的Stencil特性：选区遮罩
+ */
 public final class PipelineRegistry {
 
     public static final VertexFormat GSKO_DEFAULT = VertexFormat.builder()
@@ -21,22 +26,24 @@ public final class PipelineRegistry {
             .padding(1)
             .build();
 
-    public static final RenderPipeline MASTER_SPARK = RenderPipeline.builder()
+    public static final RenderPipeline MASTER_SPARK = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
+            .withCull(false)
             .withLocation(GSKOUtil.key("pipeline/master_spark"))
+            .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL, VertexFormat.Mode.TRIANGLES)
             .withVertexShader(GSKOUtil.key("master_spark"))
             .withFragmentShader(GSKOUtil.key("master_spark"))
-            .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL, VertexFormat.Mode.TRIANGLES)
-                .build();
+            .withDepthStencilState(DepthStencilState.DEFAULT)
+            .withColorTargetState(new ColorTargetState(BlendFunction.LIGHTNING))
+            .build();
 
-    public static final RenderPipeline DREAM_SPHERE = RenderPipeline.builder()
+    public static final RenderPipeline DREAM_SPHERE = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
+            .withCull(false)
             .withLocation(GSKOUtil.key("pipeline/dream_sphere"))
             .withVertexShader(GSKOUtil.key("dream_sphere"))
             .withFragmentShader(GSKOUtil.key("dream_sphere"))
             .withVertexFormat(GSKO_DEFAULT, VertexFormat.Mode.TRIANGLES)
             .withUniform("SphereData", UniformType.UNIFORM_BUFFER)
-            .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false)) // 或 NO_DEPTH_TEST 如果你要纯overlay
-
-            .withCull(false)         // 球体从里面也要看
-            .withColorTargetState(ColorTargetState.DEFAULT)
+            .withDepthStencilState(DepthStencilState.DEFAULT)
+            .withColorTargetState(new ColorTargetState(BlendFunction.LIGHTNING))
             .build();
 }

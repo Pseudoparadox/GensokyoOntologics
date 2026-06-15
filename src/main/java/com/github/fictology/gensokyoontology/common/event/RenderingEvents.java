@@ -10,18 +10,11 @@ import com.github.fictology.gensokyoontology.client.renderer.vfx.MasterSparkRend
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.PipelineRegistry;
 import com.github.fictology.gensokyoontology.registry.RenderTypeRegistry;
-import com.github.fictology.gensokyoontology.util.GSKOGeometry;
-import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MappableRingBuffer;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.SkyRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -30,12 +23,14 @@ import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.client.event.lifecycle.ClientStartedEvent;
-import org.joml.*;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
-import java.util.concurrent.atomic.AtomicReference;
 
 @EventBusSubscriber(modid = GensokyoOntology.MODID, value = Dist.CLIENT)
 public class RenderingEvents {
@@ -62,8 +57,6 @@ public class RenderingEvents {
 
         RenderManager.registerRenderingPass(RenderTypeRegistry.DREAM_SPHERE, PipelineRegistry.DREAM_SPHERE,
                 state, sphereBuf);
-        RenderManager.registerRenderingPass(RenderTypeRegistry.MASTER_SPARK, PipelineRegistry.MASTER_SPARK,
-                state, sparkBuf);
     }
 
     @SubscribeEvent
@@ -89,15 +82,19 @@ public class RenderingEvents {
                     new Matrix4f());
 
             ubo.rotate();
-            try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                    () -> renderType.pipeline().getLocation().toString(),
-                    renderTarget.getColorTextureView(), OptionalInt.empty(),
-                    renderTarget.getDepthTextureView(), OptionalDouble.empty())) {
+            if (renderTarget.getColorTextureView() != null) {
+                try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+                        () -> renderType.pipeline().getLocation().toString(),
+                        renderTarget.getColorTextureView(), OptionalInt.empty(),
+                        renderTarget.getDepthTextureView(), OptionalDouble.empty())) {
 
-                pass.setPipeline(pipeline);
-                pass.setUniform(entry.uniformName(), ubo.currentBuffer());
-                pass.setVertexBuffer(0, vbo);
-                pass.draw(0, entry.getVertexCount());
+                    pass.setPipeline(pipeline);
+                    pass.setUniform("DynamicTransforms", transforms);
+                    RenderSystem.bindDefaultUniforms(pass);
+                    pass.setUniform(entry.uniformName(), ubo.currentBuffer());
+                    pass.setVertexBuffer(0, vbo);
+                    pass.draw(0, entry.getVertexCount());
+                }
             }
             matrixStack.popMatrix();
         });
@@ -117,7 +114,6 @@ public class RenderingEvents {
 
     @SubscribeEvent
     public static void registerPipelines(RegisterRenderPipelinesEvent event){
-        event.registerPipeline(PipelineRegistry.MASTER_SPARK);
         event.registerPipeline(PipelineRegistry.DREAM_SPHERE);
     }
 

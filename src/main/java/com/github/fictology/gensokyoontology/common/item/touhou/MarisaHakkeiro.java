@@ -8,6 +8,8 @@ import com.github.fictology.gensokyoontology.util.api.IRayTraceReader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -30,6 +32,23 @@ public class MarisaHakkeiro extends Item implements IRayTraceReader {
 
     @Override
     public void onUseTick(Level world, LivingEntity entityLiving, ItemStack stack, int remainingUseDuration) {
+
+    }
+
+    @Override
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+
+        var sparkPos = player.getPosition(0f).add(player.getLookAngle().scale(2));
+        var masterSpark = new MasterSparkEntity(player, player.level());
+        player.setOldPosAndRot();
+        masterSpark.setOldPosAndRot(sparkPos, player.yRotO, player.xRotO);
+        player.level().addFreshEntity(masterSpark);
+
+        if (player.level().isClientSide()) {
+            player.level().playSound(player, BlockPos.containing(player.getPosition(0f)),
+                    GSKOSoundEvents.MASTER_SPARK.get(), SoundSource.AMBIENT, 0.8f, 1f);
+        }
+        return super.use(level, player, hand);
 
     }
 

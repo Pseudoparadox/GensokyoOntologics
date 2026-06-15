@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageType;
@@ -173,4 +174,8 @@ public class LaserSourceEntity extends AffiliatedEntity implements IRayTraceRead
             hurtLiving.hurtServer(serverLevel, createDamage(level, damageType), amount);
     }
 
+    @Override
+    public Identifier getTexture() {
+        return null;
+    }
 }

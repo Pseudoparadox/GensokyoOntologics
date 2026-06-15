@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
@@ -48,5 +49,10 @@ public class DreamSphere extends AffiliatedEntity {
     protected void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
         this.setFromSyncData("index", compound, this.entityData, DATA_INDEX);
+    }
+
+    @Override
+    public Identifier getTexture() {
+        return null;
     }
 }
