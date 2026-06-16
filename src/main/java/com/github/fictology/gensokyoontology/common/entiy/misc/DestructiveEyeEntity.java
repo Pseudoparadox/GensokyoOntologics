@@ -4,8 +4,7 @@ import com.github.fictology.gensokyoontology.common.combat.GSKODamage;
 import com.github.fictology.gensokyoontology.common.entiy.AffiliatedEntity;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
-import com.github.fictology.gensokyoontology.util.api.IDamageHandler;
-import net.minecraft.nbt.CompoundTag;
+import com.github.fictology.gensokyoontology.api.IDamageHandler;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -18,8 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ItemSupplier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 public class DestructiveEyeEntity extends AffiliatedEntity implements ItemSupplier, IDamageHandler {
     public final int MAX_LIVING_TICK = 50;

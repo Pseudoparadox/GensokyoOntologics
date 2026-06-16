@@ -2,7 +2,7 @@ package com.github.fictology.gensokyoontology.common.item.touhou;
 
 import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
-import com.github.fictology.gensokyoontology.util.api.IRayTraceReader;
+import com.github.fictology.gensokyoontology.api.IRayTraceReader;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;

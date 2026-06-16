@@ -1,7 +1,7 @@
 package com.github.fictology.gensokyoontology.client;
 
 import com.github.fictology.gensokyoontology.client.renderer.state.RenderingQueue;
-import com.github.fictology.gensokyoontology.util.api.render.IRenderingEntry;
+import com.github.fictology.gensokyoontology.api.render.IRenderingEntry;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.renderer.MappableRingBuffer;

@@ -1,6 +1,6 @@
 package com.github.fictology.gensokyoontology.common.entiy;
 
-import com.github.fictology.gensokyoontology.util.api.V3f;
+import com.github.fictology.gensokyoontology.api.V3f;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;

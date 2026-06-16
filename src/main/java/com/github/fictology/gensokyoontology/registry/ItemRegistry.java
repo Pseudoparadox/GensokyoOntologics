@@ -2,7 +2,6 @@ package com.github.fictology.gensokyoontology.registry;
 
 import com.github.fictology.gensokyoontology.GensokyoOntology;
 import com.github.fictology.gensokyoontology.common.combat.SpellBehaviors;
-import com.github.fictology.gensokyoontology.common.entiy.ai.goal.BattleBasedGoal;
 import com.github.fictology.gensokyoontology.common.item.DanmakuItem;
 import com.github.fictology.gensokyoontology.common.item.spellcard.SpellCardItem;
 import com.github.fictology.gensokyoontology.common.item.touhou.AyaFans;
@@ -11,9 +10,7 @@ import com.github.fictology.gensokyoontology.common.item.touhou.KoishiEyeOpen;
 import com.github.fictology.gensokyoontology.common.item.touhou.MarisaHakkeiro;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.util.StoneGambleHelper;
-import com.github.fictology.gensokyoontology.util.api.BossSpell;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.screens.Screen;
+import com.github.fictology.gensokyoontology.api.BossSpell;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -36,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 

@@ -1,7 +1,7 @@
 package com.github.fictology.gensokyoontology.client.gui;
 
 
-import com.github.fictology.gensokyoontology.util.api.IInputParser;
+import com.github.fictology.gensokyoontology.api.IInputParser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;

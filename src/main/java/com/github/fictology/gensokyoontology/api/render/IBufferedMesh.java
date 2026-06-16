@@ -1,4 +1,4 @@
-package com.github.fictology.gensokyoontology.util.api.render;
+package com.github.fictology.gensokyoontology.api.render;
 
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.vertex.BufferBuilder;

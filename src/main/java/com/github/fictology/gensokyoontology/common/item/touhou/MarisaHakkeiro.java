@@ -4,7 +4,7 @@ import com.github.fictology.gensokyoontology.common.entiy.misc.MasterSparkEntity
 import com.github.fictology.gensokyoontology.registry.GSKOSoundEvents;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
-import com.github.fictology.gensokyoontology.util.api.IRayTraceReader;
+import com.github.fictology.gensokyoontology.api.IRayTraceReader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 /**
  * 魔理沙的八卦炉
  */
-public class MarisaHakkeiro extends Item implements IRayTraceReader {
+public class MarisaHakkeiro extends Item implements IRayTraceReader, IHasCooldown {
     public MarisaHakkeiro(Properties properties) {
         super(properties);
     }
@@ -37,12 +37,13 @@ public class MarisaHakkeiro extends Item implements IRayTraceReader {
 
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
+        if (!this.canLaunchSpark(player.getInventory())) {
+            GSKOUtil.showMsg(player, "你没有足够火焰弹或者B点", true);
+            return InteractionResult.FAIL;
+        }
+        player.startUsingItem(hand);
 
-        var masterSpark = new MasterSparkEntity(player, player.level());
-        masterSpark.setPos(new Vec3(player.getX(), player.getY() + player.getEyeHeight(), player.getZ()));
-        masterSpark.setXRot(player.getXRot());
-        masterSpark.setYRot(player.getYRot());
-        player.level().addFreshEntity(masterSpark);
+
 
 //        if (player.level().isClientSide()) {
 //            player.level().playSound(player, BlockPos.containing(player.getPosition(0f)),
@@ -55,14 +56,13 @@ public class MarisaHakkeiro extends Item implements IRayTraceReader {
     @Override
     public boolean releaseUsing(ItemStack stack, Level world, LivingEntity entityLiving, int timeLeft) {
         if (!(entityLiving instanceof Player player)) return false;
-        if (!this.canLaunchSpark(player.getInventory())) return false;
         if (timeLeft <= getUseDuration(stack, player)) return false;
 
-        var sparkPos = player.getPosition(0f).add(player.getLookAngle().scale(2));
-        var masterSpark = new MasterSparkEntity(player, world);
-        player.setOldPosAndRot();
-        masterSpark.setOldPosAndRot(sparkPos, player.yRotO, player.xRotO);
-        world.addFreshEntity(masterSpark);
+        var masterSpark = new MasterSparkEntity(player, player.level());
+        masterSpark.setPos(new Vec3(player.getX(), player.getY() + player.getEyeHeight(), player.getZ()));
+        masterSpark.setXRot(player.getXRot());
+        masterSpark.setYRot(player.getYRot());
+        player.level().addFreshEntity(masterSpark);
 
         if (world.isClientSide()) {
             world.playSound(player, BlockPos.containing(player.getPosition(0f)),
@@ -74,7 +74,6 @@ public class MarisaHakkeiro extends Item implements IRayTraceReader {
 
         return true;
     }
-
 
     @SuppressWarnings("deprecation")
     public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull TooltipDisplay tooltip, Consumer<Component> tooltipAdder, @NotNull TooltipFlag flag) {
@@ -100,6 +99,7 @@ public class MarisaHakkeiro extends Item implements IRayTraceReader {
                     1.0f, false, Level.ExplosionInteraction.NONE);
         }
     }
+
 
     public boolean canLaunchSpark(Inventory inventory) {
         boolean hasBomb = false;

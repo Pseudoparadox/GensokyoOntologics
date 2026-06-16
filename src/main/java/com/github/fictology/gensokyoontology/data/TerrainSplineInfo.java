@@ -1,7 +1,7 @@
 package com.github.fictology.gensokyoontology.data;
 
-import com.github.fictology.gensokyoontology.util.api.FloatPair;
-import com.github.fictology.gensokyoontology.util.api.FloatRange;
+import com.github.fictology.gensokyoontology.api.FloatPair;
+import com.github.fictology.gensokyoontology.api.FloatRange;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

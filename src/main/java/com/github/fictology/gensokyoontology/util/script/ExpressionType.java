@@ -1,7 +1,7 @@
 package com.github.fictology.gensokyoontology.util.script;
 
 import com.github.fictology.gensokyoontology.registry.Expressions;
-import com.github.fictology.gensokyoontology.util.api.Tree;
+import com.github.fictology.gensokyoontology.api.Tree;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;

@@ -3,7 +3,7 @@ package com.github.fictology.gensokyoontology.common.item.spellcard;
 
 import com.github.fictology.gensokyoontology.common.entiy.SpellCardEntity;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
-import com.github.fictology.gensokyoontology.util.api.BossSpell;
+import com.github.fictology.gensokyoontology.api.BossSpell;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;

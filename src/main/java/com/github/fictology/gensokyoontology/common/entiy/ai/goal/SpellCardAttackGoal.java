@@ -1,7 +1,7 @@
 package com.github.fictology.gensokyoontology.common.entiy.ai.goal;
 
 import com.github.fictology.gensokyoontology.common.entiy.monster.YoukaiEntity;
-import com.github.fictology.gensokyoontology.util.api.BossSpell;
+import com.github.fictology.gensokyoontology.api.BossSpell;
 import net.minecraft.world.entity.Entity;
 
 public class SpellCardAttackGoal extends BattleBasedGoal {

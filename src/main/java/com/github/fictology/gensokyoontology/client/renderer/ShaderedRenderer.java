@@ -2,7 +2,7 @@ package com.github.fictology.gensokyoontology.client.renderer;
 
 import com.github.fictology.gensokyoontology.client.RenderManager;
 import com.github.fictology.gensokyoontology.client.renderer.state.RenderingQueue;
-import com.github.fictology.gensokyoontology.util.api.render.IRenderingEntry;
+import com.github.fictology.gensokyoontology.api.render.IRenderingEntry;
 import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;

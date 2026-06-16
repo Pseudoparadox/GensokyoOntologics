@@ -4,7 +4,7 @@ import com.github.fictology.gensokyoontology.common.combat.DanmakuUtil;
 import com.github.fictology.gensokyoontology.common.entiy.ai.goal.DamakuAttackGoal;
 import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
-import com.github.fictology.gensokyoontology.util.api.V3f;
+import com.github.fictology.gensokyoontology.api.V3f;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.AgeableMob;

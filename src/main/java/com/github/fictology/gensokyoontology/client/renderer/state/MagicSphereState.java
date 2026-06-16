@@ -1,7 +1,7 @@
 package com.github.fictology.gensokyoontology.client.renderer.state;
 
 import com.github.fictology.gensokyoontology.util.GSKOGeometry;
-import com.github.fictology.gensokyoontology.util.api.render.IRenderingEntry;
+import com.github.fictology.gensokyoontology.api.render.IRenderingEntry;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;

@@ -1,4 +1,4 @@
-package com.github.fictology.gensokyoontology.util.api;
+package com.github.fictology.gensokyoontology.api;
 
 
 import com.github.fictology.gensokyoontology.common.tags.GSKODamageTags;

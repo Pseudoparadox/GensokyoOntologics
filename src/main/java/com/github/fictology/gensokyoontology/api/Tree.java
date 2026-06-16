@@ -1,4 +1,4 @@
-package com.github.fictology.gensokyoontology.util.api;
+package com.github.fictology.gensokyoontology.api;
 
 import java.util.*;
 import java.util.stream.Collectors;

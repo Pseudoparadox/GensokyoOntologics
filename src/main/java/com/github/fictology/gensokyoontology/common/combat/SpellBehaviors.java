@@ -4,7 +4,7 @@ import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
 import com.github.fictology.gensokyoontology.common.entiy.misc.LaserSourceEntity;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
-import com.github.fictology.gensokyoontology.util.api.BossSpell;
+import com.github.fictology.gensokyoontology.api.BossSpell;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;

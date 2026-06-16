@@ -2,9 +2,7 @@ package com.github.fictology.gensokyoontology.client.renderer;
 
 import com.github.fictology.gensokyoontology.client.model.ObjMesh;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
-import com.github.fictology.gensokyoontology.util.api.render.IRenderingEntry;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;

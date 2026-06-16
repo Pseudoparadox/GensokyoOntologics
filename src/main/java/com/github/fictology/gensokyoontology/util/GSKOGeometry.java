@@ -1,6 +1,6 @@
 package com.github.fictology.gensokyoontology.util;
 
-import com.github.fictology.gensokyoontology.util.api.V3f;
+import com.github.fictology.gensokyoontology.api.V3f;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;

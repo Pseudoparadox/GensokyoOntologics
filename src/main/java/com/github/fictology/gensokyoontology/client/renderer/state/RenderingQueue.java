@@ -1,6 +1,6 @@
 package com.github.fictology.gensokyoontology.client.renderer.state;
 
-import com.github.fictology.gensokyoontology.util.api.render.IRenderingEntry;
+import com.github.fictology.gensokyoontology.api.render.IRenderingEntry;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

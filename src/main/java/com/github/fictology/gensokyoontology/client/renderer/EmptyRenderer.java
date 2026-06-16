@@ -1,7 +1,7 @@
 package com.github.fictology.gensokyoontology.client.renderer;
 
 import com.github.fictology.gensokyoontology.client.renderer.state.SimpleState;
-import com.github.fictology.gensokyoontology.util.api.render.IResourceGetter;
+import com.github.fictology.gensokyoontology.api.render.IResourceGetter;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.entity.Entity;

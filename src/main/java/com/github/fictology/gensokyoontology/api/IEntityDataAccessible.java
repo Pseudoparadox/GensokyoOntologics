@@ -1,4 +1,4 @@
-package com.github.fictology.gensokyoontology.util.api;
+package com.github.fictology.gensokyoontology.api;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;

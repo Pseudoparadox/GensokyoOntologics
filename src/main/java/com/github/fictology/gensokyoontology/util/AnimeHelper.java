@@ -1,6 +1,6 @@
 package com.github.fictology.gensokyoontology.util;
 
-import com.github.fictology.gensokyoontology.util.api.V3f;
+import com.github.fictology.gensokyoontology.api.V3f;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.ClipboardManager;

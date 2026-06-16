@@ -7,7 +7,7 @@ import com.github.fictology.gensokyoontology.data.DanmakuColor;
 import com.github.fictology.gensokyoontology.registry.DataRegistry;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
-import com.github.fictology.gensokyoontology.util.api.IRayTraceReader;
+import com.github.fictology.gensokyoontology.api.IRayTraceReader;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
