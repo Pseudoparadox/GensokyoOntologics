@@ -15,6 +15,7 @@ import com.mojang.blaze3d.buffers.Std140SizeCalculator;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MappableRingBuffer;
+import net.minecraft.client.resources.model.ModelDiscovery;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -53,7 +54,7 @@ public class RenderingEvents {
                         .putVec2().get());
 
         var state = new MagicSphereState();
-        state.buildMesh(RenderTypeRegistry.DREAM_SPHERE, 18, 18);
+        // state.buildMesh(RenderTypeRegistry.DREAM_SPHERE, 18, 18);
 
         RenderManager.registerRenderingPass(RenderTypeRegistry.DREAM_SPHERE, PipelineRegistry.DREAM_SPHERE,
                 state, sphereBuf);
@@ -65,39 +66,39 @@ public class RenderingEvents {
         var renderTarget = Minecraft.getInstance().getMainRenderTarget();
         var projMatrix = RenderSystem.getProjectionMatrixBuffer();
 
-        RenderManager.renderOnEach((renderType, entry) -> {
-
-            var ubo = RenderManager.getUniformBuffer(renderType);
-            var vbo = RenderManager.getVertexBuffer(renderType);
-            var pipeline = RenderManager.getPipeline(renderType);
-
-            Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
-            matrixStack.pushMatrix();
-            RenderManager.setModelView(renderType, matrixStack);
-
-            var transforms = RenderSystem.getDynamicUniforms().writeTransform(
-                    poseStack.last().pose(),              // <-- 实体 PoseStack pose
-                    new Vector4f(0f,0f,0f,1f),              // ColorModulator
-                    new Vector3f(),
-                    new Matrix4f());
-
-            ubo.rotate();
-            if (renderTarget.getColorTextureView() != null) {
-                try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                        () -> renderType.pipeline().getLocation().toString(),
-                        renderTarget.getColorTextureView(), OptionalInt.empty(),
-                        renderTarget.getDepthTextureView(), OptionalDouble.empty())) {
-
-                    pass.setPipeline(pipeline);
-                    pass.setUniform("DynamicTransforms", transforms);
-                    RenderSystem.bindDefaultUniforms(pass);
-                    pass.setUniform(entry.uniformName(), ubo.currentBuffer());
-                    pass.setVertexBuffer(0, vbo);
-                    pass.draw(0, entry.getVertexCount());
-                }
-            }
-            matrixStack.popMatrix();
-        });
+//        RenderManager.renderOnEach((renderType, entry) -> {
+//
+//            var ubo = RenderManager.getUniformBuffer(renderType);
+//            var vbo = RenderManager.getVertexBuffer(renderType);
+//            var pipeline = RenderManager.getPipeline(renderType);
+//
+//            Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
+//            matrixStack.pushMatrix();
+//            RenderManager.setModelView(renderType, matrixStack);
+//
+//            var transforms = RenderSystem.getDynamicUniforms().writeTransform(
+//                    poseStack.last().pose(),              // <-- 实体 PoseStack pose
+//                    new Vector4f(0f,0f,0f,1f),              // ColorModulator
+//                    new Vector3f(),
+//                    new Matrix4f());
+//
+//            ubo.rotate();
+//            if (renderTarget.getColorTextureView() != null) {
+//                try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+//                        () -> renderType.pipeline().getLocation().toString(),
+//                        renderTarget.getColorTextureView(), OptionalInt.empty(),
+//                        renderTarget.getDepthTextureView(), OptionalDouble.empty())) {
+//
+//                    pass.setPipeline(pipeline);
+//                    pass.setUniform("DynamicTransforms", transforms);
+//                    RenderSystem.bindDefaultUniforms(pass);
+//                    pass.setUniform(entry.uniformName(), ubo.currentBuffer());
+//                    pass.setVertexBuffer(0, vbo);
+//                    pass.draw(0, entry.getVertexCount());
+//                }
+//            }
+//            matrixStack.popMatrix();
+//        });
 
     }
 

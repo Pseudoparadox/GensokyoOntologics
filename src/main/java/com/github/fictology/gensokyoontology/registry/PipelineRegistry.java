@@ -30,10 +30,10 @@ public final class PipelineRegistry {
             .withCull(false)
             .withLocation(GSKOUtil.key("pipeline/master_spark"))
             .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL, VertexFormat.Mode.TRIANGLES)
-            .withVertexShader(GSKOUtil.key("master_spark"))
-            .withFragmentShader(GSKOUtil.key("master_spark"))
-            .withDepthStencilState(DepthStencilState.DEFAULT)
+            .withVertexShader("core/rendertype_lightning")
+            .withFragmentShader("core/rendertype_lightning")
             .withColorTargetState(new ColorTargetState(BlendFunction.LIGHTNING))
+            .withDepthStencilState(DepthStencilState.DEFAULT)
             .build();
 
     public static final RenderPipeline DREAM_SPHERE = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
@@ -41,8 +41,7 @@ public final class PipelineRegistry {
             .withLocation(GSKOUtil.key("pipeline/dream_sphere"))
             .withVertexShader(GSKOUtil.key("dream_sphere"))
             .withFragmentShader(GSKOUtil.key("dream_sphere"))
-            .withVertexFormat(GSKO_DEFAULT, VertexFormat.Mode.TRIANGLES)
-            .withUniform("SphereData", UniformType.UNIFORM_BUFFER)
+            .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL, VertexFormat.Mode.TRIANGLES)
             .withDepthStencilState(DepthStencilState.DEFAULT)
             .withColorTargetState(new ColorTargetState(BlendFunction.LIGHTNING))
             .build();

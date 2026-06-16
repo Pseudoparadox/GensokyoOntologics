@@ -41,4 +41,9 @@ public interface IDamageHandler {
         if (!(level instanceof ServerLevel serverLevel)) return;
         living.hurtServer(serverLevel, createDamage(level, directEntity, causingEntity, damageType), amount);
     }
+
+    default boolean canAttack(Entity source, Entity targetToHurt){
+        return source.getUUID() == targetToHurt.getUUID();
+    }
+
 }

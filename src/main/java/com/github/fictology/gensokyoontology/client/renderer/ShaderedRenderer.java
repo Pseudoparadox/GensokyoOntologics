@@ -35,7 +35,7 @@ public abstract class ShaderedRenderer<E extends Entity, S extends EntityRenderS
     @Override
     public void submit(S state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         // super.submit(state, poseStack, submitNodeCollector, camera);
-        this.submitMesh(state, poseStack);
+        // this.submitMesh(state, poseStack);
         this.submitShader(state);
     }
 

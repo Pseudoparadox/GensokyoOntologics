@@ -55,10 +55,10 @@ public abstract class AffiliatedEntity extends Entity implements OwnableEntity, 
         }
     }
 
-    public boolean tryGetOwner(AtomicReference<EntityReference<LivingEntity>> ref){
+    public boolean tryGetOwner(AtomicReference<LivingEntity> ref){
         if (this.getOwnerReference() == null) return false;
         if (this.getOwnerReference().getEntity(this.level(), LivingEntity.class) == null) return false;
-        ref.set(this.getOwnerReference());
+        ref.set(this.getOwnerReference().getEntity(this.level(), LivingEntity.class));
         return true;
     }
 

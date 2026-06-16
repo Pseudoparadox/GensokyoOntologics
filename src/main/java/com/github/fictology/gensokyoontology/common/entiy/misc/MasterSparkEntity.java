@@ -5,6 +5,7 @@ import com.github.fictology.gensokyoontology.common.combat.DanmakuUtil;
 import com.github.fictology.gensokyoontology.common.combat.GSKODamage;
 import com.github.fictology.gensokyoontology.common.entiy.AffiliatedEntity;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
+import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.util.api.IDamageHandler;
 import com.github.fictology.gensokyoontology.util.api.IRayTraceReader;
 import com.github.fictology.gensokyoontology.util.api.render.IResourceGetter;
@@ -15,11 +16,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceReader, IDamageHandler, IResourceGetter {
@@ -44,9 +47,12 @@ public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceRead
         var startList = DanmakuUtil.spheroidPos(1.5, 10);
 
         startList.forEach(vector3d -> entities.addAll(rayTrace(serverLevel, this, DISTANCE, vector3d)));
-//        Predicate<Entity> canAttack = entity -> this.getOwnerReference().;
-//
-//        entities.stream().filter(canAttack).forEach(entity -> this.hurtLiving((LivingEntity) entity, serverLevel, GSKODamage.LASER, 10F));
+        var ref = GSKOUtil.<LivingEntity>atomic();
+        if (this.tryGetOwner(ref)){
+            var owner = ref.get();
+            entities.stream().filter(entity -> this.canAttack(owner, entity))
+                    .forEach(entity ->  this.hurtLiving((LivingEntity) entity, serverLevel, GSKODamage.LASER, 10F));
+        }
     }
 
     @Override

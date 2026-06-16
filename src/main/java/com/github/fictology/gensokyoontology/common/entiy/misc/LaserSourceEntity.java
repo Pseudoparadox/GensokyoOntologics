@@ -87,13 +87,13 @@ public class LaserSourceEntity extends AffiliatedEntity implements IRayTraceRead
 
         Vec3 start = this.getPosition(0);
         Vec3 end = this.getLookAngle().scale(this.range).add(start);
-        var ref = new AtomicReference<EntityReference<LivingEntity>>();
+        var ref = new AtomicReference<LivingEntity>();
 
         if (!this.tryGetOwner(ref)) return;
         if (this.tickCount % 2 == 0 && rayTrace(this.level(), this, start, end).isPresent()) {
             rayTrace(this.level(), this, start, end).ifPresent(entity -> {
                 // 这里检测 ref 里存储的实体所有者是否和射线检测的实体是同一个实体
-                if (!ref.get().matches((LivingEntity) entity))
+                if (this.canAttack(ref.get(), entity))
                     hurtLiving((LivingEntity) entity, level(), GSKODamage.LASER, 5f);
             });
         }

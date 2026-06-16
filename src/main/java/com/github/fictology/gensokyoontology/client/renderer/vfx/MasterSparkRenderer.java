@@ -28,17 +28,29 @@ public class MasterSparkRenderer extends ObjVFXRenderer<MasterSparkEntity, Simpl
     }
 
     @Override
+    public void extractRenderState(MasterSparkEntity entity, SimpleState<MasterSparkEntity> state, float partialTicks) {
+        super.extractRenderState(entity, state, partialTicks);
+        state.entity = entity;
+    }
+
+    @Override
     public void submit(SimpleState<MasterSparkEntity> state, PoseStack poseStack, SubmitNodeCollector submitor, CameraRenderState camera) {
         poseStack.pushPose();
-
-        var hue = GSKOMathUtil.wavyPeriod(state.partialTick, 0F, 1F);
+        var hue = 3 * GSKOMathUtil.triangularPeriod(state.entity.tickCount, 0, 360) / 360f;
         var color = Color.getHSBColor(hue, 1.0F, 1.0F);
 
+        GSKOMathUtil.rotateMatrixToLookVec(poseStack, state.entity.getLookAngle());
+        poseStack.translate(0, 18, 0);
+        poseStack.scale(2, 5, 2);
         submitor.submitCustomGeometry(poseStack, this.renderType, (pose, vert) -> this.modelMap.get(MODEL_PATH)
-                .render(pose, vert, new Vector4i(color.getRed(), color.getGreen(), color.getBlue(), 100)));
-        poseStack.scale(0.8F, 0.8F, 0.76F);
+                .render(pose, vert, new Vector4i(color.getRed(), color.getGreen(), color.getBlue(), 255)));
+
+        poseStack.pushPose();
+        poseStack.scale(0.5F, 1, 0.5F);
         submitor.submitCustomGeometry(poseStack, this.renderType, (pose, vert) -> this.modelMap.get(MODEL_PATH)
                 .render(pose, vert, new Vector4i(255, 255, 255, 255)));
+
+        poseStack.popPose();
         poseStack.popPose();
     }
 

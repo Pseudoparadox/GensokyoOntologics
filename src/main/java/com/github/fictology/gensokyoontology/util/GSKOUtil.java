@@ -23,8 +23,14 @@ import org.joml.Vector4i;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class GSKOUtil {
+
+    public static <V> AtomicReference<V> atomic(){
+        return new AtomicReference<>();
+    }
+
     public static <T> ResourceKey<T> resource(ResourceKey<? extends Registry<T>> parent, String name) {
         return ResourceKey.create(parent, key(name));
     }

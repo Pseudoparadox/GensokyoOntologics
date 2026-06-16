@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -157,9 +158,6 @@ public class ObjMesh implements SubmitNodeCollector.CustomGeometryRenderer {
     public void render(PoseStack.Pose pose, VertexConsumer vc, Vector4i vertColor) {
         for (Triangle triangle : trises) {
             for (int i = 0; i < 3; i++) {
-                // VertexConsumer 对应 POSITION_TEX_COLOR layout:
-                // vertex(posX,posY,posZ,  colorRGBA,  u,v,   packedOverlay?)
-                // 下面用最常用的 4-float color=white, overlay=0 的写法
                 vc.addVertex(pose, triangle.v[i].x, triangle.v[i].y, triangle.v[i].z)
                         .setColor(vertColor.x, vertColor.y, vertColor.z, vertColor.w)
                         .setUv(triangle.t[i].x, triangle.t[i].y)
