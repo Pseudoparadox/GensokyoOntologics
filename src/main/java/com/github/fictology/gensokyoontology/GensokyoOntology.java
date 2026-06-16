@@ -53,6 +53,7 @@ public class GensokyoOntology {
         DataRegistry.ATTACHMENTS.register(modEventBus);
         DataRegistry.DATA.register(modEventBus);
         Expressions.EXPRESSIONS.register(modEventBus);
+        GSKOSoundEvents.SOUND_EVENTS.register(modEventBus);
         CREATIVE_TABS.register(modEventBus);
         // modEventBus.addListener(this::onItemRegister);
 

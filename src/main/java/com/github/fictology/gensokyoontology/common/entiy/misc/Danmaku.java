@@ -1,6 +1,7 @@
 package com.github.fictology.gensokyoontology.common.entiy.misc;
 
 
+import com.github.fictology.gensokyoontology.GensokyoOntology;
 import com.github.fictology.gensokyoontology.common.combat.GSKODamage;
 import com.github.fictology.gensokyoontology.data.DanmakuColor;
 import com.github.fictology.gensokyoontology.registry.DataRegistry;
@@ -133,11 +134,6 @@ public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, ID
 //        // this.behavior = expression;
 //        return this;
 //    }
-
-    public float getScale(){
-        return 2.0F;
-    }
-
 
     public Danmaku owner(Entity owner) {
         this.setOwner(owner);
@@ -322,7 +318,8 @@ public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, ID
 
     @Override
     public Identifier getTexture() {
-        return GSKOUtil.key("textures/item/" + BuiltInRegistries.ITEM.getKey(this.getItem().getItem()).getPath()
-        + ".png");
+        var registryName = BuiltInRegistries.ITEM.getKey(this.getItem().getItem());
+        var fileName = registryName.toString().replace(GensokyoOntology.MODID + ":", "");
+        return GSKOUtil.key("textures/item/" + fileName + ".png");
     }
 }

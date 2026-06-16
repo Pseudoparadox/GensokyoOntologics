@@ -1,6 +1,6 @@
 package com.github.fictology.gensokyoontology.client.renderer;
 
-import com.github.fictology.gensokyoontology.client.renderer.state.SimpleState;
+import com.github.fictology.gensokyoontology.client.renderer.state.DanmakuNormalState;
 import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -14,35 +14,41 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 
-public class NormalVectorRenderer extends EntityRenderer<Danmaku, SimpleState<Danmaku>> implements SubmitNodeCollector.CustomGeometryRenderer {
+public class NormalVectorRenderer extends EntityRenderer<Danmaku, DanmakuNormalState> implements SubmitNodeCollector.CustomGeometryRenderer {
 
     public NormalVectorRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
 
     @Override
-    public SimpleState<Danmaku> createRenderState() {
-        return new SimpleState<>();
+    public DanmakuNormalState createRenderState() {
+        return new DanmakuNormalState();
     }
 
     @Override
-    public void extractRenderState(Danmaku entity, SimpleState<Danmaku> state, float partialTicks) {
+    public void extractRenderState(Danmaku entity, DanmakuNormalState state, float partialTicks) {
         super.extractRenderState(entity, state, partialTicks);
-        state.entity = entity;
+        var mappedState = DanmakuNormalState.getStateForItem(entity.getItem().getItem());
+        state.danmaku = entity;
+        state.size = mappedState.size;
+        state.hasNormal = mappedState.hasNormal;
+        state.fliped = mappedState.fliped;
     }
 
     @Override
-    public void submit(SimpleState<Danmaku> state, PoseStack poseStack, SubmitNodeCollector node, CameraRenderState camera) {
+    public void submit(DanmakuNormalState state, PoseStack poseStack, SubmitNodeCollector node, CameraRenderState camera) {
 
         poseStack.pushPose();
-        poseStack.translate(0, 1F, 0);
+        poseStack.translate(0, 0.5F, 0);
 
-        poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(state.partialTick, state.entity.yRotO, state.entity.getYRot()) - 90f));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(state.partialTick, state.entity.xRotO, state.entity.getXRot()) - 90f));
+        poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(state.partialTick, state.danmaku.yRotO, state.danmaku.getYRot()) - 90f));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(state.partialTick, state.danmaku.xRotO, state.danmaku.getXRot()) - 90f));
         poseStack.mulPose(Axis.YP.rotationDegrees(90.f));
 
-        poseStack.scale(state.entity.getScale(), state.entity.getScale(), state.entity.getScale());
-        node.submitCustomGeometry(poseStack, RenderTypes.entityTranslucentEmissive(state.entity.getTexture()), this);
+        poseStack.scale(state.size, state.size, state.size);
+        if (state.fliped) poseStack.mulPose(Axis.ZP.rotationDegrees(180.F));
+
+        node.submitCustomGeometry(poseStack, RenderTypes.entityTranslucentEmissive(state.danmaku.getTexture()), this);
         poseStack.popPose();
     }
 
