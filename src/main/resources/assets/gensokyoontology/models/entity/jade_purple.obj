@@ -1,6 +1,6 @@
 # Blender 3.6.11
 # www.blender.org
-mtllib jade_black.mtl
+mtllib jade_purple.mtl
 o eyeLight
 v 0.551075 0.824818 -0.202643
 v -0.485587 -0.869398 -0.182828

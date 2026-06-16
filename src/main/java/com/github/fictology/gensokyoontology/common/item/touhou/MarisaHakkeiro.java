@@ -45,6 +45,10 @@ public class MarisaHakkeiro extends Item implements IRayTraceReader {
         if (!(entityLiving instanceof Player player)) return false;
         var timeHeld = this.getUseDuration(stack, entityLiving) - timeLeft;
         if (timeHeld <= getChargeTick()) return false;
+        if (!this.canLaunchSpark(player.getInventory())) {
+            GSKOUtil.showMsg(player, "你没有足够火焰弹或者B点", true);
+            return false;
+        }
 
         var masterSpark = new MasterSparkEntity(player, player.level());
         masterSpark.setPos(new Vec3(player.getX(), player.getY() + player.getEyeHeight(), player.getZ()));

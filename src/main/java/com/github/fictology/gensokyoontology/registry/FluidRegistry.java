@@ -47,8 +47,8 @@ public final class FluidRegistry {
     public static final ResourceLocation PAPER_PULP_STILL_TEX = STILL_HOTSPRING_TEX;
     public static final ResourceLocation PAPER_PULP_FLOW_TEX = FLOW_HOTSPRING_TEX;
 
-    private static <T extends Fluid> T copy(String key, T fluid) {
-        return Registry.copy(BuiltInRegistries.FLUID, key, fluid);
+    private static <T extends Fluid> T copy(String id, T fluid) {
+        return Registry.copy(BuiltInRegistries.FLUID, id, fluid);
     }
     public static final RegistryObject<FlowingFluid> PAPER_PULP_SOURCE = FLUIDS.copy(
             "paper_pulp_fluid",

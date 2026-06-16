@@ -120,7 +120,7 @@ public class RenderingEvents {
 
 
     /**
-     * key code请查看GLFW类，key code 从 GLFW_KEY_0 开始
+     * id code请查看GLFW类，id code 从 GLFW_KEY_0 开始
      * @see GLFW#GLFW_KEY_0
      */
     public static void onScarletMistRendered(ViewportEvent.ComputeFogColor event){

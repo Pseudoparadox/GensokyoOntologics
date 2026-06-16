@@ -50,17 +50,17 @@ public final class DataRegistry {
             "gap_info", builder -> builder.persistent(GapInfo.CODEC).networkSynchronized(GapInfo.STREAM_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<InscriptionInfo>> INSCRIPTION = register(
             "inscriptions", builder -> builder.persistent(InscriptionInfo.CODEC).networkSynchronized(InscriptionInfo.STREAM_CODEC));
-    public static final Supplier<DataComponentType<SpecialMagicInfo>> SPECIAL_MAGIC = register(
-            "special_magic", builer -> builer.persistent(SpecialMagicInfo.CODEC).networkSynchronized(SpecialMagicInfo.STREAM_CODEC));
+    public static final Supplier<DataComponentType<Sorcery>> SPECIAL_MAGIC = register(
+            "special_magic", builer -> builer.persistent(Sorcery.CODEC).networkSynchronized(Sorcery.STREAM_CODEC));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<PrimitiveValueInfo>> PRIMITIVE_VAR = register(
             "variable", builder -> builder.persistent(PrimitiveValueInfo.CODEC).networkSynchronized(PrimitiveValueInfo.STREAM_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Pair<String, Vec3>>> VEC3_VAR = register(
             "vector3", builder -> builder.persistent(Codec.pair(Codec.STRING, Vec3.CODEC)).networkSynchronized(
                     ByteBufCodecs.fromCodec(Codec.pair(Codec.STRING, Vec3.CODEC))));
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Pair<String, SpecialMagicInfo>>> DANMAKU_VAR = register(
-            "var_danmaku", builder -> builder.persistent(Codec.pair(Codec.STRING, SpecialMagicInfo.CODEC)).networkSynchronized(
-                    ByteBufCodecs.fromCodec(Codec.pair(Codec.STRING, SpecialMagicInfo.CODEC))));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Pair<String, Sorcery>>> DANMAKU_VAR = register(
+            "var_danmaku", builder -> builder.persistent(Codec.pair(Codec.STRING, Sorcery.CODEC)).networkSynchronized(
+                    ByteBufCodecs.fromCodec(Codec.pair(Codec.STRING, Sorcery.CODEC))));
 
     public static final Supplier<DataComponentType<ClosureExpression>> CLOSURE = registerExp("closure",
             builder -> builder.persistent(ClosureExpression.EMPTY.type().codec())
