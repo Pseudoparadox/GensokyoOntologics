@@ -1,16 +1,15 @@
 #version 330
 
-uniform mat4 ModelViewMat;
-uniform mat4 ProjMat;
+#moj_import <minecraft:projection.glsl>
+#moj_import <minecraft:dynamictransforms.glsl>
 
-vec2 Offset;
-vec2 Tilling;
-float CellDensity;
+uniform vec2 Offset;
+uniform vec2 Tilling;
+uniform float CellDensity;
 
-
-layout(location = 0) in vec3 Position; // unit-sphere OR obj-vertex in LOCAL space
-layout(location = 1) in vec2 UV0;
-layout(location = 2) in vec3 Normal;
+in vec3 Position; // unit-sphere OR obj-vertex in LOCAL space
+in vec2 UV0;
+in vec3 Normal;
 
 out float density;
 out vec2 offset;

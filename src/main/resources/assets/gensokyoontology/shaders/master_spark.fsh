@@ -152,6 +152,7 @@ vec3 generateColorStrip(vec2 uv){
 
 // 光柱
 void main() {
+
     vec2 uv = vec2(texCoord0.x + offset.x, texCoord0.y + offset.y);
     float noise = cellular2DFBM(uv, RETURN_DISTANCE, density, 4, 2.0F, 2.0F);
     vec3 color = generateColorStrip(uv);

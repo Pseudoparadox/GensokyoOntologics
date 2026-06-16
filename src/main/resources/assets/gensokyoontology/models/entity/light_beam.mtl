@@ -1,8 +1,7 @@
-# Blender 3.6.11 MTL File: 'Hakkeiro.blend'
+# Blender 3.6.11 MTL File: 'LightBeam.blend'
 # www.blender.org
 
-newmtl Material
-map_Kd #texture0
+newmtl material
 Ns 360.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000

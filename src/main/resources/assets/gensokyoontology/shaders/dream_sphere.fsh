@@ -1,13 +1,12 @@
 #version 150 core
 
-in float density;
-in vec2 offset;
-in vec2 tilling;
-in vec4 sphereColor;
 
 in vec3 view;
 in vec3 normal;
 in vec2 texCoord0;
+
+in float time;
+in vec4 sphereColor;
 
 out vec4 fragColor;
 
@@ -16,6 +15,8 @@ const int RETURN_DISTANCE2 = 1;
 const int RETURN_DISTANCE_SUB = 2;
 const int RETURN_DISTANCE_DIV = 3;
 const int RETURN_CELL_VALUE = 4;
+
+const float density = 2F;
 
 // ==================== 菲涅尔计算 ====================
 float fresnel(vec3 viewDir, vec3 normal, float power) {
@@ -135,7 +136,8 @@ float turbulence(vec2 p, float time) {
 }
 
 void main() {
-    vec2 uv = vec2(texCoord0.x + offset.x, texCoord0.y + offset.y);
+
+    vec2 uv = vec2(texCoord0.x, texCoord0.y);
 
     // 计算菲涅尔效应
     vec3 viewDir = normalize(view);
@@ -146,10 +148,10 @@ void main() {
     float baseNoise = cellular2DFBM(uv, RETURN_DISTANCE, density, 4, 2.0F, 2.0F);
 
     // 圆形扩散图案
-    float circlePattern = circularPattern(uv, offset.x);
+    float circlePattern = circularPattern(uv, time);
 
     // 湍流效果
-    float turb = turbulence(uv * 3.0, offset.x);
+    float turb = turbulence(uv * 3.0, time);
 
     // 组合所有效果
     float combinedPattern = baseNoise * 0.4 + circlePattern * 0.4 + turb * 0.2;
@@ -167,7 +169,7 @@ void main() {
     alpha = clamp(alpha, 0.0, 0.9);
 
     // 添加脉冲效果
-    float pulse = sin(offset.x * 2.0) * 0.1 + 0.9;
+    float pulse = sin(time * 2.0) * 0.1 + 0.9;
     finalColor *= pulse;
 
     if (density == 0.0F) {

@@ -1,7 +1,7 @@
 {
   "parent": "block/block",
   "loader": "neoforge:obj",
-  "model": "ultraparalleluniverse:models/block/beam.obj",
+  "model": "gensokyoontology:models/entity/beam.obj",
   "flip_v": true,
   "render_type": "light_beam"
 }

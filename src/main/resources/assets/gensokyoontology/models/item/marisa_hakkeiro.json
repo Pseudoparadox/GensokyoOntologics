@@ -5,6 +5,8 @@
     "texture0": "gensokyoontology:item/hakkeiro",
     "particle": "gensokyoontology:item/hakkeiro"
   },
+  "automatic_culling": true,
+  "flip_v": true,
   "display": {
     "thirdperson_righthand": {
       "translation": [3.5, 4.75, 3],

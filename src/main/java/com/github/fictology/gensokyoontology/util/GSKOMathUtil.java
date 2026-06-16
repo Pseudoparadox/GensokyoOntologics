@@ -1,12 +1,14 @@
 package com.github.fictology.gensokyoontology.util;
 
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.UnknownNullability;
+import org.joml.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +45,7 @@ public final class GSKOMathUtil {
     /**
      * 波动周期算法，用于处理周期长度为 max - min，且周期在最大值和最小值之间线性变化，当超过最大值后，函数开始线性递减，直到达到最小值，然后再次线性递增的算法
      */
-    public static float wavyPeriod(float time, float min, float max) {
+    public static float triangularPeriod(float time, float min, float max) {
         float period = max - min;
         float mod = time % (period * 2);
         return mod <= period ? min + mod : max - (mod - period);
@@ -52,7 +54,7 @@ public final class GSKOMathUtil {
     /**
      * 波动周期算法，用于处理周期长度为 max - min，且周期在最大值和最小值之间线性变化，当超过最大值后，函数开始线性递减，直到达到最小值，然后再次线性递增的算法
      */
-    public static double wavyPeriod(double time, double max, double min) {
+    public static double triangularPeriod(double time, double max, double min) {
         double period = max - min;
         double mod = time % (period * 2);
         return mod <= period ? min + mod : max - (mod - period);
@@ -494,4 +496,11 @@ public final class GSKOMathUtil {
         return num >= min && num < max;
     }
 
+    public static void rotateMatrixToLookVec(PoseStack matrixStackIn, Vec3 lookVec) {
+        Vec3 rotationVec = lookVec.scale(-1);
+        float f5 = (float)Math.acos(rotationVec.y);
+        float f6 = (float)Math.atan2(rotationVec.z, rotationVec.x);
+        matrixStackIn.mulPose(Axis.YP.rotationDegrees(((float)Math.PI / 2 - f6) * (180 / (float)Math.PI)));
+        matrixStackIn.mulPose(Axis.XP.rotationDegrees(f5 * (180 / (float)Math.PI)));
+    }
 }
