@@ -3,7 +3,9 @@ package com.github.fictology.gensokyoontology.client.renderer.vfx;
 import com.github.fictology.gensokyoontology.client.renderer.ObjVFXRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.state.SimpleState;
 import com.github.fictology.gensokyoontology.common.entiy.misc.YinyangJade;
+import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -31,7 +33,12 @@ public class YinyangJadeRenderer extends ObjVFXRenderer<YinyangJade, SimpleState
     public void submit(SimpleState<YinyangJade> state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         super.submit(state, poseStack, submitNodeCollector, camera);
         submitNodeCollector.submitCustomGeometry(poseStack, this.renderType, ((pose, buffer) -> {
-            this.modelMap.get(state.entity.modelPath()).render(pose, buffer);
+            var ref = GSKOUtil.<VertexConsumer>atomic();
+            this.modelMap.get(state.entity.modelPath())
+                    .vertex(pose, buffer, ref)
+                    .uv2(ref.get(), ref)
+                    .color(ref.get(), ref)
+                    .build(poseStack, ref.get());
         }));
     }
 }

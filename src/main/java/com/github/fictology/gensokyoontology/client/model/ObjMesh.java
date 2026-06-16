@@ -19,6 +19,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 极简 Wavefront OBJ 解析器（仅 triangulate后的 .obj，不含smoothing group复杂处理）
@@ -144,9 +145,6 @@ public class ObjMesh implements SubmitNodeCollector.CustomGeometryRenderer {
     public void render(PoseStack.Pose pose, VertexConsumer vc) {
         for (Triangle triangle : trises) {
             for (int i = 0; i < 3; i++) {
-                // VertexConsumer 对应 POSITION_TEX_COLOR layout:
-                // vertex(posX,posY,posZ,  colorRGBA,  u,v,   packedOverlay?)
-                // 下面用最常用的 4-float color=white, overlay=0 的写法
                 vc.addVertex(pose, triangle.v[i].x, triangle.v[i].y, triangle.v[i].z)
                         .setUv(triangle.t[i].x, triangle.t[i].y)
                         .setNormal(triangle.n.x, triangle.n.y, triangle.n.z);
@@ -163,5 +161,48 @@ public class ObjMesh implements SubmitNodeCollector.CustomGeometryRenderer {
                         .setNormal(triangle.n.x, triangle.n.y, triangle.n.z);
             }
         }
+    }
+
+    public ObjMesh vertex(PoseStack.Pose pose, VertexConsumer vc, AtomicReference<VertexConsumer> ref) {
+        for (Triangle triangle : trises) {
+            for (int i = 0; i < 3; i++) {
+                vc.addVertex(pose, triangle.v[i].x, triangle.v[i].y, triangle.v[i].z);
+                ref.set(vc);
+            }
+        }
+        return this;
+    }
+
+    public ObjMesh uv(PoseStack.Pose pose, VertexConsumer vc, AtomicReference<VertexConsumer> ref) {
+        for (Triangle triangle : trises) {
+            for (int i = 0; i < 3; i++) {
+                vc.setUv(triangle.t[i].x, triangle.t[i].y);
+                ref.set(vc);
+            }
+        }
+        return this;
+    }
+
+    public ObjMesh uv2(VertexConsumer vc, AtomicReference<VertexConsumer> ref) {
+        for (Triangle triangle : trises) {
+            for (int i = 0; i < 3; i++) {
+                vc.setUv2(1, 1);
+                ref.set(vc);
+            }
+        }
+        return this;
+    }
+
+    public ObjMesh color(VertexConsumer vc, AtomicReference<VertexConsumer> ref) {
+        for (Triangle triangle : trises) {
+            for (int i = 0; i < 3; i++) {
+                vc.setColor(1F, 1F, 1F, 1F);
+                ref.set(vc);
+            }
+        }
+        return this;
+    }
+    public void build(PoseStack poseStack, VertexConsumer vc){
+
     }
 }

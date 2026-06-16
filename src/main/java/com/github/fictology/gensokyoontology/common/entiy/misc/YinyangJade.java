@@ -5,6 +5,7 @@ import com.github.fictology.gensokyoontology.api.IDamageHandler;
 import com.github.fictology.gensokyoontology.api.render.IModelGetter;
 import com.github.fictology.gensokyoontology.api.render.ITextureGetter;
 import com.github.fictology.gensokyoontology.common.item.touhou.YinyangJadeItem;
+import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,22 +36,10 @@ public class YinyangJade extends ThrowableItemProjectile implements ItemSupplier
         return ItemRegistry.YINYANG_JADE_BLACK.get();
     }
 
-    @Override
-    public void shoot(double xd, double yd, double zd, float pow, float uncertainty) {
-
+    public YinyangJade(ServerLevel serverLevel, LivingEntity owner, ItemStack itemStack) {
+        super(EntityRegistry.YIN_YANG_JADE.get(), owner, serverLevel, itemStack);
+        // this.behavior = new ClosureExpression();
     }
-
-    public void shoot(YinyangJadeItem item, Entity shooter, Vec2 rotation, float velocity){
-        this.setItem(new ItemStack(item));
-        super.shootFromRotation(shooter, rotation.x, rotation.y, 0F, velocity, 1.0F);
-    }
-
-    @Override
-    public void shootFromRotation(Entity source, float xRot, float yRot, float yOffset, float pow, float uncertainty) {
-
-    }
-
-
 
     @Override
     public @NonNull ItemStack getItem() {
@@ -66,6 +55,6 @@ public class YinyangJade extends ThrowableItemProjectile implements ItemSupplier
     public Identifier modelPath() {
         var registryName = BuiltInRegistries.ITEM.getKey(this.getItem().getItem());
         var fileName = registryName.toString().replace(GensokyoOntology.MODID + ":", "");
-        return GSKOUtil.key("textures/item/" + fileName + ".obj");
+        return GSKOUtil.key("models/entity/" + fileName + ".obj");
     }
 }

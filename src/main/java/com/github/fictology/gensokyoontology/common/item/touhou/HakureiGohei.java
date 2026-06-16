@@ -3,15 +3,18 @@ package com.github.fictology.gensokyoontology.common.item.touhou;
 import com.github.fictology.gensokyoontology.common.entiy.HakureiReimuEntity;
 import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
 import com.github.fictology.gensokyoontology.common.entiy.misc.DreamSealEntity;
+import com.github.fictology.gensokyoontology.common.entiy.misc.YinyangJade;
 import com.github.fictology.gensokyoontology.data.DanmakuColor;
 import com.github.fictology.gensokyoontology.registry.DataRegistry;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.api.IRayTraceReader;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -38,6 +41,9 @@ public class HakureiGohei extends Item implements IRayTraceReader {
             return InteractionResult.PASS;
 
         ItemStack stack = playerIn.getItemInHand(handIn);
+        if (level instanceof ServerLevel serverLevel){
+            Projectile.spawnProjectileFromRotation(YinyangJade::new, serverLevel, stack, playerIn, 0F, 1.2F, 1F);
+        }
 //        var magic = stack.get(DataRegistry.SPECIAL_MAGIC);
 //        if (magic != null) {
 //

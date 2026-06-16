@@ -7,6 +7,8 @@ import com.github.fictology.gensokyoontology.client.renderer.NormalVectorRendere
 import com.github.fictology.gensokyoontology.client.renderer.state.MagicSphereState;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.DreamSphereRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.MasterSparkRenderer;
+import com.github.fictology.gensokyoontology.client.renderer.vfx.YinyangJadeRenderer;
+import com.github.fictology.gensokyoontology.common.item.touhou.YinyangJadeItem;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.PipelineRegistry;
 import com.github.fictology.gensokyoontology.registry.RenderTypeRegistry;
@@ -15,6 +17,8 @@ import com.mojang.blaze3d.buffers.Std140SizeCalculator;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MappableRingBuffer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.resources.model.ModelDiscovery;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -105,6 +109,8 @@ public class RenderingEvents {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(EntityRegistry.DANMAKU.get(), NormalVectorRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.YIN_YANG_JADE.get(), ctx ->
+                new YinyangJadeRenderer(ctx, RenderTypes.solidMovingBlock(), YinyangJadeItem.MODELS));
         event.registerEntityRenderer(EntityRegistry.MASTER_SPARK_ENTITY.get(), ctx ->
                 new MasterSparkRenderer(ctx, RenderTypeRegistry.MASTER_SPARK));
 
