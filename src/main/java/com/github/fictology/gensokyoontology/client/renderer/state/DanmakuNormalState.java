@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class DanmakuNormalState extends EntityRenderState {
     public Danmaku danmaku;
-    public float size;
+    public float size = 1F;
     public boolean hasNormal;
     public boolean fliped;
     public boolean customMesh;

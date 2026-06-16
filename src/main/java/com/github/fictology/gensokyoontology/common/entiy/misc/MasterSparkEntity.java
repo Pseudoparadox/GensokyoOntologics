@@ -50,7 +50,7 @@ public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceRead
         var ref = GSKOUtil.<LivingEntity>atomic();
         if (this.tryGetOwner(ref)){
             var owner = ref.get();
-            entities.stream().filter(entity -> this.canAttack(owner, entity))
+            entities.stream().filter(this::isHostile)
                     .forEach(entity ->  this.hurtLiving((LivingEntity) entity, serverLevel, GSKODamage.LASER, 10F));
         }
     }

@@ -30,9 +30,9 @@ public final class PipelineRegistry {
             .withCull(false)
             .withLocation(GSKOUtil.key("pipeline/master_spark"))
             .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL, VertexFormat.Mode.TRIANGLES)
-            .withVertexShader("core/rendertype_lightning")
-            .withFragmentShader("core/rendertype_lightning")
-            .withColorTargetState(new ColorTargetState(BlendFunction.LIGHTNING))
+            .withVertexShader(GSKOUtil.key("master_spark"))
+            .withFragmentShader(GSKOUtil.key("master_spark"))
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
             .withDepthStencilState(DepthStencilState.DEFAULT)
             .build();
 

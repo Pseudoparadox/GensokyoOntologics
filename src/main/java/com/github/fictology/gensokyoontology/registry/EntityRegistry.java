@@ -46,12 +46,14 @@ public final class EntityRegistry {
 
 //    public static final Supplier<EntityType<TsumiBukuroEntity>> TSUMI_BUKURO_ENTITY = register(
 //            "tsumi_bukuro", TsumiBukuroEntity::new, MobCategory.CREATURE, 0.66f, 1.8f);
+
     public static final Supplier<EntityType<LilyWhiteEntity>> LILY_WHITE = register(
             "lily_white", LilyWhiteEntity::new, MobCategory.CREATURE, 0.56f, 1.54f);
     public static final Supplier<EntityType<FlandreScarletEntity>> FLANDRE_SCARLET = register(
             "flandre_scarlet", FlandreScarletEntity::new, MobCategory.MONSTER, 0.58f, 1.58f);
     public static final Supplier<EntityType<RemiliaScarletEntity>> REMILIA_SCARLET = register(
             "remilia_scarlet", RemiliaScarletEntity::new, MobCategory.MONSTER, 0.58f, 1.58f);
+
     // public static final Supplier<EntityType<KomeijiKoishiEntity>> KOMEIJI_KOISHI = register(
     //         "komeiji_koishi", KomeijiKoishiEntity::new, MobCategory.MONSTER, 0.58f, 1.58f);
     public static final Supplier<EntityType<HakureiReimuEntity>> HAKUREI_REIMU = register(
@@ -61,7 +63,7 @@ public final class EntityRegistry {
     public static final Supplier<EntityType<LaserSourceEntity>> LASER_SOURCE = register(
             "laser_source", LaserSourceEntity::new, MobCategory.MISC, 1f, 1f);
     public static final Supplier<EntityType<Danmaku>> DANMAKU = register("danmaku", Danmaku::new,
-            MobCategory.MISC, 0.4f, 0.4f);
+            MobCategory.MISC, 1f, 1f);
     public static final Supplier<EntityType<SpellCardEntity>> SPELL_CARD = register("spell_card", SpellCardEntity::new,
             MobCategory.MISC, 1f, 1f);
 

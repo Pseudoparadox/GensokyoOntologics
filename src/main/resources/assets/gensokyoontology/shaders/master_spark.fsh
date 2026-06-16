@@ -157,7 +157,7 @@ void main() {
     float noise = cellular2DFBM(uv, RETURN_DISTANCE, density, 4, 2.0F, 2.0F);
     vec3 color = generateColorStrip(uv);
 
-    fragColor = vec4(color.xyz * noise, 0.8F);
+    fragColor = vec4(beamColor.xyz * noise, 0.8F);
     if(density == 0.0F) {
         fragColor = vec4(beamColor.xyz, 0.76F);
     }

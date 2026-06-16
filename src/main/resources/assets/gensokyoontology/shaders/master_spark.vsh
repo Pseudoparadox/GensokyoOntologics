@@ -3,12 +3,9 @@
 #moj_import <minecraft:projection.glsl>
 #moj_import <minecraft:dynamictransforms.glsl>
 
-uniform vec2 Offset;
-uniform vec2 Tilling;
-uniform float CellDensity;
-
 in vec3 Position; // unit-sphere OR obj-vertex in LOCAL space
 in vec2 UV0;
+in vec4 Color;
 in vec3 Normal;
 
 out float density;
@@ -28,8 +25,9 @@ void main() {
     gl_Position.z = gl_Position.z * 0.999;  // 轻微偏移，避免深度冲突
 
     normal = Normal;
-    offset = Offset;
-    density = CellDensity;
-    tilling = Tilling;
+    offset = vec2(0, 0);
+    tilling = vec2(1, 1);
+    density = 2F;
+    beamColor = Color;
     texCoord0 = UV0;
 }

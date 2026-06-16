@@ -2,6 +2,7 @@ package com.github.fictology.gensokyoontology.common.entiy.misc;
 
 
 import com.github.fictology.gensokyoontology.GensokyoOntology;
+import com.github.fictology.gensokyoontology.client.renderer.state.DanmakuNormalState;
 import com.github.fictology.gensokyoontology.common.combat.GSKODamage;
 import com.github.fictology.gensokyoontology.data.DanmakuColor;
 import com.github.fictology.gensokyoontology.registry.DataRegistry;
@@ -21,9 +22,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageType;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -134,6 +133,14 @@ public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, ID
 //        // this.behavior = expression;
 //        return this;
 //    }
+
+
+    @Override
+    public EntityDimensions getDimensions(Pose pose) {
+        var dim = super.getDimensions(pose);
+        dim.scale(DanmakuNormalState.getStateForItem(this.getItem().getItem()).size);
+        return dim;
+    }
 
     public Danmaku owner(Entity owner) {
         this.setOwner(owner);

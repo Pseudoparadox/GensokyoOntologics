@@ -9,6 +9,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.level.Level;
 
 public interface IDamageHandler {
@@ -45,5 +46,7 @@ public interface IDamageHandler {
     default boolean canAttack(Entity source, Entity targetToHurt){
         return source.getUUID() == targetToHurt.getUUID();
     }
-
+    default boolean isHostile(Entity targetToHurt){
+        return targetToHurt instanceof Enemy;
+    }
 }

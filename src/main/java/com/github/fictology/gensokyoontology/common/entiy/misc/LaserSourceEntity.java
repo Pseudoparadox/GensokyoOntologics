@@ -6,7 +6,6 @@ import com.github.fictology.gensokyoontology.common.entiy.AffiliatedEntity;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.util.api.IDamageHandler;
 import com.github.fictology.gensokyoontology.util.api.IRayTraceReader;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -15,7 +14,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -24,7 +22,6 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Predicate;
 
 public class LaserSourceEntity extends AffiliatedEntity implements IRayTraceReader, IDamageHandler {
     public static final EntityDataAccessor<Integer> DATA_COLOR = SynchedEntityData.defineId(LaserSourceEntity.class, EntityDataSerializers.INT);
@@ -93,8 +90,10 @@ public class LaserSourceEntity extends AffiliatedEntity implements IRayTraceRead
         if (this.tickCount % 2 == 0 && rayTrace(this.level(), this, start, end).isPresent()) {
             rayTrace(this.level(), this, start, end).ifPresent(entity -> {
                 // 这里检测 ref 里存储的实体所有者是否和射线检测的实体是同一个实体
-                if (this.canAttack(ref.get(), entity))
-                    hurtLiving((LivingEntity) entity, level(), GSKODamage.LASER, 5f);
+                // 为确保安全，Teacon 中只允许伤害敌对生物
+                if(this.isHostile(entity)) hurtLiving((LivingEntity) entity, level(), GSKODamage.LASER, 5F);
+//                if (this.canAttack(ref.get(), entity))
+//                    hurtLiving((LivingEntity) entity, level(), GSKODamage.LASER, 5f);
             });
         }
 
