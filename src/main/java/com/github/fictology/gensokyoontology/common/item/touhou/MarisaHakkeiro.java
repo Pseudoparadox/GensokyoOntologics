@@ -24,16 +24,11 @@ import java.util.function.Consumer;
 /**
  * 魔理沙的八卦炉
  */
-public class MarisaHakkeiro extends Item implements IRayTraceReader, IHasCooldown {
+public class MarisaHakkeiro extends Item implements IRayTraceReader {
     public MarisaHakkeiro(Properties properties) {
         super(properties);
     }
 
-
-    @Override
-    public void onUseTick(Level world, LivingEntity entityLiving, ItemStack stack, int remainingUseDuration) {
-
-    }
 
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
@@ -42,21 +37,14 @@ public class MarisaHakkeiro extends Item implements IRayTraceReader, IHasCooldow
             return InteractionResult.FAIL;
         }
         player.startUsingItem(hand);
-
-
-
-//        if (player.level().isClientSide()) {
-//            player.level().playSound(player, BlockPos.containing(player.getPosition(0f)),
-//                    GSKOSoundEvents.MASTER_SPARK.get(), SoundSource.AMBIENT, 0.8f, 1f);
-//        }
         return super.use(level, player, hand);
-
     }
 
     @Override
     public boolean releaseUsing(ItemStack stack, Level world, LivingEntity entityLiving, int timeLeft) {
         if (!(entityLiving instanceof Player player)) return false;
-        if (timeLeft <= getUseDuration(stack, player)) return false;
+        var timeHeld = this.getUseDuration(stack, entityLiving) - timeLeft;
+        if (timeHeld <= getChargeTick()) return false;
 
         var masterSpark = new MasterSparkEntity(player, player.level());
         masterSpark.setPos(new Vec3(player.getX(), player.getY() + player.getEyeHeight(), player.getZ()));
@@ -78,7 +66,8 @@ public class MarisaHakkeiro extends Item implements IRayTraceReader, IHasCooldow
     @SuppressWarnings("deprecation")
     public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull TooltipDisplay tooltip, Consumer<Component> tooltipAdder, @NotNull TooltipFlag flag) {
         // tooltipAdder.accept(GSKOUtil.translate("tooltip", "marisa_hakkeiro"));
-        tooltipAdder.accept(GSKOUtil.translate("tooltip", "marisa_hakkeiro.info"));
+        tooltipAdder.accept(GSKOUtil.translate("tooltip", "marisa_hakkeiro"));
+        tooltipAdder.accept(GSKOUtil.translate("tooltip", "marisa_hakkeiro.cast"));
     }
 
     @Override
@@ -89,7 +78,7 @@ public class MarisaHakkeiro extends Item implements IRayTraceReader, IHasCooldow
 
     @Override
     public int getUseDuration(ItemStack stack, LivingEntity entity) {
-        return 7200;
+        return 72000;
     }
 
     private void causeExplosion(Level worldIn, Player playerIn, Vec3 explodeStartPos) {
@@ -124,5 +113,9 @@ public class MarisaHakkeiro extends Item implements IRayTraceReader, IHasCooldow
             fireCharge.shrink(32);
             return true;
         }
+    }
+
+    public int getChargeTick(){
+        return 60;
     }
 }

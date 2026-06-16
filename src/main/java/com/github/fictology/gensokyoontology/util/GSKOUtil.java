@@ -77,7 +77,7 @@ public final class GSKOUtil {
     }
 
     public static Component translate(String prefix, String suffix) {
-        return Component.translatable(affixKey(prefix, suffix).toLanguageKey(), suffix);
+        return Component.translatable(affix(prefix, suffix));
     }
 
     public static BlockPos getStructurePos(ServerLevel level, Registry<Structure> structureRegistry) {

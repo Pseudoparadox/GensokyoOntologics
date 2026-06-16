@@ -586,8 +586,8 @@
   "tooltip.gensokyoontology.koishi_eye_open.comment": "§7Koishi is watching you ~",
   "tooltip.gensokyoontology.koishi_eye_closed.comment": "§7You can see me? Wow! This is the secret between us~",
 
-  "tooltip.gensokyoontology.marisa_hakkeiro": "§eMarisa's powerful item",
-  "tooltip.gensokyoontology.marisa_hakkeiro.info": "Spend§c32 Fire Charges§r and§a 1 Bomb§r to generate Master Spark on right click",
+  "tooltip.gensokyoontology.marisa_hakkeiro": "Spend§c32 Fire Charges§r and§a 1 Bomb§r to generate Master Spark on right click",
+  "tooltip.gensokyoontology.marisa_hakkeiro.cast": "§eHold Right Mouse for 3 Seconds to Cast",
 
   "tooltip.gensokyoontology.occult_ball.biome": "Occult Biome: ",
   "tooltip.gensokyoontology.occult_ball.hint": "A mysterious sphere that can send you to the another world.",
