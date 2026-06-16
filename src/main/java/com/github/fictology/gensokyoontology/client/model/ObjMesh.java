@@ -148,7 +148,6 @@ public class ObjMesh implements SubmitNodeCollector.CustomGeometryRenderer {
                 // vertex(posX,posY,posZ,  colorRGBA,  u,v,   packedOverlay?)
                 // 下面用最常用的 4-float color=white, overlay=0 的写法
                 vc.addVertex(pose, triangle.v[i].x, triangle.v[i].y, triangle.v[i].z)
-                        .setColor(255, 255, 255, 255)
                         .setUv(triangle.t[i].x, triangle.t[i].y)
                         .setNormal(triangle.n.x, triangle.n.y, triangle.n.z);
             }

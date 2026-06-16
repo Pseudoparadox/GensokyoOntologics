@@ -4,10 +4,7 @@ import com.github.fictology.gensokyoontology.GensokyoOntology;
 import com.github.fictology.gensokyoontology.common.combat.SpellBehaviors;
 import com.github.fictology.gensokyoontology.common.item.DanmakuItem;
 import com.github.fictology.gensokyoontology.common.item.spellcard.SpellCardItem;
-import com.github.fictology.gensokyoontology.common.item.touhou.AyaFans;
-import com.github.fictology.gensokyoontology.common.item.touhou.HakureiGohei;
-import com.github.fictology.gensokyoontology.common.item.touhou.KoishiEyeOpen;
-import com.github.fictology.gensokyoontology.common.item.touhou.MarisaHakkeiro;
+import com.github.fictology.gensokyoontology.common.item.touhou.*;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.util.StoneGambleHelper;
 import com.github.fictology.gensokyoontology.api.BossSpell;
@@ -431,29 +428,29 @@ public final class ItemRegistry {
     public static final DeferredItem<Item> SMALL_STAR_SHOT_PURPLE = registerDanmaku("small_star_shot_purple");
 
     ////////////////////////////// 所有颜色的大型星弹  /////////////////////////////////
-    public static final DeferredItem<Item> LARGE_STAR_SHOT = registerDanmaku("large_star_shot");
-    public static final DeferredItem<Item> LARGE_STAR_SHOT_RED = registerDanmaku("large_star_shot_red");
+    public static final DeferredItem<Item> LARGE_STAR_SHOT        = registerDanmaku("large_star_shot");
+    public static final DeferredItem<Item> LARGE_STAR_SHOT_RED    = registerDanmaku("large_star_shot_red");
     public static final DeferredItem<Item> LARGE_STAR_SHOT_YELLOW = registerDanmaku("large_star_shot_yellow");
-    public static final DeferredItem<Item> LARGE_STAR_SHOT_GREEN = registerDanmaku("large_star_shot_green");
-    public static final DeferredItem<Item> LARGE_STAR_SHOT_AQUA = registerDanmaku("large_star_shot_aqua");
-    public static final DeferredItem<Item> LARGE_STAR_SHOT_BLUE = registerDanmaku("large_star_shot_blue");
+    public static final DeferredItem<Item> LARGE_STAR_SHOT_GREEN  = registerDanmaku("large_star_shot_green");
+    public static final DeferredItem<Item> LARGE_STAR_SHOT_AQUA   = registerDanmaku("large_star_shot_aqua");
+    public static final DeferredItem<Item> LARGE_STAR_SHOT_BLUE   = registerDanmaku("large_star_shot_blue");
     public static final DeferredItem<Item> LARGE_STAR_SHOT_PURPLE = registerDanmaku("large_star_shot_purple");
 
     ////////////////////////////// 所有颜色的札弹  /////////////////////////////////
-    public static final DeferredItem<Item> TALISMAN_SHOT_RED = registerDanmaku("talisman_shot_red");
-    public static final DeferredItem<Item> TALISMAN_SHOT_GREEN = registerDanmaku("talisman_shot_green");
-    public static final DeferredItem<Item> TALISMAN_SHOT_AQUA = registerDanmaku("talisman_shot_aqua");
-    public static final DeferredItem<Item> TALISMAN_SHOT_BLUE = registerDanmaku("talisman_shot_blue");
+    public static final DeferredItem<Item> TALISMAN_SHOT_RED    = registerDanmaku("talisman_shot_red");
+    public static final DeferredItem<Item> TALISMAN_SHOT_GREEN  = registerDanmaku("talisman_shot_green");
+    public static final DeferredItem<Item> TALISMAN_SHOT_AQUA   = registerDanmaku("talisman_shot_aqua");
+    public static final DeferredItem<Item> TALISMAN_SHOT_BLUE   = registerDanmaku("talisman_shot_blue");
     public static final DeferredItem<Item> TALISMAN_SHOT_PURPLE = registerDanmaku("talisman_shot_purple");
 
     ////////////////////////////// 所有颜色的阴阳玉 ///////////////////////////////////
-    public static final DeferredItem<Item> INYO_JADE_BLACK = registerDanmaku("inyo_jade_black");
-    public static final DeferredItem<Item> INYO_JADE_RED = registerDanmaku("inyo_jade_red");
-    public static final DeferredItem<Item> INYO_JADE_YELLOW = registerDanmaku("inyo_jade_yellow");
-    public static final DeferredItem<Item> INYO_JADE_GREEN = registerDanmaku("inyo_jade_green");
-    public static final DeferredItem<Item> INYO_JADE_AQUA = registerDanmaku("inyo_jade_aqua");
-    public static final DeferredItem<Item> INYO_JADE_BLUE = registerDanmaku("inyo_jade_blue");
-    public static final DeferredItem<Item> INYO_JADE_PURPLE = registerDanmaku("inyo_jade_purple");
+    public static final DeferredItem<YinyangJadeItem> YINYANG_JADE_BLACK  = ITEMS.registerItem("yinyang_jade_black", YinyangJadeItem::new);
+    public static final DeferredItem<YinyangJadeItem> YINYANG_JADE_RED    = ITEMS.registerItem("yinyang_jade_red", YinyangJadeItem::new);
+    public static final DeferredItem<YinyangJadeItem> YINYANG_JADE_YELLOW = ITEMS.registerItem("yinyang_jade_yellow", YinyangJadeItem::new);
+    public static final DeferredItem<YinyangJadeItem> YINYANG_JADE_GREEN  = ITEMS.registerItem("yinyang_jade_green", YinyangJadeItem::new);
+    public static final DeferredItem<YinyangJadeItem> YINYANG_JADE_AQUA   = ITEMS.registerItem("yinyang_jade_aqua", YinyangJadeItem::new);
+    public static final DeferredItem<YinyangJadeItem> YINYANG_JADE_BLUE   = ITEMS.registerItem("yinyang_jade_blue", YinyangJadeItem::new);
+    public static final DeferredItem<YinyangJadeItem> YINYANG_JADE_PURPLE = ITEMS.registerItem("yinyang_jade_purple", YinyangJadeItem::new);
     //////////////////////////// 道具：B点、残机 ////////////////////////////////
     public static final DeferredItem<Item> FAKE_LUNAR_ITEM = registerDanmaku("fake_lunar");
 

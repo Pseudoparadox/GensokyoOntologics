@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-import static com.github.fictology.gensokyoontology.registry.ItemRegistry.INYO_JADE_RED;
+import static com.github.fictology.gensokyoontology.registry.ItemRegistry.YINYANG_JADE_RED;
 import static com.github.fictology.gensokyoontology.registry.ItemRegistry.SC_DREAM_SEAL;
 
 /**
@@ -34,23 +34,22 @@ public class HakureiGohei extends Item implements IRayTraceReader {
 
     @Override
     public InteractionResult use(Level level, Player playerIn, InteractionHand handIn) {
-        GSKOUtil.info("player has " + playerIn.getData(DataRegistry.IDENTITY).power() + "point of power");
         if (playerIn.getCooldowns().isOnCooldown(playerIn.getItemInHand(handIn)) && !playerIn.isCreative())
             return InteractionResult.PASS;
 
         ItemStack stack = playerIn.getItemInHand(handIn);
-        var magic = stack.get(DataRegistry.SPECIAL_MAGIC);
-        if (magic != null) {
-
-            var item = magic.getItem(magic.selectedIndex());
-            if (item == INYO_JADE_RED.get()) {
-                var inYoJade = Danmaku.create(level, INYO_JADE_RED.get(), playerIn);
-                Danmaku.shootTo(level, playerIn, inYoJade, 0.7f);
-            }
-            else if (item == SC_DREAM_SEAL.get()) {
-                fireDreamSeal(level, playerIn);
-            }
-        }
+//        var magic = stack.get(DataRegistry.SPECIAL_MAGIC);
+//        if (magic != null) {
+//
+//            var item = magic.getItem(magic.selectedIndex());
+//            if (item == YINYANG_JADE_RED.get()) {
+//                var inYoJade = Danmaku.create(level, YINYANG_JADE_RED.get(), playerIn);
+//                Danmaku.shootTo(level, playerIn, inYoJade, 0.7f);
+//            }
+//            else if (item == SC_DREAM_SEAL.get()) {
+//                fireDreamSeal(level, playerIn);
+//            }
+//        }
 
         if (playerIn.isCreative()) return InteractionResult.PASS;
         playerIn.getCooldowns().addCooldown(stack, 10);

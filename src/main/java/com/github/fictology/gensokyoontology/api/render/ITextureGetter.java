@@ -2,6 +2,6 @@ package com.github.fictology.gensokyoontology.api.render;
 
 import net.minecraft.resources.Identifier;
 
-public interface IResourceGetter {
+public interface ITextureGetter {
    Identifier getTexture();
 }

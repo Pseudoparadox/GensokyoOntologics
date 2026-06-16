@@ -7,12 +7,14 @@ import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 import org.joml.Vector4i;
 
 import java.awt.*;
@@ -32,6 +34,11 @@ public class MasterSparkRenderer extends ObjVFXRenderer<MasterSparkEntity, Simpl
     public void extractRenderState(MasterSparkEntity entity, SimpleState<MasterSparkEntity> state, float partialTicks) {
         super.extractRenderState(entity, state, partialTicks);
         state.entity = entity;
+        state.xRot = entity.getXRot();
+        state.yRot = entity.getYRot();
+        state.prevXRot = entity.xRotO;
+        state.prevYRot = entity.yRotO;
+        state.partialTick = partialTicks;
     }
 
     @Override
@@ -39,8 +46,14 @@ public class MasterSparkRenderer extends ObjVFXRenderer<MasterSparkEntity, Simpl
         poseStack.pushPose();
         var hue = 3 * GSKOMathUtil.triangularPeriod(state.entity.tickCount, 0, 360) / 360f;
         var color = Color.getHSBColor(hue, 1.0F, 1.0F);
-        GSKOMathUtil.rotateMatrixToLookVec(poseStack, state.entity.getLookAngle().scale(-1));
-        poseStack.translate(0, 18, 0);
+
+        float lerpedYRot = Mth.rotLerp(state.partialTick, state.prevXRot, state.yRot);
+        float lerpedXRot = Mth.rotLerp(state.partialTick, state.prevXRot, state.xRot);
+
+        poseStack.mulPose(Axis.YP.rotationDegrees(lerpedYRot));
+        poseStack.mulPose(Axis.XP.rotationDegrees(lerpedXRot));
+
+        poseStack.translate(0, 20, 0);
         poseStack.scale(2, 5, 2);
 
         submitor.submitCustomGeometry(poseStack, this.renderType, (pose, vert) -> this.modelMap.get(MODEL_PATH)

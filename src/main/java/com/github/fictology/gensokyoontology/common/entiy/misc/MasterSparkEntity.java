@@ -8,10 +8,11 @@ import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.api.IDamageHandler;
 import com.github.fictology.gensokyoontology.api.IRayTraceReader;
-import com.github.fictology.gensokyoontology.api.render.IResourceGetter;
+import com.github.fictology.gensokyoontology.api.render.ITextureGetter;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
@@ -20,7 +21,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceReader, IDamageHandler, IResourceGetter {
+public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceReader, IDamageHandler, ITextureGetter {
     public static final float DISTANCE = 50F;
 
     public MasterSparkEntity(EntityType<?> entityTypeIn, Level levelIn) {
@@ -45,6 +46,8 @@ public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceRead
         var ref = GSKOUtil.<LivingEntity>atomic();
         if (this.tryGetOwner(ref)){
             var owner = ref.get();
+            this.setYRot(Mth.approachDegrees(this.getYRot(), owner.getYRot(), 15f));
+            this.setXRot(Mth.approachDegrees(this.getXRot(), owner.getXRot(), 15f));
             entities.stream().filter(this::isHostile)
                     .forEach(entity ->  this.hurtLiving((LivingEntity) entity, serverLevel, GSKODamage.LASER, 10F));
         }

@@ -38,7 +38,7 @@ public class DanmakuItem extends Item implements ProjectileItem {
                 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F)
         );
         if (level instanceof ServerLevel serverLevel) {
-            Projectile.spawnProjectileFromRotation(Danmaku::new, serverLevel, itemStack, player, 0.0F, 0.6F, 1.0F);
+            Projectile.spawnProjectileFromRotation(Danmaku::new, serverLevel, itemStack, player, 1.0F, 0.6F, 1.0F);
         }
 
         itemStack.consume(1, player);

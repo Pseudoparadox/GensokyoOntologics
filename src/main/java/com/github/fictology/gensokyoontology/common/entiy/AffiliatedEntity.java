@@ -1,7 +1,7 @@
 package com.github.fictology.gensokyoontology.common.entiy;
 
 import com.github.fictology.gensokyoontology.api.IEntityDataAccessible;
-import com.github.fictology.gensokyoontology.api.render.IResourceGetter;
+import com.github.fictology.gensokyoontology.api.render.ITextureGetter;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -16,7 +16,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class AffiliatedEntity extends Entity implements OwnableEntity, IEntityDataAccessible, IResourceGetter {
+public abstract class AffiliatedEntity extends Entity implements OwnableEntity, IEntityDataAccessible, ITextureGetter {
 
     public static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> DATA_OWNER = SynchedEntityData.defineId(
             AffiliatedEntity.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);

@@ -11,7 +11,7 @@ import com.github.fictology.gensokyoontology.registry.Expressions;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.api.IDamageHandler;
-import com.github.fictology.gensokyoontology.api.render.IResourceGetter;
+import com.github.fictology.gensokyoontology.api.render.ITextureGetter;
 import com.github.fictology.gensokyoontology.util.script.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
@@ -51,7 +51,7 @@ import java.util.Map;
  * TODO: 弹幕攻击伤害的数值设定 <br>
  * （待补充……）
  */
-public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, IDamageHandler, IResourceGetter {
+public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, IDamageHandler, ITextureGetter {
     public static final EntityDataAccessor<Float> DATA_DAMAGE = SynchedEntityData.defineId(
             Danmaku.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Integer> DATA_LIFESPAN = SynchedEntityData.defineId(
