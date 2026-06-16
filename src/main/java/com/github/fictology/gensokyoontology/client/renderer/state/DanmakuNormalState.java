@@ -17,6 +17,7 @@ public class DanmakuNormalState extends EntityRenderState {
     public float size;
     public boolean hasNormal;
     public boolean fliped;
+    public boolean customMesh;
     
     public DanmakuNormalState size(float size){
         this.size = size;
@@ -56,6 +57,9 @@ public class DanmakuNormalState extends EntityRenderState {
         map.put(ItemRegistry.SMALL_SHOT_PURPLE.get(), new DanmakuNormalState().size(0.4f));
         map.put(ItemRegistry.SMALL_SHOT_MAGENTA.get(), new DanmakuNormalState().size(0.4f));
 
+        map.put(ItemRegistry.CIRCLE_SHOT_BLUE.get(), new DanmakuNormalState().size(0.4F));
+        map.put(ItemRegistry.CIRCLE_SHOT_MAGENTA.get(), new DanmakuNormalState().size(0.4F));
+
         map.put(ItemRegistry.LARGE_STAR_SHOT.get(), new DanmakuNormalState().size(3f));
         map.put(ItemRegistry.LARGE_STAR_SHOT_RED.get(), new DanmakuNormalState().size(3f));
         map.put(ItemRegistry.LARGE_STAR_SHOT_YELLOW.get(), new DanmakuNormalState().size(3f));
@@ -74,28 +78,30 @@ public class DanmakuNormalState extends EntityRenderState {
 
         map.put(ItemRegistry.FAKE_LUNAR_ITEM.get(), new DanmakuNormalState().size(4f));
 
-        map.put(ItemRegistry.SCALE_SHOT.get(), new DanmakuNormalState().size(0.5F));
-        map.put(ItemRegistry.SCALE_SHOT_RED.get(), new DanmakuNormalState().size(0.5F));
-        map.put(ItemRegistry.SCALE_SHOT_YELLOW.get(), new DanmakuNormalState().size(0.5F));
-        map.put(ItemRegistry.SCALE_SHOT_GREEN.get(), new DanmakuNormalState().size(0.5F));
-        map.put(ItemRegistry.SCALE_SHOT_BLUE.get(), new DanmakuNormalState().size(0.5F));
-        map.put(ItemRegistry.SCALE_SHOT_PURPLE.get(), new DanmakuNormalState().size(0.5F));
+        map.put(ItemRegistry.SCALE_SHOT.get(), new DanmakuNormalState().size(0.5F).normal());
+        map.put(ItemRegistry.SCALE_SHOT_RED.get(), new DanmakuNormalState().size(0.5F).normal());
+        map.put(ItemRegistry.SCALE_SHOT_YELLOW.get(), new DanmakuNormalState().size(0.5F).normal());
+        map.put(ItemRegistry.SCALE_SHOT_GREEN.get(), new DanmakuNormalState().size(0.5F).normal());
+        map.put(ItemRegistry.SCALE_SHOT_BLUE.get(), new DanmakuNormalState().size(0.5F).normal());
+        map.put(ItemRegistry.SCALE_SHOT_PURPLE.get(), new DanmakuNormalState().size(0.5F).normal());
 
-        map.put(ItemRegistry.TALISMAN_SHOT.get(), new DanmakuNormalState().size(1.0F));
-        map.put(ItemRegistry.TALISMAN_SHOT_RED.get(), new DanmakuNormalState().size(1.0F));
-        map.put(ItemRegistry.TALISMAN_SHOT_GREEN.get(), new DanmakuNormalState().size(1.0F));
-        map.put(ItemRegistry.TALISMAN_SHOT_BLUE.get(), new DanmakuNormalState().size(1.0F));
-        map.put(ItemRegistry.TALISMAN_SHOT_PURPLE.get(), new DanmakuNormalState().size(1.0F));
+        map.put(ItemRegistry.TALISMAN_SHOT.get(), new DanmakuNormalState().size(1.0F).normal());
+        map.put(ItemRegistry.TALISMAN_SHOT_RED.get(), new DanmakuNormalState().size(1.0F).normal());
+        map.put(ItemRegistry.TALISMAN_SHOT_GREEN.get(), new DanmakuNormalState().size(1.0F).normal());
+        map.put(ItemRegistry.TALISMAN_SHOT_BLUE.get(), new DanmakuNormalState().size(1.0F).normal());
+        map.put(ItemRegistry.TALISMAN_SHOT_PURPLE.get(), new DanmakuNormalState().size(1.0F).normal());
+        map.put(ItemRegistry.TALISMAN_SHOT_AQUA.get(), new DanmakuNormalState().size(1.0F).normal());
 
-        map.put(ItemRegistry.RICE_SHOT.get(), new DanmakuNormalState().size(0.5F));
-        map.put(ItemRegistry.RICE_SHOT_RED.get(), new DanmakuNormalState().size(0.5F));
-        map.put(ItemRegistry.RICE_SHOT_BLUE.get(), new DanmakuNormalState().size(0.5F));
-        map.put(ItemRegistry.RICE_SHOT_PURPLE.get(), new DanmakuNormalState().size(0.5F));
+        map.put(ItemRegistry.RICE_SHOT.get(), new DanmakuNormalState().size(0.5F).normal());
+        map.put(ItemRegistry.RICE_SHOT_RED.get(), new DanmakuNormalState().size(0.5F).normal());
+        map.put(ItemRegistry.RICE_SHOT_BLUE.get(), new DanmakuNormalState().size(0.5F).normal());
+        map.put(ItemRegistry.RICE_SHOT_PURPLE.get(), new DanmakuNormalState().size(0.5F).normal());
 
         map.put(ItemRegistry.HEART_SHOT.get(), new DanmakuNormalState().size(2.0F).normal().flip());
         map.put(ItemRegistry.HEART_SHOT_RED.get(), new DanmakuNormalState().size(2.0F).normal().flip());
         map.put(ItemRegistry.HEART_SHOT_BLUE.get(), new DanmakuNormalState().size(2.0F).normal().flip());
         map.put(ItemRegistry.HEART_SHOT_PINK.get(), new DanmakuNormalState().size(2.0F).normal().flip());
+        map.put(ItemRegistry.HEART_SHOT_AQUA.get(), new DanmakuNormalState().size(2.0F).normal().flip());
 
         return map;
     });

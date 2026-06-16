@@ -53,10 +53,4 @@ public class MasterSparkRenderer extends ObjVFXRenderer<MasterSparkEntity, Simpl
         poseStack.popPose();
         poseStack.popPose();
     }
-
-
-    public void renderObjModel(PoseStack.Pose pose, VertexConsumer vertexConsumer, Vector4i color) {
-
-    }
-
 }

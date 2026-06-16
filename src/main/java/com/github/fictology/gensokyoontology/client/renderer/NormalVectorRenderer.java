@@ -8,6 +8,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -41,9 +42,14 @@ public class NormalVectorRenderer extends EntityRenderer<Danmaku, DanmakuNormalS
         poseStack.pushPose();
         poseStack.translate(0, 0.5F, 0);
 
-        poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(state.partialTick, state.danmaku.yRotO, state.danmaku.getYRot()) - 90f));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(state.partialTick, state.danmaku.xRotO, state.danmaku.getXRot()) - 90f));
-        poseStack.mulPose(Axis.YP.rotationDegrees(90.f));
+        if (state.hasNormal){
+            poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(state.partialTick, state.danmaku.yRotO, state.danmaku.getYRot()) - 90f));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(state.partialTick, state.danmaku.xRotO, state.danmaku.getXRot()) - 90f));
+            poseStack.mulPose(Axis.YP.rotationDegrees(90.f));
+        }
+        else {
+            poseStack.mulPose(camera.orientation);
+        }
 
         poseStack.scale(state.size, state.size, state.size);
         if (state.fliped) poseStack.mulPose(Axis.ZP.rotationDegrees(180.F));

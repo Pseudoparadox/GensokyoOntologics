@@ -63,19 +63,11 @@ public class HakureiGohei extends Item implements IRayTraceReader {
     public static void fireDreamSeal(Level worldIn, Player playerIn) {
         for (int i = 0; i < 8; i++) {
             int i1 = i % 3;
-            String color;
-            switch (i1) {
-                default:
-                case 0:
-                    color = DanmakuColor.RED;
-                    break;
-                case 1:
-                    color = DanmakuColor.BLUE;
-                    break;
-                case 2:
-                    color = DanmakuColor.GREEN;
-                    break;
-            }
+            String color = switch (i1) {
+                case 1 -> DanmakuColor.BLUE;
+                case 2 -> DanmakuColor.GREEN;
+                default -> DanmakuColor.RED;
+            };
             var vector3d = i % 2 == 0 ? new Vec3(2, 3, 0).xRot((float) Math.PI * 2 / i) :
                     new Vec3(2, 3, 0).xRot((float) -Math.PI * 2 / i);
             // Vector3d shootVec = playerIn.getLookVec();
@@ -86,7 +78,6 @@ public class HakureiGohei extends Item implements IRayTraceReader {
             dreamSeal.shoot(vector3d.x, vector3d.y, vector3d.z, 1.2f, 0f);
             dreamSeal.setOldPosAndRot(initPos, playerIn.yRotO, playerIn.xRotO);
             worldIn.addFreshEntity(dreamSeal);
-
         }
     }
 
