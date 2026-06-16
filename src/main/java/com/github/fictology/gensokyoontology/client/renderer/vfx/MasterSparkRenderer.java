@@ -10,6 +10,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector4i;
@@ -38,10 +39,10 @@ public class MasterSparkRenderer extends ObjVFXRenderer<MasterSparkEntity, Simpl
         poseStack.pushPose();
         var hue = 3 * GSKOMathUtil.triangularPeriod(state.entity.tickCount, 0, 360) / 360f;
         var color = Color.getHSBColor(hue, 1.0F, 1.0F);
-
-        GSKOMathUtil.rotateMatrixToLookVec(poseStack, state.entity.getLookAngle());
+        GSKOMathUtil.rotateMatrixToLookVec(poseStack, state.entity.getLookAngle().scale(-1));
         poseStack.translate(0, 18, 0);
         poseStack.scale(2, 5, 2);
+
         submitor.submitCustomGeometry(poseStack, this.renderType, (pose, vert) -> this.modelMap.get(MODEL_PATH)
                 .render(pose, vert, new Vector4i(color.getRed(), color.getGreen(), color.getBlue(), 255)));
 

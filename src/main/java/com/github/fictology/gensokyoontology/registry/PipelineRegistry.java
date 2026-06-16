@@ -6,6 +6,7 @@ import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.CompareOp;
+import com.mojang.blaze3d.platform.PolygonMode;
 import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -30,10 +31,11 @@ public final class PipelineRegistry {
             .withCull(false)
             .withLocation(GSKOUtil.key("pipeline/master_spark"))
             .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL, VertexFormat.Mode.TRIANGLES)
-            .withVertexShader(GSKOUtil.key("master_spark"))
-            .withFragmentShader(GSKOUtil.key("master_spark"))
-            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
-            .withDepthStencilState(DepthStencilState.DEFAULT)
+            .withVertexShader("core/rendertype_lightning")
+            .withFragmentShader("core/rendertype_lightning")
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT_PREMULTIPLIED_ALPHA))
+            .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
+            .withPolygonMode(PolygonMode.FILL)
             .build();
 
     public static final RenderPipeline DREAM_SPHERE = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
