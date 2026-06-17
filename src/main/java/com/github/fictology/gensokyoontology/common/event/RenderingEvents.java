@@ -8,6 +8,7 @@ import com.github.fictology.gensokyoontology.client.renderer.NormalVectorRendere
 import com.github.fictology.gensokyoontology.client.renderer.living.FlandreRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.state.MagicSphereState;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.DreamSphereRenderer;
+import com.github.fictology.gensokyoontology.client.renderer.vfx.LaserRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.MasterSparkRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.YinyangJadeRenderer;
 import com.github.fictology.gensokyoontology.common.item.touhou.YinyangJadeItem;
@@ -106,11 +107,12 @@ public class RenderingEvents {
                 new YinyangJadeRenderer(ctx, RenderTypeRegistry.YINYANG, YinyangJadeItem.MODELS));
 
         // 特效类实体
-        event.registerEntityRenderer(EntityRegistry.MASTER_SPARK_ENTITY.get(), ctx ->
-                new MasterSparkRenderer(ctx, RenderTypeRegistry.MASTER_SPARK));
         event.registerEntityRenderer(EntityRegistry.DREAM_SEAL.get(), EmptyRenderer::new);
         event.registerEntityRenderer(EntityRegistry.DREAM_SPHERE.get(), ctx ->
                 new DreamSphereRenderer(ctx, RenderTypeRegistry.DREAM_SPHERE));
+        event.registerEntityRenderer(EntityRegistry.MASTER_SPARK_ENTITY.get(), ctx ->
+                new MasterSparkRenderer(ctx, RenderTypeRegistry.MASTER_SPARK));
+        event.registerEntityRenderer(EntityRegistry.LASER_SOURCE.get(), LaserRenderer::new);
 
         // 生物实体
         event.registerEntityRenderer(EntityRegistry.FLANDRE_SCARLET.get(), FlandreRenderer::new);

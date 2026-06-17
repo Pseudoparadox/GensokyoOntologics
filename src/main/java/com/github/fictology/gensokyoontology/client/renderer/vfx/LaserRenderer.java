@@ -16,12 +16,12 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import org.joml.Matrix4f;
 
-public class LaserEntityRenderer extends EntityRenderer<Laser, SimpleState<Laser>> {
+public class LaserRenderer extends EntityRenderer<Laser, SimpleState<Laser>> {
 
     public static final Identifier LASER_BEAM_TEX = GSKOUtil.key("textures/entity/laser_beam_1.png");
     public static final RenderType LASER_BEAM = RenderTypes.entityTranslucent(LASER_BEAM_TEX);
 
-    protected LaserEntityRenderer(EntityRendererProvider.Context context) {
+    public LaserRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
 
