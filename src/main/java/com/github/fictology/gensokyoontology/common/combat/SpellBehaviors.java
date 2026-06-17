@@ -1,7 +1,7 @@
 package com.github.fictology.gensokyoontology.common.combat;
 
 import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
-import com.github.fictology.gensokyoontology.common.entiy.misc.LaserSourceEntity;
+import com.github.fictology.gensokyoontology.common.entiy.misc.Laser;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
 import com.github.fictology.gensokyoontology.api.BossSpell;
@@ -80,7 +80,7 @@ public class SpellBehaviors {
             position = position.add(new Vec3(0, 0.5, 0));
 
             var direction = GSKOMathUtil.toYawPitch(initRot);
-            var laser = new LaserSourceEntity(remilia.level(), remilia);
+            var laser = new Laser(remilia.level(), remilia);
             laser.setOldPosAndRot(new Vec3(position.x, position.y, position.z), direction.y, direction.x);
             laser.init(500, 30, 100);
             level.addFreshEntity(laser);

@@ -14,12 +14,14 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class YoukaiEntity extends RetreatableEntity {
+public abstract class YoukaiEntity extends RetreatableEntity implements Enemy {
 
     public static final EntityDataAccessor<Boolean> DATA_RETREATED = SynchedEntityData.defineId(
             YoukaiEntity.class, EntityDataSerializers.BOOLEAN);
@@ -38,7 +40,6 @@ public abstract class YoukaiEntity extends RetreatableEntity {
     // @OnlyIn(Dist.CLIENT)
     // private Animation animation = Animation.IDLE;
     protected boolean duringSpellCard = false;
-    protected String battlePhase = "1.1";
     protected ServerBossEvent bossEvent;
     protected YoukaiEntity(EntityType<? extends TamableAnimal> type, Level worldIn) {
         super(type, worldIn);
@@ -48,7 +49,7 @@ public abstract class YoukaiEntity extends RetreatableEntity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
-        builder.define(DATA_PHASE, this.battlePhase);
+        builder.define(DATA_PHASE, "1.1");
     }
 
     @Override
@@ -68,13 +69,11 @@ public abstract class YoukaiEntity extends RetreatableEntity {
     }
 
     public void setBattlePhase(int mainPhase, int subPhase) {
-        this.battlePhase = mainPhase + "." + subPhase;
-        this.getEntityData().set(DATA_PHASE, this.battlePhase);
+        this.getEntityData().set(DATA_PHASE, mainPhase + "." + subPhase);
     }
 
     private void setBattlePhase(String battlePhase) {
-        this.battlePhase = battlePhase;
-        this.getEntityData().set(DATA_PHASE, this.battlePhase);
+        this.getEntityData().set(DATA_PHASE, battlePhase);
     }
 
     public void nextPhase(){

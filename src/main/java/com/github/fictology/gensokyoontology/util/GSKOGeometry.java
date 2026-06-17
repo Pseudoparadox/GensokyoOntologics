@@ -6,7 +6,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.util.Mth;
 import org.joml.*;
+import org.joml.Vector3f;
 
 import java.lang.Math;
 
@@ -213,6 +215,63 @@ public final class GSKOGeometry {
         }
     }
 
+    private static void buildCylinder(Matrix4f matrix, VertexConsumer builder, Vector3f start, Vector3f end, float radius, float height, int segments, Vector4i color) {
+        var direction = new Vector3f(end).sub(new Vector3f(start)).normalize();
+
+        // 计算一个垂直于方向的法线
+        Vector3f perpendicular = new Vector3f(0, 1, 0);
+        if (Math.abs(direction.dot(perpendicular)) > 0.99) {
+            perpendicular = new Vector3f(1, 0, 0);
+        }
+        Vector3f normal = perpendicular.cross(direction).normalize();
+        Vector3f binormal = direction.cross(normal).normalize();
+        for (int i = 0; i < segments; i++) {
+            double theta0 = (2.0 * Mth.PI / segments) * i;
+            double theta1 = (2.0 * Mth.PI / segments) * (i + 1);
+
+            // 计算当前和下一个圆周上的点
+            Vector3f p0 = normal.mul(Mth.cos(theta0) * radius)
+                    .add(binormal.mul(Mth.sin(theta0) * radius))
+                    .add(new Vector3f(start));
+
+            Vector3f p1 = normal.mul(Mth.cos(theta1) * radius)
+                    .add(binormal.mul(Mth.sin(theta1) * radius))
+                    .add(new Vector3f(start));
+
+            Vector3f p2 = normal.mul(Mth.cos(theta1) * radius)
+                    .add(binormal.mul(Mth.sin(theta1) * radius))
+                    .add(new Vector3f(end));
+
+            Vector3f p3 = normal.mul(Mth.cos(theta0) * radius)
+                    .add(binormal.mul(Mth.sin(theta0) * radius))
+                    .add(new Vector3f(end));
+
+            renderQuad(builder, matrix, p0, p1, p2, p3, color.x, color.y, color.z, color.w);
+            renderQuad(builder, matrix, p3, p2, p1, p0, color.x, color.y, color.z, color.w);
+        }
+    }
+
+    private static void buildCylinder(Matrix4f matrix, VertexConsumer vertexBuilder, float radius, float height,
+                                            int segments, Vector4i color) {
+        for (int i = 0; i < segments; i++) {
+            double angle1 = 2 * Math.PI * i / segments;
+            double angle2 = 2 * Math.PI * (i + 1) / segments;
+
+            float x1 = (float) Math.cos(angle1) * radius;
+            float z1 = (float) Math.sin(angle1) * radius;
+            float x2 = (float) Math.cos(angle2) * radius;
+            float z2 = (float) Math.sin(angle2) * radius;
+
+            // 计算法线（侧面法线指向外部）
+            float normalX = (x1 + x2) / 2 / radius;
+            float normalZ = (z1 + z2) / 2 / radius;
+
+            vertexBuilder.addVertex(matrix, x1, 0,      z1).setColor(color.x, color.y, color.z, color.w).setNormal(normalX, 0.0f, normalZ);
+            vertexBuilder.addVertex(matrix, x2, 0,      z2).setColor(color.x, color.y, color.z, color.w).setNormal(normalX, 0.0f, normalZ);
+            vertexBuilder.addVertex(matrix, x2, height, z2).setColor(color.x, color.y, color.z, color.w).setNormal(normalX, 0.0f, normalZ);
+            vertexBuilder.addVertex(matrix, x1, height, z1).setColor(color.x, color.y, color.z, color.w).setNormal(normalX, 0.0f, normalZ);
+        }
+    }
 
 
     public static void renderTriangle(BufferBuilder builder, Matrix4f matrix,
@@ -227,6 +286,15 @@ public final class GSKOGeometry {
         addVertex(builder, matrix, v3, n3, uv3, color);
         addVertex(builder, matrix, v2, n2, uv2, color);
         addVertex(builder, matrix, v1, n1, uv1, color);
+    }
+
+    private static void renderQuad(VertexConsumer builder, Matrix4f matrix, Vector3f p0, Vector3f p1, Vector3f p2, Vector3f p3,
+                                   int red, int green, int blue, int alpha) {
+        // 设置顶点，按逆时针顺序渲染四边面
+        builder.addVertex(matrix, p0.x, p0.y, p0.z).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, p1.x, p1.y, p1.z).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, p2.x, p2.y, p2.z).setColor(red, green, blue, alpha);
+        builder.addVertex(matrix, p3.x, p3.y, p3.z).setColor(red, green, blue, alpha);
     }
 
     private static void addVertex(BufferBuilder builder, Matrix4f matrix,

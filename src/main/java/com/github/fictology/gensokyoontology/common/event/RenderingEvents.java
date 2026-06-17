@@ -2,8 +2,10 @@ package com.github.fictology.gensokyoontology.common.event;
 
 import com.github.fictology.gensokyoontology.GensokyoOntology;
 import com.github.fictology.gensokyoontology.client.RenderManager;
+import com.github.fictology.gensokyoontology.client.model.FlandreScarletModel;
 import com.github.fictology.gensokyoontology.client.renderer.EmptyRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.NormalVectorRenderer;
+import com.github.fictology.gensokyoontology.client.renderer.living.FlandreRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.state.MagicSphereState;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.DreamSphereRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.MasterSparkRenderer;
@@ -12,15 +14,11 @@ import com.github.fictology.gensokyoontology.common.item.touhou.YinyangJadeItem;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.PipelineRegistry;
 import com.github.fictology.gensokyoontology.registry.RenderTypeRegistry;
-import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MappableRingBuffer;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.resources.model.ModelDiscovery;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -29,14 +27,7 @@ import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.client.event.lifecycle.ClientStartedEvent;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
 
 @EventBusSubscriber(modid = GensokyoOntology.MODID, value = Dist.CLIENT)
 public class RenderingEvents {
@@ -109,16 +100,20 @@ public class RenderingEvents {
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        // 投掷物实体
         event.registerEntityRenderer(EntityRegistry.DANMAKU.get(), NormalVectorRenderer::new);
         event.registerEntityRenderer(EntityRegistry.YIN_YANG_JADE.get(), ctx ->
                 new YinyangJadeRenderer(ctx, RenderTypeRegistry.YINYANG, YinyangJadeItem.MODELS));
 
+        // 特效类实体
         event.registerEntityRenderer(EntityRegistry.MASTER_SPARK_ENTITY.get(), ctx ->
                 new MasterSparkRenderer(ctx, RenderTypeRegistry.MASTER_SPARK));
-
         event.registerEntityRenderer(EntityRegistry.DREAM_SEAL.get(), EmptyRenderer::new);
         event.registerEntityRenderer(EntityRegistry.DREAM_SPHERE.get(), ctx ->
                 new DreamSphereRenderer(ctx, RenderTypeRegistry.DREAM_SPHERE));
+
+        // 生物实体
+        event.registerEntityRenderer(EntityRegistry.FLANDRE_SCARLET.get(), FlandreRenderer::new);
     }
 
     @SubscribeEvent
@@ -126,6 +121,10 @@ public class RenderingEvents {
         event.registerPipeline(PipelineRegistry.DREAM_SPHERE);
     }
 
+    @SubscribeEvent // on the mod event bus only on the physical client
+    public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(FlandreScarletModel.ID, FlandreScarletModel::createLayer);
+    }
 
     /**
      * id code请查看GLFW类，id code 从 GLFW_KEY_0 开始

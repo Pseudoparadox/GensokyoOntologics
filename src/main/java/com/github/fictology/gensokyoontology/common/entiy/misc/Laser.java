@@ -23,23 +23,23 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class LaserSourceEntity extends AffiliatedEntity implements IRayTraceReader, IDamageHandler {
-    public static final EntityDataAccessor<Integer> DATA_COLOR = SynchedEntityData.defineId(LaserSourceEntity.class, EntityDataSerializers.INT);
-    public static final EntityDataAccessor<Integer> DATA_LIFESPAN = SynchedEntityData.defineId(LaserSourceEntity.class, EntityDataSerializers.INT);
-    public static final EntityDataAccessor<Integer> DATA_PREPARATION = SynchedEntityData.defineId(LaserSourceEntity.class, EntityDataSerializers.INT);
-    public static final EntityDataAccessor<Float> DATA_RANGE = SynchedEntityData.defineId(LaserSourceEntity.class, EntityDataSerializers.FLOAT);
+public class Laser extends AffiliatedEntity implements IRayTraceReader, IDamageHandler {
+    public static final EntityDataAccessor<Integer> DATA_COLOR = SynchedEntityData.defineId(Laser.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> DATA_LIFESPAN = SynchedEntityData.defineId(Laser.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> DATA_PREPARATION = SynchedEntityData.defineId(Laser.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Float> DATA_RANGE = SynchedEntityData.defineId(Laser.class, EntityDataSerializers.FLOAT);
     public int rgba = 0xFF0000FF;
     private int lifespan = 100;
     private int preparation = 30;
     private float range = 128;
 
-    public LaserSourceEntity(EntityType<?> entityTypeIn, Level worldIn) {
+    public Laser(EntityType<?> entityTypeIn, Level worldIn) {
         super(entityTypeIn, worldIn);
         this.setRGBA(0xFF0000AA);
         this.init(100, 30, 128F);
     }
 
-    public LaserSourceEntity(Level worldIn, Entity owner) {
+    public Laser(Level worldIn, Entity owner) {
         super(EntityRegistry.LASER_SOURCE.get(), worldIn);
         this.setOwner((LivingEntity) owner);
         this.setRGBA(0xFF0000AA);

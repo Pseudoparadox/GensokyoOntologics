@@ -125,7 +125,7 @@ public class YinyangJade extends ThrowableItemProjectile implements ItemSupplier
         bounceOffEntity(hitEntity);
 
         // 播放碰撞音效
-        this.playSound(SoundEvents.STONE_HIT, 0.5f, 1.2f);
+        this.playSound(SoundEvents.TRIDENT_HIT, 0.7f, 1.2f);
     }
 
     /**

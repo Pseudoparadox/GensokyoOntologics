@@ -2,7 +2,7 @@ package com.github.fictology.gensokyoontology.common.combat;
 
 import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
 import com.github.fictology.gensokyoontology.common.entiy.misc.DestructiveEyeEntity;
-import com.github.fictology.gensokyoontology.common.entiy.misc.LaserSourceEntity;
+import com.github.fictology.gensokyoontology.common.entiy.misc.Laser;
 import com.github.fictology.gensokyoontology.common.entiy.monster.YoukaiEntity;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
@@ -10,8 +10,6 @@ import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -46,7 +44,7 @@ public class SpecialSkill {
     public static final YoukaiSkill LASER_RAIN = (level, youkai) -> {
         if (!(level instanceof ServerLevel serverLevel)) return;
         if (youkai.tickCount % 18 == 0) {
-            var laser = new LaserSourceEntity(level, youkai);
+            var laser = new Laser(level, youkai);
             var target = youkai.getTarget();
             if (target == null) return;
 

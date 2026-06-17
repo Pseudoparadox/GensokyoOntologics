@@ -1,6 +1,6 @@
 package com.github.fictology.gensokyoontology.common.item.touhou;
 
-import com.github.fictology.gensokyoontology.common.entiy.misc.LaserSourceEntity;
+import com.github.fictology.gensokyoontology.common.entiy.misc.Laser;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.api.IRayTraceReader;
 import net.minecraft.network.chat.Component;
@@ -29,7 +29,7 @@ public class KoishiEyeOpen extends Item implements IRayTraceReader {
         ItemStack stack = playerIn.getItemInHand(handIn);
         if (playerIn.getCooldowns().isOnCooldown(stack)) return InteractionResult.PASS;
 
-        var laserSource = new LaserSourceEntity(level, playerIn);
+        var laserSource = new Laser(level, playerIn);
         laserSource.init(200, 40, 85);
         laserSource.setRGBA(0x88FF0000);
         // lasers(level, playerIn);
