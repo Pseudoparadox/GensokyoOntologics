@@ -7,6 +7,7 @@ import com.github.fictology.gensokyoontology.common.entiy.misc.YinyangJade;
 import com.github.fictology.gensokyoontology.data.DanmakuColor;
 import com.github.fictology.gensokyoontology.registry.DataRegistry;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
+import com.github.fictology.gensokyoontology.registry.ItemRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.api.IRayTraceReader;
 import net.minecraft.resources.Identifier;
@@ -42,7 +43,8 @@ public class HakureiGohei extends Item implements IRayTraceReader {
 
         ItemStack stack = playerIn.getItemInHand(handIn);
         if (level instanceof ServerLevel serverLevel){
-            Projectile.spawnProjectileFromRotation(YinyangJade::new, serverLevel, stack, playerIn, 0F, 1.2F, 1F);
+            Projectile.spawnProjectileFromRotation(YinyangJade::new, serverLevel,
+                    YINYANG_JADE_RED.toStack(), playerIn, 0F, 1.2F, 1F);
         }
 //        var magic = stack.get(DataRegistry.SPECIAL_MAGIC);
 //        if (magic != null) {

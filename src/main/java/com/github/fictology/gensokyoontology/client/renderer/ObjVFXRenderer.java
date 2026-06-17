@@ -31,12 +31,4 @@ public abstract class ObjVFXRenderer<E extends Entity, S extends EntityRenderSta
         this.randomSource = RandomSource.create();
         this.randomSource.setSeed(10230);
     }
-
-    @Override
-    public void submit(S state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
-        super.submit(state, poseStack, submitNodeCollector, camera);
-        this.modelMap.values().forEach(mesh ->
-                submitNodeCollector.submitCustomGeometry(poseStack, this.renderType, mesh));
-    }
-
 }

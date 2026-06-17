@@ -1,0 +1,5 @@
+newmtl material_dark
+Kd 0.000000 0.58400 1.000000
+
+newmtl material_light
+Kd 1.000000 1.000000 1.000000

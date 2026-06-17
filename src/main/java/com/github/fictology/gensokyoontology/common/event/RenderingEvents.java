@@ -12,6 +12,7 @@ import com.github.fictology.gensokyoontology.common.item.touhou.YinyangJadeItem;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.PipelineRegistry;
 import com.github.fictology.gensokyoontology.registry.RenderTypeRegistry;
+import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -110,7 +111,8 @@ public class RenderingEvents {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(EntityRegistry.DANMAKU.get(), NormalVectorRenderer::new);
         event.registerEntityRenderer(EntityRegistry.YIN_YANG_JADE.get(), ctx ->
-                new YinyangJadeRenderer(ctx, RenderTypes.solidMovingBlock(), YinyangJadeItem.MODELS));
+                new YinyangJadeRenderer(ctx, RenderTypeRegistry.YINYANG, YinyangJadeItem.MODELS));
+
         event.registerEntityRenderer(EntityRegistry.MASTER_SPARK_ENTITY.get(), ctx ->
                 new MasterSparkRenderer(ctx, RenderTypeRegistry.MASTER_SPARK));
 

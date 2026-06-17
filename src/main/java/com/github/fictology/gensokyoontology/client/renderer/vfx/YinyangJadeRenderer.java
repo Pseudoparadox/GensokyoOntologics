@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.Identifier;
+import org.joml.Vector4i;
 
 public class YinyangJadeRenderer extends ObjVFXRenderer<YinyangJade, SimpleState<YinyangJade>> {
 
@@ -34,11 +35,7 @@ public class YinyangJadeRenderer extends ObjVFXRenderer<YinyangJade, SimpleState
         super.submit(state, poseStack, submitNodeCollector, camera);
         submitNodeCollector.submitCustomGeometry(poseStack, this.renderType, ((pose, buffer) -> {
             var ref = GSKOUtil.<VertexConsumer>atomic();
-            this.modelMap.get(state.entity.modelPath())
-                    .vertex(pose, buffer, ref)
-                    .uv2(ref.get(), ref)
-                    .color(ref.get(), ref)
-                    .build(poseStack, ref.get());
+            this.modelMap.get(state.entity.modelPath()).renderMtl(pose, buffer);
         }));
     }
 }

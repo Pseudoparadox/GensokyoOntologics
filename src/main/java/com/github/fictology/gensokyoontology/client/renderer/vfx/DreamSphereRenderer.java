@@ -7,6 +7,7 @@ import com.github.fictology.gensokyoontology.util.GSKOGeometry;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.SkyRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -34,7 +35,6 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
         state.mainColor = DreamSphere.INDEX_2_COLOR.get(entity.getIntSyncData(entity.getEntityData(), DreamSphere.DATA_INDEX));
         // state.buildMesh(this.renderType, 18, 18);
     }
-
 
     @Override
     public void submit(MagicSphereState state, PoseStack poseStack, SubmitNodeCollector submitor, CameraRenderState camera) {

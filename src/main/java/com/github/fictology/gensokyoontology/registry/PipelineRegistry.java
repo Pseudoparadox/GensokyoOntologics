@@ -12,6 +12,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.neoforged.neoforge.client.stencil.StencilPerFaceTest;
 import net.neoforged.neoforge.client.stencil.StencilTest;
 
@@ -46,5 +47,15 @@ public final class PipelineRegistry {
             .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL, VertexFormat.Mode.TRIANGLES)
             .withDepthStencilState(DepthStencilState.DEFAULT)
             .withColorTargetState(new ColorTargetState(BlendFunction.LIGHTNING))
+            .build();
+
+    public static final RenderPipeline YINYANG = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
+            .withCull(true)
+            .withLocation(GSKOUtil.key("pipeline/yinyang"))
+            .withVertexShader("core/position_color")
+            .withFragmentShader("core/position_color")
+            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES)
+            .withDepthStencilState(DepthStencilState.DEFAULT)
+            .withColorTargetState(ColorTargetState.DEFAULT)
             .build();
 }
