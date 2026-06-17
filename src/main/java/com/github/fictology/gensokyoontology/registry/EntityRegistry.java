@@ -33,7 +33,7 @@ public final class EntityRegistry {
     public static final Supplier<BlockEntityType<SaisenBoxTileEntity>> SAISEN_BOX_TILE = BLOCK_ENTITIES.register(
             "saisen_box_tile", () -> new BlockEntityType<>(SaisenBoxTileEntity::new, BlockRegistry.SAISEN_BOX.get()));
     public static final Supplier<EntityType<MasterSparkEntity>> MASTER_SPARK_ENTITY = register("master_spark",
-            MasterSparkEntity::new, MobCategory.MISC, 3.5f, 3.5f);
+            MasterSparkEntity::new, MobCategory.MISC, 1f, 1f);
     public static final Supplier<EntityType<DreamSealEntity>> DREAM_SEAL = register("dream_seal",
             DreamSealEntity::new, MobCategory.MISC, 1f, 1f);
     public static final Supplier<EntityType<DreamSphere>> DREAM_SPHERE = register("dream_sphere",
@@ -42,7 +42,7 @@ public final class EntityRegistry {
             "fairy", FairyEntity::new, MobCategory.MONSTER, 0.54f, 1.5f);
 
     public static final Supplier<EntityType<YinyangJade>> YIN_YANG_JADE = register(
-            "yin_yang_jade", YinyangJade::new, MobCategory.MISC, 0.2F, 0.2F);
+            "yin_yang_jade", YinyangJade::new, MobCategory.MISC, 2F, 2F);
 
 //    public static final Supplier<EntityType<TsumiBukuroEntity>> TSUMI_BUKURO_ENTITY = register(
 //            "tsumi_bukuro", TsumiBukuroEntity::new, MobCategory.CREATURE, 0.66f, 1.8f);

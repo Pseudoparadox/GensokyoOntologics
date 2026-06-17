@@ -33,9 +33,12 @@ public class YinyangJadeRenderer extends ObjVFXRenderer<YinyangJade, SimpleState
     @Override
     public void submit(SimpleState<YinyangJade> state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         super.submit(state, poseStack, submitNodeCollector, camera);
+        poseStack.pushPose();
+        poseStack.translate(0, 0.5, 0);
         submitNodeCollector.submitCustomGeometry(poseStack, this.renderType, ((pose, buffer) -> {
             var ref = GSKOUtil.<VertexConsumer>atomic();
             this.modelMap.get(state.entity.modelPath()).renderMtl(pose, buffer);
         }));
+        poseStack.popPose();
     }
 }
