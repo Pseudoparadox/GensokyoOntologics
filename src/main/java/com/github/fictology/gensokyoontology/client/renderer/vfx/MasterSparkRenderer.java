@@ -59,11 +59,10 @@ public class MasterSparkRenderer extends ObjVFXRenderer<MasterSparkEntity, Simpl
 
         GSKOMathUtil.rotateMatrixToLookVec(poseStack, lerpedXRot, lerpedYRot);
 
-        if (state.entity.tickCount < state.entity.getPreparation()){
+        if (state.entity.tickCount <= state.entity.getPreparation()){
             var scalar = GSKOMathUtil.lerpTicks(state.partialTick, state.entity.getPreparation(), state.entity.tickCount, 0F, 5F);
 
             poseStack.scale(scale.x, scalar, scale.z);
-            GSKOUtil.info("Scalar = " + scalar);
             submitor.submitCustomGeometry(poseStack, this.renderType, (pose, vert) -> this.modelMap.get(MODEL_PATH)
                     .render(pose, vert, new Vector4i(255, 255, 255, 255)));
             poseStack.popPose();
@@ -71,18 +70,16 @@ public class MasterSparkRenderer extends ObjVFXRenderer<MasterSparkEntity, Simpl
         }
 
         var scalar = GSKOMathUtil.lerpTicks(state.partialTick, 15,
-                state.entity.tickCount - state.entity.getPreparation(), 0F, 3F);
+                state.entity.tickCount - state.entity.getPreparation(), 0F, 2F);
 
         poseStack.scale(scalar, 5, scalar);
         submitor.submitCustomGeometry(poseStack, this.renderType, (pose, vert) -> this.modelMap.get(MODEL_PATH)
                 .render(pose, vert, new Vector4i(color.getRed(), color.getGreen(), color.getBlue(), 255)));
 
-        poseStack.pushPose();
         poseStack.scale(0.5F, 1, 0.5F);
         submitor.submitCustomGeometry(poseStack, this.renderType, (pose, vert) -> this.modelMap.get(MODEL_PATH)
                 .render(pose, vert, new Vector4i(255, 255, 255, 255)));
 
-        poseStack.popPose();
         poseStack.popPose();
     }
 }

@@ -1,7 +1,7 @@
 package com.github.fictology.gensokyoontology.common.entiy.misc;
 
 import com.github.fictology.gensokyoontology.common.entiy.AffiliatedEntity;
-import com.github.fictology.gensokyoontology.registry.DataRegistry;
+import com.github.fictology.gensokyoontology.registry.AttachRegistry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -29,8 +29,8 @@ public class DreamSphere extends AffiliatedEntity {
     });
     public DreamSphere(EntityType<?> entityTypeIn, Level worldIn) {
         super(entityTypeIn, worldIn);
-        this.setData(DataRegistry.NBT_DATA, new CompoundTag());
-        this.putIntTag(this, DataRegistry.NBT_DATA.get(), "size", 1);
+        this.setData(AttachRegistry.NBT_DATA, new CompoundTag());
+        this.putIntTag(this, AttachRegistry.NBT_DATA.get(), "size", 1);
     }
 
     @Override

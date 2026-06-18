@@ -42,7 +42,18 @@ public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceRead
     public void tick() {
         super.tick();
         if (tickCount >= 120) this.setRemoved(RemovalReason.DISCARDED);
-        if (tickCount < this.getPreparation()) return;
+        if (tickCount < this.getPreparation()) {
+            var ref = GSKOUtil.<LivingEntity>atomic();
+            if (this.tryGetOwner(ref)) {
+                var owner = ref.get();
+                this.setOldPosAndRot();
+                this.setPos(owner.getEyePosition());
+                this.setYRot(owner.getYRot());
+                this.setXRot(owner.getXRot());
+            }
+            return;
+        }
+
         if (level().isClientSide()) return;
         var serverLevel = (ServerLevel) this.level();
         var entities = rayTrace(serverLevel, this, DISTANCE, new Vec3(0, 0, 0));
@@ -58,7 +69,7 @@ public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceRead
 //            }
 
             this.setOldPosAndRot();
-            this.setPos(owner.position());
+            this.setPos(owner.getEyePosition());
             this.setYRot(owner.getYRot());
             this.setXRot(owner.getXRot());
             entities.stream().filter(this::isHostile)

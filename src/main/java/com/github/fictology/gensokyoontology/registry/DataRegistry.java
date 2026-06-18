@@ -8,15 +8,12 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -25,16 +22,6 @@ import java.util.function.UnaryOperator;
 public final class DataRegistry {
     public static final DeferredRegister.DataComponents DATA = DeferredRegister.createDataComponents(
             Registries.DATA_COMPONENT_TYPE, GensokyoOntology.MODID);
-    public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(
-            NeoForgeRegistries.ATTACHMENT_TYPES, GensokyoOntology.MODID);
-
-    public static final Supplier<AttachmentType<Integer>> POWER = ATTACHMENTS.register("power",
-            () -> AttachmentType.builder(() -> 0).build());
-
-    public static final Supplier<AttachmentType<CompoundTag>> NBT_DATA = ATTACHMENTS.register("nbt_data",
-            () -> AttachmentType.builder(() -> new CompoundTag()).build());
-    public static final Supplier<AttachmentType<Identities>> IDENTITY = ATTACHMENTS.register("identity",
-            () -> AttachmentType.serializable(() -> new Identities(10000, 0, 1)).build());
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ByteInfo>> BYTES = register(
             "bytes", builder -> builder.persistent(ByteInfo.CODEC).networkSynchronized(ByteInfo.STREAM_CODEC));
@@ -86,6 +73,8 @@ public final class DataRegistry {
     public static final Supplier<DataComponentType<ReferenceExpression>> REFERENCE = registerExp("reference",
             builder -> builder.persistent(ReferenceExpression.EMPTY.type().codec())
                     .networkSynchronized(ReferenceExpression.EMPTY.streamCodec()));
+
+
 
     private static <E extends IExpressionType> Supplier<DataComponentType<E>> registerExp(String name, UnaryOperator<DataComponentType.Builder<E>> builder) {
         return DATA.register(name, () -> builder.apply(DataComponentType.builder()).build());

@@ -52,7 +52,7 @@ public class MarisaHakkeiro extends Item implements IRayTraceReader {
 
         var masterSpark = new MasterSparkEntity(player, player.level());
         masterSpark.setOwner(player);
-        masterSpark.setPos(new Vec3(player.getX(), player.getY() + player.getEyeHeight(), player.getZ()));
+        masterSpark.setPos(player.getEyePosition());
         masterSpark.setXRot(player.getXRot());
         masterSpark.setYRot(player.getYRot());
         player.level().addFreshEntity(masterSpark);

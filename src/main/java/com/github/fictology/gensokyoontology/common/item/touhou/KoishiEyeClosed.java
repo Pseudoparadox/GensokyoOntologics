@@ -1,6 +1,8 @@
 package com.github.fictology.gensokyoontology.common.item.touhou;
 
+import com.github.fictology.gensokyoontology.api.IHasCooldown;
 import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
+import com.github.fictology.gensokyoontology.common.entiy.misc.Laser;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.api.IRayTraceReader;
 import net.minecraft.network.chat.Component;
@@ -13,25 +15,39 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.function.Consumer;
 
-public class KoishiEyeClosed extends Item implements IRayTraceReader {
+public class KoishiEyeClosed extends Item implements IRayTraceReader, IHasCooldown {
     public KoishiEyeClosed(Properties properties) {
         super(properties);
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
-        if (player.getCooldowns().isOnCooldown(player.getItemInHand(hand)))
-            return InteractionResult.PASS;
+    public InteractionResult use(Level level, Player playerIn, InteractionHand handIn) {
+        ItemStack stack = playerIn.getItemInHand(handIn);
+        if (playerIn.getCooldowns().isOnCooldown(stack)) return InteractionResult.PASS;
 
-        var list = getRayTraceBox(player.getPosition(0), player.getLookAngle(), 50, 2);
-        list.forEach(aabbs -> aabbs.forEach(aabb -> {
-            var es = level.getEntitiesOfClass(Danmaku.class, aabb);
-            es.forEach(e -> e.setRemoved(Entity.RemovalReason.KILLED));
-        }));
-        return InteractionResult.SUCCESS;
+        var laserSource = new Laser(level, playerIn);
+        laserSource.init(200, 40, 85);
+        laserSource.setRGBA(0x88FF0000);
+        // lasers(level, playerIn);
+
+        laserSource.setOldPosAndRot(new Vec3(playerIn.getX(), playerIn.getY() + playerIn.getEyeHeight() * 0.5,
+                playerIn.getZ()), playerIn.yHeadRot, playerIn.xRotO);
+        level.addFreshEntity(laserSource);
+        this.setCD(playerIn, stack, 1200);
+        return super.use(level, playerIn, handIn);
+//        if (player.getCooldowns().isOnCooldown(player.getItemInHand(hand)))
+//            return InteractionResult.PASS;
+//
+//        var list = getRayTraceBox(player.getPosition(0), player.getLookAngle(), 50, 2);
+//        list.forEach(aabbs -> aabbs.forEach(aabb -> {
+//            var es = level.getEntitiesOfClass(Danmaku.class, aabb);
+//            es.forEach(e -> e.setRemoved(Entity.RemovalReason.KILLED));
+//        }));
+//        return InteractionResult.SUCCESS;
     }
 
     @Override

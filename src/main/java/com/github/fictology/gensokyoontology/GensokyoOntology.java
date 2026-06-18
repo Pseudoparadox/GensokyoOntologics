@@ -1,6 +1,5 @@
 package com.github.fictology.gensokyoontology;
 
-import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
 import com.github.fictology.gensokyoontology.registry.*;
 import net.minecraft.world.item.*;
 import org.slf4j.Logger;
@@ -50,7 +49,7 @@ public class GensokyoOntology {
         ItemRegistry.ITEMS.register(modEventBus);
         EntityRegistry.ENTITIES.register(modEventBus);
 
-        DataRegistry.ATTACHMENTS.register(modEventBus);
+        AttachRegistry.ATTACHMENTS.register(modEventBus);
         DataRegistry.DATA.register(modEventBus);
         Expressions.EXPRESSIONS.register(modEventBus);
         GSKOSoundEvents.SOUND_EVENTS.register(modEventBus);

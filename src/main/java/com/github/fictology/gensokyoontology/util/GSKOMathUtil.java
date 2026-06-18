@@ -234,7 +234,7 @@ public final class GSKOMathUtil {
     // tick: 0, 0.1, 0.2, 0.3 ... 1, 1.1, 1.2, 1.3 ... 2 ...
     // ∴ (tickEx + partial) / MAX_TICK => a very smooth approach.
     public static float lerpTicks(float partial, int maxTick, int presentTick, float minValue, float maxValue) {
-        return Mth.lerp((presentTick + partial) / maxTick, minValue, maxValue);
+        return presentTick > maxTick ? maxValue : Mth.lerp((presentTick + partial) / maxTick, minValue, maxValue);
     }
 
     private static float lerp(float t, float minValue, float maxValue) {

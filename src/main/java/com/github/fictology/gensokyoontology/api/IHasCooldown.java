@@ -1,6 +1,11 @@
 package com.github.fictology.gensokyoontology.api;
 
 
+import com.github.fictology.gensokyoontology.data.CooldownHaste;
+import com.github.fictology.gensokyoontology.registry.EnchantRegistry;
+import com.github.fictology.gensokyoontology.util.GSKOGeometry;
+import com.github.fictology.gensokyoontology.util.GSKOUtil;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
@@ -9,19 +14,17 @@ public interface IHasCooldown {
         return (int) (100F / (100 + hasteLevel * 20) * cooldown);
     }
 
-//    default int getCD(CooldownHasteEnchantment enchantment, ItemStack stack, int cooldown){
-//        int level = EnchantmentHelper.getEnchantments(stack).getOrDefault(EnchantRegistry.COOLDOWN_HASTE.get(),0);
-//        return this.getCD(level, cooldown);
-//    }
-//
-//    default void setCD(PlayerEntity player, ItemStack stack, int basicCooldown) {
-//        CooldownTracker cooldownTracker = player.getCooldownTracker();
-//
-//        int level = EnchantmentHelper.getEnchantments(stack).getOrDefault(EnchantRegistry.COOLDOWN_HASTE.get(), 0);
-//        if (level == 0) cooldownTracker.setCooldown(stack.getItem(), basicCooldown);
-//        if (cooldownTracker.hasCooldown(stack.getItem())) return;
-//
-//        cooldownTracker.setCooldown(stack.getItem(), this.getCD(level, basicCooldown));
-//
-//    }
+    default int getCD(ItemStack stack, int cooldown){
+        var cd = GSKOUtil.<Integer>atomic();
+        EnchantmentHelper.runIterationOnItem(stack, (_, level) -> {
+            cd.set(level);
+        });
+        return this.getCD(cd.get(), cooldown);
+    }
+
+    default void setCD(Player player, ItemStack stack, int basicCooldown) {
+        var cooldownTracker = player.getCooldowns();
+        var cd = GSKOUtil.<Integer>atomic();
+        cooldownTracker.addCooldown(stack, this.getCD(stack, basicCooldown));
+    }
 }
