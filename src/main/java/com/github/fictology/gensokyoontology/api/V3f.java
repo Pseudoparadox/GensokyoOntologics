@@ -18,6 +18,9 @@ public record V3f(float x, float y, float z) {
     public static final V3f ZP = new V3f(0, 0, 1);
     public static final V3f ZN = new V3f(0, 0, -1);
 
+    public static final Vector3f ZERO = new Vector3f(0,0,0);
+    public static final Vector3f ONE = new Vector3f(1,1,1);
+
     public static Vector3f of(float x, float y, float z){
         return new Vector3f(x, y, z);
     }

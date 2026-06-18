@@ -1,5 +1,6 @@
 package com.github.fictology.gensokyoontology.client.renderer.vfx;
 
+import com.github.fictology.gensokyoontology.api.V3f;
 import com.github.fictology.gensokyoontology.client.renderer.ObjVFXRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.state.SimpleState;
 import com.github.fictology.gensokyoontology.common.entiy.misc.MasterSparkEntity;
@@ -14,12 +15,17 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import org.joml.Vector3f;
 import org.joml.Vector4i;
 
 import java.awt.*;
 
 public class MasterSparkRenderer extends ObjVFXRenderer<MasterSparkEntity, SimpleState<MasterSparkEntity>> {
     private static final Identifier MODEL_PATH = GSKOUtil.key("models/entity/beam.obj");
+
+    public static final Vector3f INITIAL_SCALE = new Vector3f(0.04F, 5, 0.04F);
+    public static final Vector3f MAX_SCALE = new Vector3f(2,5,2);
+
     public MasterSparkRenderer(EntityRendererProvider.Context context, RenderType renderType) {
         super(context, renderType, MODEL_PATH);
     }
@@ -42,19 +48,32 @@ public class MasterSparkRenderer extends ObjVFXRenderer<MasterSparkEntity, Simpl
 
     @Override
     public void submit(SimpleState<MasterSparkEntity> state, PoseStack poseStack, SubmitNodeCollector submitor, CameraRenderState camera) {
-        poseStack.pushPose();
+
         var hue = 3 * GSKOMathUtil.triangularPeriod(state.entity.tickCount, 0, 360) / 360f;
         var color = Color.getHSBColor(hue, 1.0F, 1.0F);
 
-        float lerpedYRot = Mth.rotLerp(state.partialTick, state.prevXRot, state.yRot);
+        poseStack.pushPose();
+        float lerpedYRot = Mth.rotLerp(state.partialTick, state.prevYRot, state.yRot);
         float lerpedXRot = Mth.rotLerp(state.partialTick, state.prevXRot, state.xRot);
+        var scale = new Vector3f(0.04F, 0F, 0.04F);
 
-        poseStack.mulPose(Axis.YP.rotationDegrees(lerpedYRot));
-        poseStack.mulPose(Axis.XP.rotationDegrees(lerpedXRot));
+        GSKOMathUtil.rotateMatrixToLookVec(poseStack, lerpedXRot, lerpedYRot);
 
-        poseStack.translate(0, 20, 0);
-        poseStack.scale(2, 5, 2);
+        if (state.entity.tickCount < state.entity.getPreparation()){
+            var scalar = GSKOMathUtil.lerpTicks(state.partialTick, state.entity.getPreparation(), state.entity.tickCount, 0F, 5F);
 
+            poseStack.scale(scale.x, scalar, scale.z);
+            GSKOUtil.info("Scalar = " + scalar);
+            submitor.submitCustomGeometry(poseStack, this.renderType, (pose, vert) -> this.modelMap.get(MODEL_PATH)
+                    .render(pose, vert, new Vector4i(255, 255, 255, 255)));
+            poseStack.popPose();
+            return;
+        }
+
+        var scalar = GSKOMathUtil.lerpTicks(state.partialTick, 15,
+                state.entity.tickCount - state.entity.getPreparation(), 0F, 3F);
+
+        poseStack.scale(scalar, 5, scalar);
         submitor.submitCustomGeometry(poseStack, this.renderType, (pose, vert) -> this.modelMap.get(MODEL_PATH)
                 .render(pose, vert, new Vector4i(color.getRed(), color.getGreen(), color.getBlue(), 255)));
 

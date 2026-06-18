@@ -5,12 +5,14 @@ import com.github.fictology.gensokyoontology.common.combat.DanmakuUtil;
 import com.github.fictology.gensokyoontology.common.combat.GSKODamage;
 import com.github.fictology.gensokyoontology.common.entiy.AffiliatedEntity;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
+import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.api.IDamageHandler;
 import com.github.fictology.gensokyoontology.api.IRayTraceReader;
 import com.github.fictology.gensokyoontology.api.render.ITextureGetter;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.commands.AttributeCommand;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -18,11 +20,15 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceReader, IDamageHandler, ITextureGetter {
-    public static final float DISTANCE = 50F;
+    public static final float DISTANCE = 30F;
+    public static final int MAX_TICK = 120;
 
     public MasterSparkEntity(EntityType<?> entityTypeIn, Level levelIn) {
         super(entityTypeIn, levelIn);
@@ -36,7 +42,7 @@ public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceRead
     public void tick() {
         super.tick();
         if (tickCount >= 120) this.setRemoved(RemovalReason.DISCARDED);
-        if (tickCount < 40) return;
+        if (tickCount < this.getPreparation()) return;
         if (level().isClientSide()) return;
         var serverLevel = (ServerLevel) this.level();
         var entities = rayTrace(serverLevel, this, DISTANCE, new Vec3(0, 0, 0));
@@ -46,10 +52,26 @@ public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceRead
         var ref = GSKOUtil.<LivingEntity>atomic();
         if (this.tryGetOwner(ref)){
             var owner = ref.get();
-            this.setYRot(Mth.approachDegrees(this.getYRot(), owner.getYRot(), 15f));
-            this.setXRot(Mth.approachDegrees(this.getXRot(), owner.getXRot(), 15f));
+//            var atom = GSKOUtil.<AttributeInstance>atomic();
+//            if (GSKOUtil.tryGetAttribute(owner, Attributes.MOVEMENT_SPEED, atom)){
+//                atom.get().setBaseValue(0);
+//            }
+
+            this.setOldPosAndRot();
+            this.setPos(owner.position());
+            this.setYRot(owner.getYRot());
+            this.setXRot(owner.getXRot());
             entities.stream().filter(this::isHostile)
                     .forEach(entity ->  this.hurtLiving((LivingEntity) entity, serverLevel, GSKODamage.LASER, 10F));
+        }
+    }
+
+    @Override
+    public void onRemoval(RemovalReason reason) {
+        super.onRemoval(reason);
+        var ref = GSKOUtil.<LivingEntity>atomic();
+        if (this.tryGetOwner(ref)) {
+            ref.get().getAttributes().resetBaseValue(Attributes.MOVEMENT_SPEED);
         }
     }
 
@@ -67,5 +89,9 @@ public class MasterSparkEntity extends AffiliatedEntity implements IRayTraceRead
     @Override
     public Identifier getTexture() {
         return null;
+    }
+
+    public int getPreparation(){
+        return 40;
     }
 }

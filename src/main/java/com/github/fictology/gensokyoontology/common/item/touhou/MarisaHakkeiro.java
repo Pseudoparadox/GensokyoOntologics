@@ -51,6 +51,7 @@ public class MarisaHakkeiro extends Item implements IRayTraceReader {
         }
 
         var masterSpark = new MasterSparkEntity(player, player.level());
+        masterSpark.setOwner(player);
         masterSpark.setPos(new Vec3(player.getX(), player.getY() + player.getEyeHeight(), player.getZ()));
         masterSpark.setXRot(player.getXRot());
         masterSpark.setYRot(player.getYRot());
@@ -120,6 +121,6 @@ public class MarisaHakkeiro extends Item implements IRayTraceReader {
     }
 
     public int getChargeTick(){
-        return 60;
+        return 30;
     }
 }

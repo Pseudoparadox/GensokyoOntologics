@@ -44,18 +44,15 @@ public abstract class AffiliatedEntity extends Entity implements OwnableEntity, 
     protected void readAdditionalSaveData(ValueInput input) {
         EntityReference<LivingEntity> owner = EntityReference.readWithOldOwnerConversion(input, "Owner", this.level());
         if (owner != null) {
-            try {
-                this.entityData.set(DATA_OWNER, Optional.of(owner));
-            } catch (Throwable _) {
-
-            }
+            this.entityData.set(DATA_OWNER, Optional.of(owner));
         } else {
             this.entityData.set(DATA_OWNER, Optional.empty());
         }
     }
 
     public boolean tryGetOwner(AtomicReference<LivingEntity> ref){
-        if (this.getOwnerReference() == null) return false;
+        if (this.getOwnerReference() == null)
+            return false;
         if (this.getOwnerReference().getEntity(this.level(), LivingEntity.class) == null) return false;
         ref.set(this.getOwnerReference().getEntity(this.level(), LivingEntity.class));
         return true;

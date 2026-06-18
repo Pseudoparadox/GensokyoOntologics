@@ -5,10 +5,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.UnknownNullability;
-import org.joml.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -235,7 +234,7 @@ public final class GSKOMathUtil {
     // tick: 0, 0.1, 0.2, 0.3 ... 1, 1.1, 1.2, 1.3 ... 2 ...
     // ∴ (tickEx + partial) / MAX_TICK => a very smooth approach.
     public static float lerpTicks(float partial, int maxTick, int presentTick, float minValue, float maxValue) {
-        return lerp((presentTick + partial) / maxTick, minValue, maxValue);
+        return Mth.lerp((presentTick + partial) / maxTick, minValue, maxValue);
     }
 
     private static float lerp(float t, float minValue, float maxValue) {
@@ -496,11 +495,34 @@ public final class GSKOMathUtil {
         return num >= min && num < max;
     }
 
+    public static float lerpRotation(float delta, float prevRot, float currentRot){
+        while (currentRot - prevRot < -180.0F) {
+            prevRot -= 360.0F;
+        }
+
+        while (currentRot - prevRot >= 180.0F) {
+            prevRot += 360.0F;
+        }
+
+        return Mth.lerp(0.2F, prevRot, currentRot);
+    }
+
     public static void rotateMatrixToLookVec(PoseStack matrixStackIn, Vec3 lookVec) {
         Vec3 rotationVec = lookVec.scale(-1);
-        float f5 = (float)Math.acos(rotationVec.y);
-        float f6 = (float)Math.atan2(rotationVec.z, rotationVec.x);
-        matrixStackIn.mulPose(Axis.YP.rotationDegrees(((float)Math.PI / 2 - f6) * (180 / (float)Math.PI)));
-        matrixStackIn.mulPose(Axis.XP.rotationDegrees(f5 * (180 / (float)Math.PI)));
+        float acos = (float)Math.acos(rotationVec.y);
+        float atan2 = (float)Math.atan2(rotationVec.z, rotationVec.x);
+        matrixStackIn.mulPose(Axis.YP.rotationDegrees(((float)Math.PI / 2 - atan2) * (180 / (float)Math.PI)));
+        matrixStackIn.mulPose(Axis.XP.rotationDegrees(acos * (180 / (float)Math.PI)));
+    }
+
+    public static void rotateMatrixToLookVec(PoseStack poseStack, float xRot, float yRot){
+        var realXRot = xRot * (float) (Math.PI / 180.0);
+        var realYRot = -yRot * (float) (Math.PI / 180.0);
+        var yCos = Mth.cos(realYRot);
+        var ySin = Mth.sin(realYRot);
+        var xCos = Mth.cos(realXRot);
+        var xSin = Mth.sin(realXRot);
+        var vec = new Vec3(ySin * xCos, -xSin, yCos * xCos);
+        rotateMatrixToLookVec(poseStack, vec.scale(-1));
     }
 }

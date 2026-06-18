@@ -7,6 +7,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.client.renderer.MappableRingBuffer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -15,6 +16,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import org.jetbrains.annotations.NotNull;
@@ -114,5 +118,11 @@ public final class GSKOUtil {
     @NotNull
     public static <K,V> K getKeyByValueOrDefault(Map<K,V> map, K defaultKey, V value){
         return getKeyByValue(map, value) == null ? defaultKey : Objects.requireNonNull(getKeyByValue(map, value));
+    }
+
+    public static boolean tryGetAttribute(LivingEntity entity, Holder<Attribute> attribute, AtomicReference<AttributeInstance> ref){
+        if(entity.getAttributes().getInstance(attribute) == null) return false;
+        ref.set(entity.getAttributes().getInstance(attribute));
+        return true;
     }
 }
