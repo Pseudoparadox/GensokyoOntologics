@@ -58,4 +58,15 @@ public final class PipelineRegistry {
             .withDepthStencilState(DepthStencilState.DEFAULT)
             .withColorTargetState(ColorTargetState.DEFAULT)
             .build();
+
+    public static final RenderPipeline LASER = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
+            .withCull(false)
+            .withLocation(GSKOUtil.key("pipeline/laser"))
+            .withVertexShader("core/position_color")
+            .withFragmentShader("core/position_color")
+            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+            .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
+            .withPolygonMode(PolygonMode.FILL)
+            .build();
 }

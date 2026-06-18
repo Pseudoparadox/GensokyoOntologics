@@ -49,7 +49,7 @@ public class LaserRenderer extends EntityRenderer<Laser, SimpleState<Laser>> {
         GSKOMathUtil.rotateMatrixToLookVec(matrixStackIn, state.entity.getLookAngle().scale(-1));
 
         if (state.entity.tickCount <= state.entity.getPreparation()) {
-            submitNodeCollector.submitCustomGeometry(matrixStackIn, RenderTypes.lightning(), (pose, buffer) -> {
+            submitNodeCollector.submitCustomGeometry(matrixStackIn, RenderTypeRegistry.LASER, (pose, buffer) -> {
                 drawLaser(buffer, pose, length, 1.0f, 1.0F, 1.0F, 0.7F, 0.02f);
             });
             matrixStackIn.popPose();
@@ -67,13 +67,11 @@ public class LaserRenderer extends EntityRenderer<Laser, SimpleState<Laser>> {
         });
         matrixStackIn.scale(2.5F, 2.5F, 2.5F);
 
-        matrixStackIn.pushPose();
-        submitNodeCollector.submitCustomGeometry(matrixStackIn, RenderTypes.lightning(), (pose, buffer) -> {
+        submitNodeCollector.submitCustomGeometry(matrixStackIn, RenderTypeRegistry.LASER, (pose, buffer) -> {
             drawLaser(buffer, pose, length, red(state.entity), green(state.entity), blue(state.entity), alpha(state.entity), 0.12f);
-            drawLaser(buffer, pose, length, 1.0f, 1.0f, 1.0f, 1.0f, 0.1f);
+            drawLaser(buffer, pose, length, 1.0f, 1.0f, 1.0f, 1.0f, 0.08f);
         });
 
-        matrixStackIn.popPose();
         matrixStackIn.popPose();
     }
 
@@ -115,7 +113,6 @@ public class LaserRenderer extends EntityRenderer<Laser, SimpleState<Laser>> {
         vertex(pose, vertexBuilder, thickness, 0.0F, -thickness, red, green, blue, alpha);
         vertex(pose, vertexBuilder, thickness, length, -thickness, red, green, blue, alpha);
         vertex(pose, vertexBuilder, -thickness, length, -thickness, red, green, blue, alpha);
-
     }
 
     private void vertex(PoseStack.Pose matrixStack, VertexConsumer vertexBuilder, float x, float y, float z, float red, float green, float blue, float alpha) {

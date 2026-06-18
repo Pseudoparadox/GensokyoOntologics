@@ -31,6 +31,7 @@ public class GSKOCommonEvents {
                         .add(Attributes.MOVEMENT_SPEED)
                         .add(Attributes.MAX_HEALTH, 100)
                         .add(Attributes.ATTACK_DAMAGE, 3)
+                        .add(Attributes.FOLLOW_RANGE, 10)
                         .build());
 
         event.put(EntityRegistry.HAKUREI_REIMU.get(),
@@ -39,6 +40,7 @@ public class GSKOCommonEvents {
                         .add(Attributes.ARMOR, 10)
                         .add(Attributes.MAX_HEALTH, 200)
                         .add(Attributes.ATTACK_DAMAGE, 10)
+                        .add(Attributes.FOLLOW_RANGE, 10)
                         .build());
 
         event.put(EntityRegistry.FLANDRE_SCARLET.get(),
@@ -48,6 +50,7 @@ public class GSKOCommonEvents {
                         .add(Attributes.ARMOR_TOUGHNESS, 20)
                         .add(Attributes.MAX_HEALTH, 495)
                         .add(Attributes.ATTACK_DAMAGE, 10)
+                        .add(Attributes.FOLLOW_RANGE, 10)
                         .build());
 
         event.put(EntityRegistry.REMILIA_SCARLET.get(),
@@ -56,6 +59,7 @@ public class GSKOCommonEvents {
                         .add(Attributes.ARMOR, 15)
                         .add(Attributes.MAX_HEALTH, 500)
                         .add(Attributes.ATTACK_DAMAGE, 10)
+                        .add(Attributes.FOLLOW_RANGE, 10)
                         .build());
     }
 

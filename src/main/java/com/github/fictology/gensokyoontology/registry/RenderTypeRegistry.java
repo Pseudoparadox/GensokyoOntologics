@@ -19,4 +19,8 @@ public final class RenderTypeRegistry {
             RenderSetup.builder(PipelineRegistry.DREAM_SPHERE)
                     .setOutputTarget(OutputTarget.MAIN_TARGET).createRenderSetup());
 
+    public static final RenderType LASER = RenderType.create("laser",
+            RenderSetup.builder(PipelineRegistry.LASER)
+                    .setOutputTarget(OutputTarget.MAIN_TARGET).createRenderSetup());
+
 }

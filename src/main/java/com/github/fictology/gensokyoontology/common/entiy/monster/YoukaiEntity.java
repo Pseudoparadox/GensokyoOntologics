@@ -23,11 +23,11 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class YoukaiEntity extends RetreatableEntity implements Enemy {
 
-    public static final EntityDataAccessor<Boolean> DATA_RETREATED = SynchedEntityData.defineId(
-            YoukaiEntity.class, EntityDataSerializers.BOOLEAN);
+//    public static final EntityDataAccessor<Boolean> DATA_RETREATED = SynchedEntityData.defineId(
+//            YoukaiEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<String> DATA_PHASE = SynchedEntityData.defineId(YoukaiEntity.class,
             EntityDataSerializers.STRING);
-    public static final EntityDataAccessor<Integer> DATA_FAVORABILITY = SynchedEntityData.defineId(YoukaiEntity.class, EntityDataSerializers.INT);
+//    public static final EntityDataAccessor<Integer> DATA_FAVORABILITY = SynchedEntityData.defineId(YoukaiEntity.class, EntityDataSerializers.INT);
     /**
      * 是否被退治
      */
@@ -127,21 +127,21 @@ public abstract class YoukaiEntity extends RetreatableEntity implements Enemy {
         // }
     }
 
-    public int getFavorability() {
-        return this.getEntityData().get(DATA_FAVORABILITY);
-    }
+//    public int getFavorability() {
+//        return this.getEntityData().get(DATA_FAVORABILITY);
+//    }
+//
+//    public void setFavorability(int favorabilityIn) {
+//        this.getEntityData().set(DATA_FAVORABILITY, favorabilityIn);
+//    }
 
-    public void setFavorability(int favorabilityIn) {
-        this.getEntityData().set(DATA_FAVORABILITY, favorabilityIn);
-    }
-
-    public boolean isRetreated() {
-        return this.getEntityData().get(DATA_RETREATED);
-    }
-
-    public void setRetreated(boolean isRetreated) {
-        this.getEntityData().set(DATA_RETREATED, isRetreated);
-    }
+//    public boolean isRetreated() {
+//        return this.getEntityData().get(DATA_RETREATED);
+//    }
+//
+//    public void setRetreated(boolean isRetreated) {
+//        this.getEntityData().set(DATA_RETREATED, isRetreated);
+//    }
 
     public boolean isDuringSpellCardAttack(boolean isDuringSpellCardAttack) {
         this.duringSpellCard = isDuringSpellCardAttack;
