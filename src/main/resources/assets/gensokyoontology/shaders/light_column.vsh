@@ -27,7 +27,6 @@ void main() {
 
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
     gl_Position.z = gl_Position.z * 0.999;  // 轻微偏移，避免深度冲突
-
     normal = Normal;
     offset = Offset;
     density = CellDensity;

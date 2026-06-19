@@ -3,6 +3,7 @@ package com.github.fictology.gensokyoontology.common.event;
 import com.github.fictology.gensokyoontology.GensokyoOntology;
 import com.github.fictology.gensokyoontology.client.RenderManager;
 import com.github.fictology.gensokyoontology.client.model.FlandreScarletModel;
+import com.github.fictology.gensokyoontology.client.model.RumiaModel;
 import com.github.fictology.gensokyoontology.client.renderer.EmptyRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.NormalVectorRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.living.FlandreRenderer;
@@ -20,9 +21,11 @@ import com.mojang.blaze3d.buffers.Std140SizeCalculator;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MappableRingBuffer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.NeoForgeRenderTypes;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -32,100 +35,38 @@ import org.lwjgl.glfw.GLFW;
 
 @EventBusSubscriber(modid = GensokyoOntology.MODID, value = Dist.CLIENT)
 public class RenderingEvents {
-    @SubscribeEvent
-    public static void onClientStart(ClientStartedEvent event){
-        var sphereBuf = new MappableRingBuffer(
-                () -> "SphereData",
-                GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_MAP_WRITE,
-                new Std140SizeCalculator()
-                        .putVec4()
-                        .putVec2()
-                        .putVec2()
-                        .putFloat().get());
-
-        var sparkBuf = new MappableRingBuffer(
-                () -> "SphereData",
-                GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_MAP_WRITE,
-                new Std140SizeCalculator()
-                        .putVec2()
-                        .putVec2().get());
-
-        var state = new MagicSphereState();
-        // state.buildMesh(RenderTypeRegistry.DREAM_SPHERE, 18, 18);
-
-        RenderManager.registerRenderingPass(RenderTypeRegistry.DREAM_SPHERE, PipelineRegistry.DREAM_SPHERE,
-                state, sphereBuf);
-    }
-
-    @SubscribeEvent
-    public static void onCustomDrawCall(RenderLevelStageEvent.AfterTranslucentParticles event){
-        var poseStack = event.getPoseStack();
-        var renderTarget = Minecraft.getInstance().getMainRenderTarget();
-        var projMatrix = RenderSystem.getProjectionMatrixBuffer();
-
-//        RenderManager.renderOnEach((renderType, entry) -> {
-//
-//            var ubo = RenderManager.getUniformBuffer(renderType);
-//            var vbo = RenderManager.getVertexBuffer(renderType);
-//            var pipeline = RenderManager.getPipeline(renderType);
-//
-//            Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
-//            matrixStack.pushMatrix();
-//            RenderManager.setModelView(renderType, matrixStack);
-//
-//            var transforms = RenderSystem.getDynamicUniforms().writeTransform(
-//                    poseStack.last().pose(),              // <-- 实体 PoseStack pose
-//                    new Vector4f(0f,0f,0f,1f),              // ColorModulator
-//                    new Vector3f(),
-//                    new Matrix4f());
-//
-//            ubo.rotate();
-//            if (renderTarget.getColorTextureView() != null) {
-//                try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-//                        () -> renderType.pipeline().getLocation().toString(),
-//                        renderTarget.getColorTextureView(), OptionalInt.empty(),
-//                        renderTarget.getDepthTextureView(), OptionalDouble.empty())) {
-//
-//                    pass.setPipeline(pipeline);
-//                    pass.setUniform("DynamicTransforms", transforms);
-//                    RenderSystem.bindDefaultUniforms(pass);
-//                    pass.setUniform(entry.uniformName(), ubo.currentBuffer());
-//                    pass.setVertexBuffer(0, vbo);
-//                    pass.draw(0, entry.getVertexCount());
-//                }
-//            }
-//            matrixStack.popMatrix();
-//        });
-
-    }
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         // 投掷物实体
         event.registerEntityRenderer(EntityRegistry.DANMAKU.get(), NormalVectorRenderer::new);
         event.registerEntityRenderer(EntityRegistry.YIN_YANG_JADE.get(), ctx ->
-                new YinyangJadeRenderer(ctx, RenderTypeRegistry.YINYANG, YinyangJadeItem.MODELS));
+                new YinyangJadeRenderer(ctx, RenderTypes.dragonRays(), YinyangJadeItem.MODELS));
 
         // 特效类实体
         event.registerEntityRenderer(EntityRegistry.DREAM_SEAL.get(), EmptyRenderer::new);
         event.registerEntityRenderer(EntityRegistry.DREAM_SPHERE.get(), ctx ->
-                new DreamSphereRenderer(ctx, RenderTypeRegistry.DREAM_SPHERE));
+                new DreamSphereRenderer(ctx, RenderTypes.dragonRays()));
         event.registerEntityRenderer(EntityRegistry.MASTER_SPARK_ENTITY.get(), ctx ->
-                new MasterSparkRenderer(ctx, RenderTypeRegistry.MASTER_SPARK));
+                new MasterSparkRenderer(ctx, RenderTypes.dragonRays()));
         event.registerEntityRenderer(EntityRegistry.LASER_SOURCE.get(), LaserRenderer::new);
 
         // 生物实体
         event.registerEntityRenderer(EntityRegistry.FLANDRE_SCARLET.get(), FlandreRenderer::new);
     }
 
-    @SubscribeEvent
+    // @SubscribeEvent
     public static void registerPipelines(RegisterRenderPipelinesEvent event){
-        event.registerPipeline(PipelineRegistry.DREAM_SPHERE);
+//        event.registerPipeline(PipelineRegistry.DREAM_SPHERE);
+//        event.registerPipeline(PipelineRegistry.MASTER_SPARK);
+//        event.registerPipeline(PipelineRegistry.YINYANG);
+//        event.registerPipeline(PipelineRegistry.LASER);
     }
 
     @SubscribeEvent // on the mod event bus only on the physical client
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(FlandreScarletModel.ID, FlandreScarletModel::createLayer);
+        event.registerLayerDefinition(RumiaModel.ID, RumiaModel::createBodyLayer);
     }
 
     /**

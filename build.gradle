@@ -34,6 +34,7 @@ sourceSets.main.resources {
 }
 
 repositories {
+    mavenCentral()
     maven {
         name = "Modrinth"
         url = "https://maven.modrinth.com"
@@ -141,8 +142,6 @@ dependencies {
     // Example project dependency using a sister or child project:
     // implementation project(":myproject")
 
-//    modDevRuntimeDependencies "maven.modrinth:sodium:Fg5Mk6Y3" //
-//    modDevRuntimeDependencies "maven.modrinth:irisshaders:YEGDGnJM"
 //    compileOnly "maven.modrinth:irisshaders:YEGDGnJM"
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html

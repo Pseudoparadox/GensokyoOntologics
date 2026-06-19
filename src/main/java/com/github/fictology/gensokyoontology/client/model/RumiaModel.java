@@ -3,18 +3,18 @@ package com.github.fictology.gensokyoontology.client.model;// Made with Blockben
 // Paste this class into your mod and generate all required imports
 
 
-import com.github.fictology.gensokyoontology.client.renderer.state.SimpleState;
-import com.github.fictology.gensokyoontology.common.entiy.monster.RumiaEntity;
+import com.github.fictology.gensokyoontology.client.renderer.state.RumiaState;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
-import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.animation.*;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 
-public class RumiaModel extends EntityModel<SimpleState<RumiaEntity>> {
+public class RumiaModel extends HumanoidModel<RumiaState> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(GSKOUtil.key("rumiamodel"), "main");
+	public static final ModelLayerLocation ID = new ModelLayerLocation(GSKOUtil.key("rumiamodel"), "main");
 	private final ModelPart head;
 	private final ModelPart blink;
 	private final ModelPart armRight;
@@ -24,6 +24,20 @@ public class RumiaModel extends EntityModel<SimpleState<RumiaEntity>> {
 	private final ModelPart legLeft;
 	private final ModelPart legRight;
 	private final ModelPart hairtie;
+	private final KeyframeAnimation animation;
+	public static final AnimationDefinition ARM_CROSS = AnimationDefinition.Builder.withLength(2.0F).looping()
+			.addAnimation("armRight", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+
+					new Keyframe(0, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM),
+					new Keyframe(20, KeyframeAnimations.degreeVec(0.0F, 0.0F, -5.0F), AnimationChannel.Interpolations.CATMULLROM),
+					new Keyframe(40, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
+			))
+			.addAnimation("armLeft", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+					new Keyframe(0, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F),  AnimationChannel.Interpolations.CATMULLROM),
+					new Keyframe(20, KeyframeAnimations.degreeVec(0.0F, 0.0F, 5.0F), AnimationChannel.Interpolations.CATMULLROM),
+					new Keyframe(40, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.CATMULLROM)
+			))
+			.build();
 
 	public RumiaModel(ModelPart root) {
         super(root);
@@ -36,6 +50,7 @@ public class RumiaModel extends EntityModel<SimpleState<RumiaEntity>> {
 		this.legLeft = root.getChild("legLeft");
 		this.legRight = root.getChild("legRight");
 		this.hairtie = root.getChild("hairtie");
+		this.animation = ARM_CROSS.bake(root);
 	}
 
 	public static LayerDefinition createBodyLayer() {
@@ -70,9 +85,10 @@ public class RumiaModel extends EntityModel<SimpleState<RumiaEntity>> {
 		return LayerDefinition.create(meshdefinition, 128, 128);
 	}
 
-	@Override
-	public void setupAnim(SimpleState<RumiaEntity> state) {
-		super.setupAnim(state);
-	}
 
+	@Override
+	public void setupAnim(RumiaState state) {
+		super.setupAnim(state);
+		// this.animation.apply(state.rumia, state.ageInTicks);
+	}
 }

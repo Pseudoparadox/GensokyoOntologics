@@ -17,7 +17,6 @@ public class FlandreScarletModel extends HumanoidModel<FlandreState> {
 	private List<ModelPart> modelParts = Lists.newArrayList();
 	public static final ModelLayerLocation ID = new ModelLayerLocation(GSKOUtil.key("flandre"), "main");
 
-
 	public static LayerDefinition createLayer() {
 		MeshDefinition mesh = new MeshDefinition();
 		PartDefinition root = mesh.getRoot();

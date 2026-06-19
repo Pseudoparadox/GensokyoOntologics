@@ -23,6 +23,8 @@ public class LaserRenderer extends EntityRenderer<Laser, SimpleState<Laser>> {
 
     public static final Identifier LASER_BEAM_TEX = GSKOUtil.key("textures/entity/laser_beam_1.png");
     public static final RenderType LASER_BEAM = RenderTypes.entityTranslucent(LASER_BEAM_TEX);
+    private static final RenderType TRIANGLE_TYPE = RenderTypes.dragonRays();
+    private static final RenderType QUAD_TYPE = RenderTypes.lightning();
 
     public LaserRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -49,25 +51,25 @@ public class LaserRenderer extends EntityRenderer<Laser, SimpleState<Laser>> {
         GSKOMathUtil.rotateMatrixToLookVec(matrixStackIn, state.entity.getLookAngle().scale(-1));
 
         if (state.entity.tickCount <= state.entity.getPreparation()) {
-            submitNodeCollector.submitCustomGeometry(matrixStackIn, RenderTypeRegistry.LASER, (pose, buffer) -> {
+            submitNodeCollector.submitCustomGeometry(matrixStackIn, RenderTypes.debugQuads(), (pose, buffer) -> {
                 drawLaser(buffer, pose, length, 1.0f, 1.0F, 1.0F, 0.7F, 0.02f);
             });
             matrixStackIn.popPose();
             return;
         }
         matrixStackIn.scale(0.5F, 0.5F, 0.5F);
-        submitNodeCollector.submitCustomGeometry(matrixStackIn, RenderTypeRegistry.MASTER_SPARK, (pose, buffer) -> {
-            GSKOGeometry.buildSphereMesh(pose.pose(), buffer, RenderTypeRegistry.MASTER_SPARK, 8, 8,
+        submitNodeCollector.submitCustomGeometry(matrixStackIn, TRIANGLE_TYPE, (pose, buffer) -> {
+            GSKOGeometry.buildSphereMesh(pose.pose(), buffer, TRIANGLE_TYPE, 8, 8,
                     new Vector4i(255, 0, 0, 255));
         });
         matrixStackIn.scale(0.8F, 0.8F, 0.8F);
-        submitNodeCollector.submitCustomGeometry(matrixStackIn, RenderTypeRegistry.MASTER_SPARK, (pose, buffer) -> {
-            GSKOGeometry.buildSphereMesh(pose.pose(), buffer, RenderTypeRegistry.MASTER_SPARK, 8, 8,
+        submitNodeCollector.submitCustomGeometry(matrixStackIn, TRIANGLE_TYPE, (pose, buffer) -> {
+            GSKOGeometry.buildSphereMesh(pose.pose(), buffer, TRIANGLE_TYPE, 8, 8,
                     new Vector4i(255, 255, 255, 255));
         });
         matrixStackIn.scale(2.5F, 2.5F, 2.5F);
 
-        submitNodeCollector.submitCustomGeometry(matrixStackIn, RenderTypeRegistry.LASER, (pose, buffer) -> {
+        submitNodeCollector.submitCustomGeometry(matrixStackIn, QUAD_TYPE, (pose, buffer) -> {
             drawLaser(buffer, pose, length, red(state.entity), green(state.entity), blue(state.entity), alpha(state.entity), 0.12f);
             drawLaser(buffer, pose, length, 1.0f, 1.0f, 1.0f, 1.0f, 0.08f);
         });
