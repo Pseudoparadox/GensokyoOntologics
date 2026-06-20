@@ -47,7 +47,7 @@ public class RumiaEntity extends YoukaiEntity{
     @Override
     public void tick() {
         super.tick();
-        int light = this.level().getLightEngine().getRawBrightness(BlockPos.containing(this.getPosition(0)), 0);
+        int light = this.level().getRawBrightness(BlockPos.containing(this.getPosition(0)), 0);
         this.setInvulnerable(light < 10);
     }
 

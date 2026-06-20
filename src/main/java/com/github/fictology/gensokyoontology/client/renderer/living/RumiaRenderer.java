@@ -45,13 +45,14 @@ public class RumiaRenderer extends MobRenderer<RumiaEntity, RumiaState, RumiaMod
 
     @Override
     public void submit(RumiaState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
+        super.submit(state, poseStack, submitNodeCollector, camera);
+        if (state.light < 10) return;
         poseStack.pushPose();
         poseStack.scale(3F, 3F, 3F);
         submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.debugTriangleFan(), ((pose, buffer) -> {
             GSKOGeometry.buildSphereMesh(pose.pose(), buffer, 16, 16, new Vector4i(0,0,0,255));
         }));
         poseStack.popPose();
-        super.submit(state, poseStack, submitNodeCollector, camera);
     }
 
     @Override
