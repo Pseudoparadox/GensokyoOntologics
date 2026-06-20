@@ -3,8 +3,6 @@ package com.github.fictology.gensokyoontology.client.renderer;
 import com.github.fictology.gensokyoontology.client.RenderManager;
 import com.github.fictology.gensokyoontology.client.renderer.state.RenderingQueue;
 import com.github.fictology.gensokyoontology.api.render.IRenderingEntry;
-import com.mojang.blaze3d.buffers.Std140Builder;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -14,8 +12,9 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.entity.Entity;
+import org.jspecify.annotations.NonNull;
 
-public abstract class ShaderedRenderer<E extends Entity, S extends EntityRenderState & IRenderingEntry> extends EntityRenderer<E, S>
+public abstract class ShaderedRenderer<E extends Entity, S extends EntityRenderState> extends EntityRenderer<E, S>
         implements SubmitNodeCollector.CustomGeometryRenderer {
 
     protected final RenderingQueue queue;
@@ -40,15 +39,15 @@ public abstract class ShaderedRenderer<E extends Entity, S extends EntityRenderS
     }
 
     protected void submitShader(S state){
-        var ubo = RenderManager.getUniformBuffer(this.renderType).currentBuffer();
-        try(var view = RenderSystem.getDevice().createCommandEncoder().mapBuffer(ubo, false, true)){
-            this.buildUniform(Std140Builder.intoBuffer(view.data()), state);
-        }
+//        var ubo = RenderManager.getUniformBuffer(this.renderType).currentBuffer();
+//        try(var view = RenderSystem.getDevice().createCommandEncoder().mapBuffer(ubo, false, true)){
+//             this.buildUniform(Std140Builder.intoBuffer(view.data()), state);
+//        }
     }
 
-    protected abstract void buildUniform(Std140Builder builder, S state);
-    protected void submitMesh(S state, PoseStack stack){
-        state.setModelView(stack.last().pose());
-        RenderManager.setVertexBuffer(this.renderType, state.getVertexBuffer());
+
+    @Override
+    protected boolean affectedByCulling(@NonNull E entity) {
+        return true;
     }
 }

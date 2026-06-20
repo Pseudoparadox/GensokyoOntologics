@@ -71,8 +71,13 @@ public class Laser extends AffiliatedEntity implements IRayTraceReader, IDamageH
         super.addAdditionalSaveData(tag);
         tag.putInt("lifespan", this.lifespan);
         tag.putInt("preparation", this.preparation);
-        tag.putInt("argb", this.rgba);
+        tag.putInt("rgba", this.rgba);
         tag.putFloat("range", this.range);
+    }
+
+    @Override
+    public void onAddedToLevel() {
+        super.onAddedToLevel();
     }
 
     @Override

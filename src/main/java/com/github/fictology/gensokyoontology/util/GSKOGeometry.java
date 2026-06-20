@@ -159,116 +159,103 @@ public final class GSKOGeometry {
     }
 
     public static void buildSphereMesh(Matrix4f pose, VertexConsumer builder, RenderType renderType, int latitudeBands, int longitudeBands) {
-        var radius = 1F;
-        int vertexCount = latitudeBands * longitudeBands * 6; // 每个格子 2 个三角形 × 3 顶点
-        int vertexSize = renderType.format().getVertexSize();
 
-        try (ByteBufferBuilder byteBufferBuilder =
-                     ByteBufferBuilder.exactlySized(vertexCount * vertexSize)) {
+        for (int latNumber = 0; latNumber < latitudeBands; latNumber++) {
+            float theta1 = (float) (latNumber * Math.PI / latitudeBands);
+            float theta2 = (float) ((latNumber + 1) * Math.PI / latitudeBands);
 
-            for (int latNumber = 0; latNumber < latitudeBands; latNumber++) {
-                float theta1 = (float) (latNumber * Math.PI / latitudeBands);
-                float theta2 = (float) ((latNumber + 1) * Math.PI / latitudeBands);
+            float sinTheta1 = (float) Math.sin(theta1);
+            float cosTheta1 = (float) Math.cos(theta1);
+            float sinTheta2 = (float) Math.sin(theta2);
+            float cosTheta2 = (float) Math.cos(theta2);
 
-                float sinTheta1 = (float) Math.sin(theta1);
-                float cosTheta1 = (float) Math.cos(theta1);
-                float sinTheta2 = (float) Math.sin(theta2);
-                float cosTheta2 = (float) Math.cos(theta2);
+            for (int longNumber = 0; longNumber < longitudeBands; longNumber++) {
+                float phi1 = (float) (longNumber * 2 * Math.PI / longitudeBands);
+                float phi2 = (float) ((longNumber + 1) * 2 * Math.PI / longitudeBands);
 
-                for (int longNumber = 0; longNumber < longitudeBands; longNumber++) {
-                    float phi1 = (float) (longNumber * 2 * Math.PI / longitudeBands);
-                    float phi2 = (float) ((longNumber + 1) * 2 * Math.PI / longitudeBands);
+                float sinPhi1 = (float) Math.sin(phi1);
+                float cosPhi1 = (float) Math.cos(phi1);
+                float sinPhi2 = (float) Math.sin(phi2);
+                float cosPhi2 = (float) Math.cos(phi2);
 
-                    float sinPhi1 = (float) Math.sin(phi1);
-                    float cosPhi1 = (float) Math.cos(phi1);
-                    float sinPhi2 = (float) Math.sin(phi2);
-                    float cosPhi2 = (float) Math.cos(phi2);
+                // 球面坐标转笛卡尔坐标
+                float x1 = cosPhi1 * sinTheta1;
+                float z1 = sinPhi1 * sinTheta1;
 
-                    // 球面坐标转笛卡尔坐标
-                    float x1 = cosPhi1 * sinTheta1;
-                    float z1 = sinPhi1 * sinTheta1;
+                float x2 = cosPhi2 * sinTheta1;
+                float z2 = sinPhi2 * sinTheta1;
 
-                    float x2 = cosPhi2 * sinTheta1;
-                    float z2 = sinPhi2 * sinTheta1;
+                float x3 = cosPhi1 * sinTheta2;
+                float z3 = sinPhi1 * sinTheta2;
 
-                    float x3 = cosPhi1 * sinTheta2;
-                    float z3 = sinPhi1 * sinTheta2;
+                float x4 = cosPhi2 * sinTheta2;
+                float z4 = sinPhi2 * sinTheta2;
 
-                    float x4 = cosPhi2 * sinTheta2;
-                    float z4 = sinPhi2 * sinTheta2;
+                // UV 坐标
+                float u1 = (float) longNumber / longitudeBands;
+                float v1 = (float) latNumber / latitudeBands;
+                float u2 = (float) (longNumber + 1) / longitudeBands;
+                float v2 = (float) (latNumber + 1) / latitudeBands;
 
-                    // UV 坐标
-                    float u1 = (float) longNumber / longitudeBands;
-                    float v1 = (float) latNumber / latitudeBands;
-                    float u2 = (float) (longNumber + 1) / longitudeBands;
-                    float v2 = (float) (latNumber + 1) / latitudeBands;
+                builder.addVertex(pose, x1, cosTheta1, z1).setUv(u1, v1).setNormal(x1, cosTheta1, z1).setColor(1F, 1F, 1F, 1F);
+                builder.addVertex(pose, x3, cosTheta2, z3).setUv(u1, v2).setNormal(x3, cosTheta2, z3).setColor(1F, 1F, 1F, 1F);
+                builder.addVertex(pose, x2, cosTheta1, z2).setUv(u2, v1).setNormal(x2, cosTheta1, z2).setColor(1F, 1F, 1F, 1F);
 
-                    builder.addVertex(pose, x1, cosTheta1, z1).setUv(u1, v1).setNormal(x1, cosTheta1, z1).setColor(1F, 1F, 1F, 1F);
-                    builder.addVertex(pose, x3, cosTheta2, z3).setUv(u1, v2).setNormal(x3, cosTheta2, z3).setColor(1F, 1F, 1F, 1F);
-                    builder.addVertex(pose, x2, cosTheta1, z2).setUv(u2, v1).setNormal(x2, cosTheta1, z2).setColor(1F, 1F, 1F, 1F);
-
-                    builder.addVertex(pose, x3, cosTheta2, z3).setUv(u1, v2).setNormal(x3, cosTheta2, z3).setColor(1F, 1F, 1F, 1F);
-                    builder.addVertex(pose, x4, cosTheta2, z4).setUv(u2, v2).setNormal(x4, cosTheta2, z4).setColor(1F, 1F, 1F, 1F);
-                    builder.addVertex(pose, x2, cosTheta1, z2).setUv(u2, v1).setNormal(x2, cosTheta1, z2).setColor(1F, 1F, 1F, 1F);
-                }
+                builder.addVertex(pose, x3, cosTheta2, z3).setUv(u1, v2).setNormal(x3, cosTheta2, z3).setColor(1F, 1F, 1F, 1F);
+                builder.addVertex(pose, x4, cosTheta2, z4).setUv(u2, v2).setNormal(x4, cosTheta2, z4).setColor(1F, 1F, 1F, 1F);
+                builder.addVertex(pose, x2, cosTheta1, z2).setUv(u2, v1).setNormal(x2, cosTheta1, z2).setColor(1F, 1F, 1F, 1F);
             }
         }
     }
 
-    public static void buildSphereMesh(Matrix4f pose, VertexConsumer builder, RenderType renderType, int latitudeBands, int longitudeBands,
+    public static void buildSphereMesh(Matrix4f pose, VertexConsumer builder, int latitudeBands, int longitudeBands,
                                        Vector4i color) {
-        var radius = 1F;
-        int vertexCount = latitudeBands * longitudeBands * 6; // 每个格子 2 个三角形 × 3 顶点
-        int vertexSize = renderType.format().getVertexSize();
 
-        try (ByteBufferBuilder byteBufferBuilder =
-                     ByteBufferBuilder.exactlySized(vertexCount * vertexSize)) {
+        for (int latNumber = 0; latNumber < latitudeBands; latNumber++) {
+            float theta1 = (float) (latNumber * Math.PI / latitudeBands);
+            float theta2 = (float) ((latNumber + 1) * Math.PI / latitudeBands);
 
-            for (int latNumber = 0; latNumber < latitudeBands; latNumber++) {
-                float theta1 = (float) (latNumber * Math.PI / latitudeBands);
-                float theta2 = (float) ((latNumber + 1) * Math.PI / latitudeBands);
+            float sinTheta1 = (float) Math.sin(theta1);
+            float cosTheta1 = (float) Math.cos(theta1);
+            float sinTheta2 = (float) Math.sin(theta2);
+            float cosTheta2 = (float) Math.cos(theta2);
 
-                float sinTheta1 = (float) Math.sin(theta1);
-                float cosTheta1 = (float) Math.cos(theta1);
-                float sinTheta2 = (float) Math.sin(theta2);
-                float cosTheta2 = (float) Math.cos(theta2);
+            for (int longNumber = 0; longNumber < longitudeBands; longNumber++) {
+                float phi1 = (float) (longNumber * 2 * Math.PI / longitudeBands);
+                float phi2 = (float) ((longNumber + 1) * 2 * Math.PI / longitudeBands);
 
-                for (int longNumber = 0; longNumber < longitudeBands; longNumber++) {
-                    float phi1 = (float) (longNumber * 2 * Math.PI / longitudeBands);
-                    float phi2 = (float) ((longNumber + 1) * 2 * Math.PI / longitudeBands);
+                float sinPhi1 = (float) Math.sin(phi1);
+                float cosPhi1 = (float) Math.cos(phi1);
+                float sinPhi2 = (float) Math.sin(phi2);
+                float cosPhi2 = (float) Math.cos(phi2);
 
-                    float sinPhi1 = (float) Math.sin(phi1);
-                    float cosPhi1 = (float) Math.cos(phi1);
-                    float sinPhi2 = (float) Math.sin(phi2);
-                    float cosPhi2 = (float) Math.cos(phi2);
+                // 球面坐标转笛卡尔坐标
+                float x1 = cosPhi1 * sinTheta1;
+                float z1 = sinPhi1 * sinTheta1;
 
-                    // 球面坐标转笛卡尔坐标
-                    float x1 = cosPhi1 * sinTheta1;
-                    float z1 = sinPhi1 * sinTheta1;
+                float x2 = cosPhi2 * sinTheta1;
+                float z2 = sinPhi2 * sinTheta1;
 
-                    float x2 = cosPhi2 * sinTheta1;
-                    float z2 = sinPhi2 * sinTheta1;
+                float x3 = cosPhi1 * sinTheta2;
+                float z3 = sinPhi1 * sinTheta2;
 
-                    float x3 = cosPhi1 * sinTheta2;
-                    float z3 = sinPhi1 * sinTheta2;
+                float x4 = cosPhi2 * sinTheta2;
+                float z4 = sinPhi2 * sinTheta2;
 
-                    float x4 = cosPhi2 * sinTheta2;
-                    float z4 = sinPhi2 * sinTheta2;
+                // UV 坐标
+                float u1 = (float) longNumber / longitudeBands;
+                float v1 = (float) latNumber / latitudeBands;
+                float u2 = (float) (longNumber + 1) / longitudeBands;
+                float v2 = (float) (latNumber + 1) / latitudeBands;
 
-                    // UV 坐标
-                    float u1 = (float) longNumber / longitudeBands;
-                    float v1 = (float) latNumber / latitudeBands;
-                    float u2 = (float) (longNumber + 1) / longitudeBands;
-                    float v2 = (float) (latNumber + 1) / latitudeBands;
-
-                    builder.addVertex(pose, x1, cosTheta1, z1).setUv(u1, v1).setNormal(x1, cosTheta1, z1).setColor(color.x, color.y, color.z, color.w);
-                    builder.addVertex(pose, x3, cosTheta2, z3).setUv(u1, v2).setNormal(x3, cosTheta2, z3).setColor(color.x, color.y, color.z, color.w);
-                    builder.addVertex(pose, x2, cosTheta1, z2).setUv(u2, v1).setNormal(x2, cosTheta1, z2).setColor(color.x, color.y, color.z, color.w);
-                    builder.addVertex(pose, x3, cosTheta2, z3).setUv(u1, v2).setNormal(x3, cosTheta2, z3).setColor(color.x, color.y, color.z, color.w);
-                    builder.addVertex(pose, x4, cosTheta2, z4).setUv(u2, v2).setNormal(x4, cosTheta2, z4).setColor(color.x, color.y, color.z, color.w);
-                    builder.addVertex(pose, x2, cosTheta1, z2).setUv(u2, v1).setNormal(x2, cosTheta1, z2).setColor(color.x, color.y, color.z, color.w);
-                }
+                builder.addVertex(pose, x1, cosTheta1, z1).setUv(u1, v1).setNormal(x1, cosTheta1, z1).setColor(color.x, color.y, color.z, color.w);
+                builder.addVertex(pose, x3, cosTheta2, z3).setUv(u1, v2).setNormal(x3, cosTheta2, z3).setColor(color.x, color.y, color.z, color.w);
+                builder.addVertex(pose, x2, cosTheta1, z2).setUv(u2, v1).setNormal(x2, cosTheta1, z2).setColor(color.x, color.y, color.z, color.w);
+                builder.addVertex(pose, x3, cosTheta2, z3).setUv(u1, v2).setNormal(x3, cosTheta2, z3).setColor(color.x, color.y, color.z, color.w);
+                builder.addVertex(pose, x4, cosTheta2, z4).setUv(u2, v2).setNormal(x4, cosTheta2, z4).setColor(color.x, color.y, color.z, color.w);
+                builder.addVertex(pose, x2, cosTheta1, z2).setUv(u2, v1).setNormal(x2, cosTheta1, z2).setColor(color.x, color.y, color.z, color.w);
             }
+
         }
     }
 

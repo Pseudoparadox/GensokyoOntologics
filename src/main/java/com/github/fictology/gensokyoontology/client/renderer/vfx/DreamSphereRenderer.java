@@ -44,11 +44,4 @@ public class DreamSphereRenderer extends ShaderedRenderer<DreamSphere, MagicSphe
         });
     }
 
-    @Override
-    protected void buildUniform(Std140Builder builder, MagicSphereState state) {
-        builder.putVec4(GSKOUtil.wrapColor(state.mainColor))
-                .putVec2(state.offset)
-                .putVec2(state.tilling)
-                .putFloat(state.cellDensity);
-    }
 }

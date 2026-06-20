@@ -10,9 +10,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LightLayer;
 import org.joml.Vector4f;
@@ -43,10 +45,17 @@ public class RumiaRenderer extends MobRenderer<RumiaEntity, RumiaState, RumiaMod
 
     @Override
     public void submit(RumiaState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
-        super.submit(state, poseStack, submitNodeCollector, camera);
-        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.dragonRays(), ((pose, buffer) -> {
-            GSKOGeometry.buildSphereMesh(pose.pose(), buffer, RenderTypes.dragonRays(), 12, 12,
-                    new Vector4i(0,0,0,255));
+        poseStack.pushPose();
+        poseStack.scale(3F, 3F, 3F);
+        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.debugTriangleFan(), ((pose, buffer) -> {
+            GSKOGeometry.buildSphereMesh(pose.pose(), buffer, 16, 16, new Vector4i(0,0,0,255));
         }));
+        poseStack.popPose();
+        super.submit(state, poseStack, submitNodeCollector, camera);
+    }
+
+    @Override
+    protected boolean affectedByCulling(RumiaEntity entity) {
+        return false;
     }
 }

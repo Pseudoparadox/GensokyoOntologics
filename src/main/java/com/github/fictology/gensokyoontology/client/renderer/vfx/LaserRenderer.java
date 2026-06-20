@@ -1,11 +1,13 @@
 package com.github.fictology.gensokyoontology.client.renderer.vfx;
 
+import com.github.fictology.gensokyoontology.client.renderer.ShaderedRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.state.SimpleState;
 import com.github.fictology.gensokyoontology.common.entiy.misc.Laser;
 import com.github.fictology.gensokyoontology.registry.RenderTypeRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOGeometry;
 import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
+import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -20,7 +22,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4i;
 
-public class LaserRenderer extends EntityRenderer<Laser, SimpleState<Laser>> {
+public class LaserRenderer extends ShaderedRenderer<Laser, SimpleState<Laser>> {
 
     public static final Identifier LASER_BEAM_TEX = GSKOUtil.key("textures/entity/laser_beam_1.png");
     public static final RenderType LASER_BEAM = RenderTypes.entityTranslucent(LASER_BEAM_TEX);
@@ -28,7 +30,7 @@ public class LaserRenderer extends EntityRenderer<Laser, SimpleState<Laser>> {
     private static final RenderType QUAD_TYPE = RenderTypes.lightning();
 
     public LaserRenderer(EntityRendererProvider.Context context) {
-        super(context);
+        super(context, QUAD_TYPE);
     }
 
 
@@ -60,12 +62,12 @@ public class LaserRenderer extends EntityRenderer<Laser, SimpleState<Laser>> {
         }
         matrixStackIn.scale(0.5F, 0.5F, 0.5F);
         submitNodeCollector.submitCustomGeometry(matrixStackIn, TRIANGLE_TYPE, (pose, buffer) -> {
-            GSKOGeometry.buildSphereMesh(pose.pose(), buffer, TRIANGLE_TYPE, 8, 8,
+            GSKOGeometry.buildSphereMesh(pose.pose(), buffer, 8, 8,
                     new Vector4i(255, 0, 0, 255));
         });
         matrixStackIn.scale(0.8F, 0.8F, 0.8F);
         submitNodeCollector.submitCustomGeometry(matrixStackIn, TRIANGLE_TYPE, (pose, buffer) -> {
-            GSKOGeometry.buildSphereMesh(pose.pose(), buffer, TRIANGLE_TYPE, 8, 8,
+            GSKOGeometry.buildSphereMesh(pose.pose(), buffer, 8, 8,
                     new Vector4i(255, 255, 255, 255));
         });
         matrixStackIn.scale(2.5F, 2.5F, 2.5F);

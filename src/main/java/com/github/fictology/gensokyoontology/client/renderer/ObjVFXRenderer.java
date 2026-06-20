@@ -2,16 +2,14 @@ package com.github.fictology.gensokyoontology.client.renderer;
 
 import com.github.fictology.gensokyoontology.client.model.ObjMesh;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
 
@@ -30,5 +28,10 @@ public abstract class ObjVFXRenderer<E extends Entity, S extends EntityRenderSta
 
         this.randomSource = RandomSource.create();
         this.randomSource.setSeed(10230);
+    }
+
+    @Override
+    protected boolean affectedByCulling(@NonNull E entity) {
+        return true;
     }
 }
