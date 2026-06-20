@@ -19,7 +19,7 @@ public interface IHasCooldown {
         EnchantmentHelper.runIterationOnItem(stack, (_, level) -> {
             cd.set(level);
         });
-        return this.getCD(cd.get(), cooldown);
+        return cd.get() == null ? cooldown : this.getCD(cd.get(), cooldown);
     }
 
     default void setCD(Player player, ItemStack stack, int basicCooldown) {

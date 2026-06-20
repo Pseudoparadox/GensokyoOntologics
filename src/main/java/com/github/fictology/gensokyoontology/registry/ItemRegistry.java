@@ -241,8 +241,8 @@ public final class ItemRegistry {
             AyaFans::new, () -> new Item.Properties().stacksTo(1));
     public static final DeferredItem<KoishiEyeOpen> KOISHI_EYE_OPEN = ITEMS.registerItem("koishi_eye_open",
             KoishiEyeOpen::new);
-    public static final DeferredItem<Item> KOISHI_EYE_CLOSED = ITEMS.registerSimpleItem("koishi_eye_closed",
-            Item.Properties::new);
+    public static final DeferredItem<KoishiEyeClosed> KOISHI_EYE_CLOSED = ITEMS.registerItem("koishi_eye_closed",
+            KoishiEyeClosed::new);
     // ----------------------------------- 杂项物品 --------------------------------------//
     public static final DeferredItem<Item> SILVER_COIN = ITEMS.registerSimpleItem("silver_coin", Item.Properties::new);
     // public static final DeferredItem<Item> HOTSPRING_BUCKET = ITEMS.registerSimpleItem("hotspring_bucket",

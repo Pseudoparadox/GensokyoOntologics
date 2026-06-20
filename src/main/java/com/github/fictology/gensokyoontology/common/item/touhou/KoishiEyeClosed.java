@@ -31,11 +31,11 @@ public class KoishiEyeClosed extends Item implements IRayTraceReader, IHasCooldo
 
         var laserSource = new Laser(level, playerIn);
         laserSource.init(200, 40, 85);
-        laserSource.setRGBA(0x88FF0000);
-        // lasers(level, playerIn);
-
-        laserSource.setOldPosAndRot(new Vec3(playerIn.getX(), playerIn.getY() + playerIn.getEyeHeight() * 0.5,
-                playerIn.getZ()), playerIn.yHeadRot, playerIn.xRotO);
+        laserSource.setRGBA(0xFF0000FF);
+        laserSource.setOwner(playerIn);
+        laserSource.setYRot(playerIn.getYRot());
+        laserSource.setXRot(playerIn.getXRot());
+        laserSource.setPos(playerIn.getEyePosition());
         level.addFreshEntity(laserSource);
         this.setCD(playerIn, stack, 1200);
         return super.use(level, playerIn, handIn);

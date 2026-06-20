@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.joml.Vector4i;
 
 public class LaserRenderer extends EntityRenderer<Laser, SimpleState<Laser>> {
@@ -77,49 +78,49 @@ public class LaserRenderer extends EntityRenderer<Laser, SimpleState<Laser>> {
         matrixStackIn.popPose();
     }
 
-    private void drawLaser(VertexConsumer vertexBuilder, PoseStack.Pose pose, float length, float red, float green, float blue, float alpha, float thickness) {
+    private void drawLaser(VertexConsumer builder, PoseStack.Pose pose,
+                           float length, float r, float g, float b, float a,
+                           float thickness) {
 
-        // Front face
-        vertex(pose, vertexBuilder, -thickness, 0.0F, -thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, thickness, 0.0F,  -thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, thickness, 0.0F, thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, -thickness, 0.0F, thickness, red, green, blue, alpha);
+        // 8 个顶点
+        Vector3f p0 = new Vector3f(-thickness, 0.0F, -thickness);
+        Vector3f p1 = new Vector3f( thickness, 0.0F, -thickness);
+        Vector3f p2 = new Vector3f( thickness, 0.0F,  thickness);
+        Vector3f p3 = new Vector3f(-thickness, 0.0F,  thickness);
 
-        // Back face
-        vertex(pose, vertexBuilder, -thickness, length, thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, thickness, length, -thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, thickness, length, thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, -thickness, length, thickness, red, green, blue, alpha);
+        Vector3f p4 = new Vector3f(-thickness, length, -thickness);
+        Vector3f p5 = new Vector3f( thickness, length, -thickness);
+        Vector3f p6 = new Vector3f( thickness, length,  thickness);
+        Vector3f p7 = new Vector3f(-thickness, length,  thickness);
 
-
-        // Left face
-        vertex(pose, vertexBuilder, -thickness, 0.0F, -thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, -thickness, length, -thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, -thickness, length, thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, -thickness, 0.0F, thickness, red, green, blue, alpha);
-
-        // Right face
-        vertex(pose, vertexBuilder, thickness, 0.0F, -thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, thickness, length, -thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, thickness, length, thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, thickness, 0.0F, thickness, red, green, blue, alpha);
-
-        // Top face
-        vertex(pose, vertexBuilder, -thickness, 0.0F, thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, thickness, 0.0F, thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, thickness, length, thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, -thickness, length, thickness, red, green, blue, alpha);
-
-        // Bottom face
-        vertex(pose, vertexBuilder, -thickness, 0.0F, -thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, thickness, 0.0F, -thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, thickness, length, -thickness, red, green, blue, alpha);
-        vertex(pose, vertexBuilder, -thickness, length, -thickness, red, green, blue, alpha);
+        // 每个面单独写法线（LIGHTNING 必须）
+        quad(builder, pose, p0, p1, p2, p3, new Vector3f(0, 0, -1), r, g, b, a); // front
+        quad(builder, pose, p5, p4, p7, p6, new Vector3f(0, 0,  1), r, g, b, a); // back
+        quad(builder, pose, p4, p0, p3, p7, new Vector3f(-1, 0, 0), r, g, b, a); // left
+        quad(builder, pose, p1, p5, p6, p2, new Vector3f( 1, 0, 0), r, g, b, a); // right
+        quad(builder, pose, p3, p2, p6, p7, new Vector3f(0, 1, 0), r, g, b, a); // top
+        quad(builder, pose, p0, p4, p5, p1, new Vector3f(0, -1, 0), r, g, b, a); // bottom
     }
 
-    private void vertex(PoseStack.Pose matrixStack, VertexConsumer vertexBuilder, float x, float y, float z, float red, float green, float blue, float alpha) {
-        vertexBuilder.addVertex(matrixStack.pose(), x, y, z).setColor(red, green, blue, alpha);
+    private void quad(VertexConsumer builder, PoseStack.Pose pose,
+                      Vector3f v0, Vector3f v1, Vector3f v2, Vector3f v3,
+                      Vector3f normal, float r, float g, float b, float a) {
+
+        vertex(builder, pose, v0, normal, r, g, b, a);
+        vertex(builder, pose, v1, normal, r, g, b, a);
+        vertex(builder, pose, v2, normal, r, g, b, a);
+        vertex(builder, pose, v3, normal, r, g, b, a);
     }
+
+    private void vertex(VertexConsumer builder, PoseStack.Pose pose,
+                        Vector3f pos, Vector3f normal,
+                        float r, float g, float b, float a) {
+
+        builder.addVertex(pose.pose(), pos.x(), pos.y(), pos.z())
+                .setColor(r, g, b, a)
+                .setNormal(pose, normal.x(), normal.y(), normal.z());
+    }
+
 
     private float red(Laser entityIn) {
         return (float) entityIn.getRed() / 255;

@@ -5,4 +5,5 @@ import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 
 public class RumiaState extends HumanoidRenderState {
     public RumiaEntity rumia;
+    public int light;
 }

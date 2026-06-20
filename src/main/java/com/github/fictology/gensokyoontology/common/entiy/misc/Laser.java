@@ -63,7 +63,6 @@ public class Laser extends AffiliatedEntity implements IRayTraceReader, IDamageH
         tag.getInt("lifespan").ifPresent(this::setLifespan);
         tag.getInt("preparation").ifPresent(this::setPreparation);
         tag.getInt("rgba").ifPresent(this::setRGBA);
-
         this.setRange(tag.getFloatOr("range", 10F));
     }
 
@@ -120,11 +119,10 @@ public class Laser extends AffiliatedEntity implements IRayTraceReader, IDamageH
     }
 
     public int getPreparation() {
-        return this.getEntityData().get(DATA_PREPARATION) == 0 ? this.preparation : this.getEntityData().get(DATA_PREPARATION);
+        return this.getEntityData().get(DATA_PREPARATION);
     }
 
     public void setPreparation(int preparation) {
-        this.preparation = preparation;
         this.getEntityData().set(DATA_PREPARATION, preparation);
     }
 
@@ -133,11 +131,10 @@ public class Laser extends AffiliatedEntity implements IRayTraceReader, IDamageH
     }
 
     public float getRange() {
-        return this.getEntityData().get(DATA_RANGE) == 0 ? this.range : this.getEntityData().get(DATA_RANGE);
+        return this.getEntityData().get(DATA_RANGE);
     }
 
     public void setRange(float range) {
-        this.range = range;
         this.getEntityData().set(DATA_RANGE, range);
     }
 
@@ -146,7 +143,6 @@ public class Laser extends AffiliatedEntity implements IRayTraceReader, IDamageH
     }
 
     public void setRGBA(int rgba) {
-        this.rgba = rgba;
         this.getEntityData().set(DATA_COLOR, rgba);
     }
 
