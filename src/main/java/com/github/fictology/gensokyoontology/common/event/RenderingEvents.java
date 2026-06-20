@@ -7,6 +7,7 @@ import com.github.fictology.gensokyoontology.client.model.RumiaModel;
 import com.github.fictology.gensokyoontology.client.renderer.EmptyRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.NormalVectorRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.living.FlandreRenderer;
+import com.github.fictology.gensokyoontology.client.renderer.living.RumiaRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.state.MagicSphereState;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.DreamSphereRenderer;
 import com.github.fictology.gensokyoontology.client.renderer.vfx.LaserRenderer;
@@ -53,6 +54,7 @@ public class RenderingEvents {
 
         // 生物实体
         event.registerEntityRenderer(EntityRegistry.FLANDRE_SCARLET.get(), FlandreRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.RUMIA.get(), RumiaRenderer::new);
     }
 
     // @SubscribeEvent

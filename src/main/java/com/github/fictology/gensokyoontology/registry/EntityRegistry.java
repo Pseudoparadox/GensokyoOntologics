@@ -50,14 +50,17 @@ public final class EntityRegistry {
     public static final Supplier<EntityType<LilyWhiteEntity>> LILY_WHITE = register(
             "lily_white", LilyWhiteEntity::new, MobCategory.CREATURE, 0.56f, 1.54f);
     public static final Supplier<EntityType<FlandreScarletEntity>> FLANDRE_SCARLET = register(
-            "flandre_scarlet", FlandreScarletEntity::new, MobCategory.MONSTER, 0.58f, 1.58f);
+            "flandre_scarlet", FlandreScarletEntity::new, MobCategory.MONSTER, 0.58f, 1.68f);
     public static final Supplier<EntityType<RemiliaScarletEntity>> REMILIA_SCARLET = register(
             "remilia_scarlet", RemiliaScarletEntity::new, MobCategory.MONSTER, 0.58f, 1.58f);
-
+    public static final Supplier<EntityType<RumiaEntity>> RUMIA = register(
+            "rumia", RumiaEntity::new, MobCategory.CREATURE, 0.5F, 1.5F);
     // public static final Supplier<EntityType<KomeijiKoishiEntity>> KOMEIJI_KOISHI = register(
     //         "komeiji_koishi", KomeijiKoishiEntity::new, MobCategory.MONSTER, 0.58f, 1.58f);
     public static final Supplier<EntityType<HakureiReimuEntity>> HAKUREI_REIMU = register(
             "hakurei_reimu", HakureiReimuEntity::new, MobCategory.CREATURE, 0.6f, 1.61f);
+
+
     public static final Supplier<EntityType<DestructiveEyeEntity>> DESTRUCTIVE_EYE = register(
             "destructive_eye", DestructiveEyeEntity::new, MobCategory.MISC, 3f, 3f);
     public static final Supplier<EntityType<Laser>> LASER_SOURCE = register(

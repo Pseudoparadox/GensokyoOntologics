@@ -43,6 +43,14 @@ public class GSKOCommonEvents {
                         .add(Attributes.FOLLOW_RANGE, 10)
                         .build());
 
+        event.put(EntityRegistry.RUMIA.get(),
+                LivingEntity.createLivingAttributes()
+                        .add(Attributes.MOVEMENT_SPEED, 0.6)
+                        .add(Attributes.MAX_HEALTH, 100)
+                        .add(Attributes.ATTACK_DAMAGE, 2)
+                        .add(Attributes.FOLLOW_RANGE, 20)
+                        .build());
+
         event.put(EntityRegistry.FLANDRE_SCARLET.get(),
                 LivingEntity.createLivingAttributes()
                         .add(Attributes.MOVEMENT_SPEED, 0.8)
