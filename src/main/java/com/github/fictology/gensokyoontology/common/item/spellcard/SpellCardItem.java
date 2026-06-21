@@ -1,9 +1,9 @@
 package com.github.fictology.gensokyoontology.common.item.spellcard;
 
 
+import com.github.fictology.gensokyoontology.common.combat.SpellBehaviors;
 import com.github.fictology.gensokyoontology.common.entiy.SpellCardEntity;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
-import com.github.fictology.gensokyoontology.common.combat.BossSpell;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,9 +14,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class SpellCardItem extends Item {
 
-    private final BossSpell<LivingEntity> spellBehavior;
+    private final SpellBehaviors.Spell<LivingEntity> spellBehavior;
 
-    public SpellCardItem(Properties properties, BossSpell<LivingEntity> spellBehavior) {
+    public SpellCardItem(Properties properties, SpellBehaviors.Spell<LivingEntity> spellBehavior) {
         super(properties);
         this.spellBehavior = spellBehavior;
     }

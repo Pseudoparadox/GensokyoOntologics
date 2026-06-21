@@ -6,10 +6,13 @@ import com.github.fictology.gensokyoontology.registry.ItemRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.function.BiConsumer;
+
 public class SpellBehaviors {
-    public static final BossSpell<LivingEntity> HELL_ECLIPSE = (level, living) -> {
+    public static final Spell<LivingEntity> HELL_ECLIPSE = (level, living) -> {
         var fakeLunar = Danmaku.create(level, ItemRegistry.FAKE_LUNAR_ITEM.get(), living);
         var ticksExisted = living.tickCount;
 
@@ -36,7 +39,7 @@ public class SpellBehaviors {
         }
     };
 
-    public static final BossSpell<LivingEntity> WAVE_PARTICLE = (level, living) -> {
+    public static final Spell<LivingEntity> WAVE_PARTICLE = (level, living) -> {
         var ticksExisted = living.tickCount;
         for (int i = 0; i < 3; i++) {
             var riceShot = Danmaku.create(level, ItemRegistry.RICE_SHOT_PURPLE.get(), living).from(living);
@@ -48,7 +51,7 @@ public class SpellBehaviors {
         }
     };
 
-    public static final BossSpell<Entity> MOBIUS_RING = (level, living) -> {
+    public static final Spell<Entity> MOBIUS_RING = (level, living) -> {
         var horizonVec = new Vec3(0, 0, 1);
         var ticksExisted = living.tickCount;
         horizonVec = horizonVec.scale(6);
@@ -67,7 +70,7 @@ public class SpellBehaviors {
         // createMobius(level, living, verticalVec, velocity);
     };
 
-    public static final BossSpell<Entity> REMILIA_LASER_SPIRAL = (level, remilia) -> {
+    public static final Spell<Entity> REMILIA_LASER_SPIRAL = (level, remilia) -> {
         int count = 25;
         Vec3 initRot = new Vec3(1, 0, 0);
         Vec3 position = remilia.getPosition(0);
@@ -85,7 +88,7 @@ public class SpellBehaviors {
             level.addFreshEntity(laser);
         }
     };
-    public static final BossSpell<LivingEntity> MANIA_DEPRESS = (level, living) -> {
+    public static final Spell<LivingEntity> MANIA_DEPRESS = (level, living) -> {
         var pinkPositions = DanmakuUtil.getHeartLinePos(0.3f, 0.11);
         var aquaPositions = DanmakuUtil.getHeartLinePos(1.8f, 0.11);
         var ticksExisted = living.tickCount;
@@ -131,4 +134,8 @@ public class SpellBehaviors {
     }
 
      */
+
+    @FunctionalInterface
+    public interface Spell<E extends Entity> extends BiConsumer<Level, E> {
+    }
 }

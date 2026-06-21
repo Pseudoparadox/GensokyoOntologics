@@ -1,12 +1,13 @@
 package com.github.fictology.gensokyoontology.common.entiy.monster;
 
-import com.github.fictology.gensokyoontology.common.combat.YoukaiSorcery;
+import com.github.fictology.gensokyoontology.common.combat.YoukaiCombat;
 import com.mojang.datafixers.util.Pair;
 import com.github.fictology.gensokyoontology.common.combat.Sorceries;
 import com.github.fictology.gensokyoontology.common.entiy.ai.goal.YoukaiSorceryGoal;
 import com.github.fictology.gensokyoontology.common.entiy.SpellCardEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.behavior.Swim;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
@@ -21,7 +22,7 @@ import java.util.List;
 public class FlandreScarletEntity extends YoukaiEntity{
 
     public static final int[][] MAX_PHASES = {{1,2,3},{1,2,3},{1,2,3}};
-    public static final List<Pair<String, YoukaiSorcery>> BATTLE_PHASES = List.of(
+    public static final List<Pair<String, YoukaiCombat.SorceryAction<YoukaiEntity>>> BATTLE_PHASES = List.of(
             Pair.of("1.1", Sorceries.DESTRUCTIVE_EYE));
 
     public FlandreScarletEntity(EntityType<? extends TamableAnimal> type, Level worldIn) {
@@ -96,8 +97,6 @@ public class FlandreScarletEntity extends YoukaiEntity{
     public AgeableMob getBreedOffspring(ServerLevel serverLevel, AgeableMob ageableMob) {
         return null;
     }
-
-
 
     /*
     public static class Doppelganger extends FlandreScarletEntity {

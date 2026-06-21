@@ -7,7 +7,6 @@ import com.github.fictology.gensokyoontology.common.item.spellcard.SpellCardItem
 import com.github.fictology.gensokyoontology.common.item.touhou.*;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.util.StoneGambleHelper;
-import com.github.fictology.gensokyoontology.common.combat.BossSpell;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -656,7 +655,7 @@ public final class ItemRegistry {
     
      */
 
-    public static <I extends Item & ItemLike> DeferredItem<Item> registerSpell(String name, BiFunction<Item.Properties, BossSpell<LivingEntity>, I> func, BossSpell<LivingEntity> behavior) {
+    public static <I extends Item & ItemLike> DeferredItem<Item> registerSpell(String name, BiFunction<Item.Properties, SpellBehaviors.Spell<LivingEntity>, I> func, SpellBehaviors.Spell<LivingEntity> behavior) {
         return ITEMS.registerItem(name, properties -> func.apply(properties, behavior));
     }
 

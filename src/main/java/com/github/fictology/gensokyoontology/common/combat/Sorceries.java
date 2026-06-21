@@ -3,6 +3,7 @@ package com.github.fictology.gensokyoontology.common.combat;
 import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
 import com.github.fictology.gensokyoontology.common.entiy.misc.DestructiveEyeEntity;
 import com.github.fictology.gensokyoontology.common.entiy.misc.Laser;
+import com.github.fictology.gensokyoontology.common.entiy.monster.YoukaiEntity;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 
 public final class Sorceries {
     private static final int MAX_DISTANCE = 8;
-    public static final YoukaiSorcery DESTRUCTIVE_EYE = (level, entity) -> {
+    public static final YoukaiCombat.SorceryAction<YoukaiEntity> DESTRUCTIVE_EYE = (level, entity) -> {
         var target = entity.getTarget();
         var list = new ArrayList<Entity>();
 
@@ -37,7 +38,7 @@ public final class Sorceries {
         if (entity.tickCount >= 500) entity.nextPhase();
     };
 
-    public static final YoukaiSorcery LASER_RAIN = (level, youkai) -> {
+    public static final YoukaiCombat.SorceryAction<YoukaiEntity> LASER_RAIN = (level, youkai) -> {
         if (!(level instanceof ServerLevel serverLevel)) return;
         if (youkai.tickCount % 18 == 0) {
             var laser = new Laser(level, youkai);
@@ -52,7 +53,7 @@ public final class Sorceries {
         }
     };
 
-    public static final YoukaiSorcery SNOW_STORM = (level, youkai) -> {
+    public static final YoukaiCombat.SorceryAction<YoukaiEntity> SNOW_STORM = (level, youkai) -> {
         if (!(level instanceof ServerLevel serverLevel)) return;
         var crystalVec = new Vec3(1,0,0);
         var rotSpeed = 0.01f;
