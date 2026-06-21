@@ -1,4 +1,4 @@
-package com.github.fictology.gensokyoontology.api;
+package com.github.fictology.gensokyoontology.common.combat;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;

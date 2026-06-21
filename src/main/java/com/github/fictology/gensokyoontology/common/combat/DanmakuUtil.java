@@ -60,11 +60,6 @@ public class DanmakuUtil {
         return vector3d;
     }
 
-    public static Vec3 getAimingShootVec(LivingEntity thrower, LivingEntity target) {
-        return target.getPosition(0f).subtract(thrower.getPosition(0f));
-        // return new Vec3(target.getPosX() - thrower.getPosX(), target.getPosY() - thrower.getPosY() - offset, target.getPosZ() - thrower.getPosZ());
-    }
-
     public static <D extends Danmaku> void shootWithRoseLine(D danmaku, Plane planeIn, Vec3 offsetRotation,
                                                              double radius, double count, double size, int density) {
         // List<Vec3> roseLinePos = getRoseLinePos(radius, count, size, density);

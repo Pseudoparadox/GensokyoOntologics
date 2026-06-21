@@ -35,28 +35,23 @@ public class ObjMesh {
 
     public static class MtlInfo {
         String name;
-        float kdR = 1f, kdG = 1f, kdB = 1f;  // Kd，默认白
-        float d = 1f;                          // 不透明度（d），默认 1=完全不透明
+        float kdR = 1f, kdG = 1f, kdB = 1f;
+        float d = 1f;
     }
 
     private final List<Triangle> trises = new ArrayList<>();
 
     public List<Triangle> tris() { return trises; }
 
-    // ---------- 加载 ----------
     public static ObjMesh load(Identifier modelPath) {
         var mesh = new ObjMesh();
 
-        // ── 材质库：materialName → MtlInfo ──────────────────────────────
         Map<String, MtlInfo> mtlLib = new LinkedHashMap<>();
-        String pendingMtlFile = null; // 从 mtllib 指令收集到的 mtl 文件名
-
+        String pendingMtlFile = null;
         var positions = new ArrayList<Vector3f>();
         var uvs      = new ArrayList<Vector2f>();
 
-        // ── pass 0：先扫 mtllib（也可以边读边解，但这里先扫一行拿文件名最稳）──
-        // 实际上我们直接一趟读完就行：遇到 mtllib 就读 mtl，遇到 usemtl 就切槽
-        MtlInfo currentMtl = null; // 当前激活材质（null ⇒ 默认白）
+        MtlInfo currentMtl = null;
 
         try {
             var resOpt = Minecraft.getInstance().getResourceManager().getResource(modelPath);
@@ -71,9 +66,7 @@ public class ObjMesh {
 
                 String[] p = line.split("\\s+");
 
-                // ---------- mtllib：加载 .mtl ----------
                 if (p[0].equals("mtllib")) {
-                    // p[1] 可能是 "model.mtl"（同目录）或带路径
                     String mtlFileName = p[1];
                     Identifier mtlId = resolveSibling(modelPath, mtlFileName);
                     try {
@@ -82,24 +75,19 @@ public class ObjMesh {
                             mtlLib = parseMtl(mtlResOpt.get(), mtlLib);
                         }
                     } catch (Exception ignored) {
-                        // mtl 找不到也别炸，退化到全白即可
                     }
                     continue;
                 }
 
-                // ---------- usemtl：切换当前材质 ----------
                 if (p[0].equals("usemtl")) {
                     String mtlName = p[1];
                     currentMtl = mtlLib.get(mtlName);
-                    // 如果 mtl 里没找到这个名字（异常 mtl），currentMtl==null ⇒ fallback 白
                     continue;
                 }
 
-                // skip 我们不关心的全局指令
                 if (p[0].startsWith("o ") || p[0].startsWith("g ") ||
                         p[0].equals("o") || p[0].equals("g") ||
                         p[0].startsWith("s ")) {
-                    // smoothing group 跳过
                     continue;
                 }
 
@@ -126,7 +114,6 @@ public class ObjMesh {
                                     ? Integer.parseInt(sp[1]) - 1 : 0;
                         }
                         Triangle tri = new Triangle();
-                        // ★ 烙材质颜色
                         if (currentMtl != null) {
                             tri.kdR = currentMtl.kdR;
                             tri.kdG = currentMtl.kdG;
@@ -162,17 +149,16 @@ public class ObjMesh {
         for (Triangle tri : trises) {
             for (int i = 0; i < 3; i++) {
                 Vector3f p = tri.v[i];
-                Vector3f n = tri.n;          // 你加载时已经算好了面法线
+                Vector3f n = tri.n;
                 Vector2f u = tri.t[i];
 
-                // P
                 bb.putFloat(p.x);
                 bb.putFloat(p.y);
                 bb.putFloat(p.z);
-                // UV
+
                 bb.putFloat(u.x);
                 bb.putFloat(u.y);
-                // N
+
                 bb.putFloat(n.x);
                 bb.putFloat(n.y);
                 bb.putFloat(n.z);
@@ -183,10 +169,7 @@ public class ObjMesh {
         return bb;
     }
 
-    // ────────────────────────────────────────────────────────────────
-//  .mtl 解析：只抓 newmtl / Kd / d(Tr) 三个最关键的
-//  可随意扩展 Ka / Ks / Ns / map_Kd 等
-// ────────────────────────────────────────────────────────────────
+
     private static Map<String, MtlInfo> parseMtl(
             Resource mtlRes,
             Map<String, MtlInfo> out) throws IOException {
@@ -211,18 +194,15 @@ public class ObjMesh {
                         cur.kdR = floatOr(tk, 1, 1f);
                         cur.kdG = floatOr(tk, 2, 1f);
                         cur.kdB = floatOr(tk, 3, 1f);
-                        // Kd 有时只写 Kd r（单值 ⇒ 灰度），但这种 obj 少见
                         if (tk.length <= 2) cur.kdG = cur.kdB = cur.kdR;
                     }
                     case "d" -> {
                         if (cur == null) break;
-                        // d 可能写成 "d -halo 1.0" 或单纯 "d 0.8"
-                        // 找第一个合法 float
                         for (int i = 1; i < tk.length; i++)
                             try { cur.d = Float.parseFloat(tk[i]); break; }
                             catch (NumberFormatException ignored) {}
                     }
-                    case "Tr" -> { // Tr = 1 - d
+                    case "Tr" -> {
                         if (cur == null) break;
                         float tr = 0f;
                         for (int i = 1; i < tk.length; i++)
@@ -230,7 +210,7 @@ public class ObjMesh {
                             catch (NumberFormatException ignored) {}
                         cur.d = 1f - tr;
                     }
-                    // TODO: 你要扩 Ka / Ks / Ns / illum / map_Kd 的话从这里加
+
                 }
             }
             if (cur != null) out.put(cur.name, cur);
@@ -281,9 +261,6 @@ public class ObjMesh {
         }
     }
 
-    // ============================================================
-    //  写入 VertexConsumer —— 对接 submitCustomGeometry 的回调
-    // ============================================================
     public void render(PoseStack.Pose pose, VertexConsumer vc) {
         for (Triangle triangle : trises) {
             for (int i = 0; i < 3; i++) {

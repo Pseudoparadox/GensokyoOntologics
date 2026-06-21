@@ -1,8 +1,9 @@
 package com.github.fictology.gensokyoontology.common.entiy.monster;
 
+import com.github.fictology.gensokyoontology.common.combat.YoukaiSorcery;
 import com.mojang.datafixers.util.Pair;
-import com.github.fictology.gensokyoontology.common.combat.SpecialSkill;
-import com.github.fictology.gensokyoontology.common.entiy.ai.goal.SpecialSkillGoal;
+import com.github.fictology.gensokyoontology.common.combat.Sorceries;
+import com.github.fictology.gensokyoontology.common.entiy.ai.goal.YoukaiSorceryGoal;
 import com.github.fictology.gensokyoontology.common.entiy.SpellCardEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
@@ -20,8 +21,8 @@ import java.util.List;
 public class FlandreScarletEntity extends YoukaiEntity{
 
     public static final int[][] MAX_PHASES = {{1,2,3},{1,2,3},{1,2,3}};
-    public static final List<Pair<String, SpecialSkill.YoukaiSkill>> BATTLE_PHASES = List.of(
-            Pair.of("1.1", SpecialSkill.DESTRUCTIVE_EYE));
+    public static final List<Pair<String, YoukaiSorcery>> BATTLE_PHASES = List.of(
+            Pair.of("1.1", Sorceries.DESTRUCTIVE_EYE));
 
     public FlandreScarletEntity(EntityType<? extends TamableAnimal> type, Level worldIn) {
         super(type, worldIn);
@@ -32,15 +33,20 @@ public class FlandreScarletEntity extends YoukaiEntity{
     }
 
     @Override
-    public int[][] getMaxPhases() {
-        return MAX_PHASES;
+    public void nextSubPhase() {
+
+    }
+
+    @Override
+    public int[] getMaxPhases() {
+        return new int[]{3};
     }
 
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(2, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1D, true));
-        this.goalSelector.addGoal(4, new SpecialSkillGoal(this, 1, 1, SpecialSkill.DESTRUCTIVE_EYE));
+        this.goalSelector.addGoal(4, new YoukaiSorceryGoal<>(this, Sorceries.DESTRUCTIVE_EYE, 1, 1, 800));
         this.goalSelector.addGoal(5, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.4f));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 0.8f));

@@ -23,6 +23,16 @@ public class LilyWhiteEntity extends YoukaiEntity {
     }
 
     @Override
+    public void nextSubPhase() {
+
+    }
+
+    @Override
+    public int[] getMaxPhases() {
+        return new int[0];
+    }
+
+    @Override
     protected void registerGoals() {
         // GSKOBossGoal.Stage stage = new GSKOBossGoal.Stage(GSKOBossGoal.Type.NON_SPELL, 500, true);
         // stages.put(GSKOBossGoal.Type.SPELL_CARD_BREAKABLE, Pair.of(50f, 2000));

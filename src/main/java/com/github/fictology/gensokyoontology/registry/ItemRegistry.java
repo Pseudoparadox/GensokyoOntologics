@@ -7,7 +7,7 @@ import com.github.fictology.gensokyoontology.common.item.spellcard.SpellCardItem
 import com.github.fictology.gensokyoontology.common.item.touhou.*;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.util.StoneGambleHelper;
-import com.github.fictology.gensokyoontology.api.BossSpell;
+import com.github.fictology.gensokyoontology.common.combat.BossSpell;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;

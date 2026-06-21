@@ -1,7 +1,7 @@
 package com.github.fictology.gensokyoontology.common.entiy.monster;
 
+import com.github.fictology.gensokyoontology.common.entiy.ai.goal.BattlePhaseGoal;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -14,7 +14,6 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
@@ -76,15 +75,62 @@ public abstract class YoukaiEntity extends RetreatableEntity implements Enemy {
         this.getEntityData().set(DATA_PHASE, battlePhase);
     }
 
+    /**
+     * 该方法是{@link BattlePhaseGoal YoukaiBattlePhaseGoal.java}中默认调用的方法，重写该方法以自定义你想实现的切换战斗阶段的逻辑。<br>
+     * 核心思路：<br>
+     * 1. 判断小阶段的值是否大于当前小阶段的数量<br>
+     * 2. 如果大于最大值且允许进入下一个大阶段则进入下一个大阶段<br>
+     * 3. 如果小于最大值调用该实体实现的如何进入下一个小阶段的函数<br>
+     */
     public void nextPhase(){
-        var mainPhase = this.getMainPhase();
-        var subPhase = this.getSubPhase();
-        if ((subPhase + 1) > this.getMaxPhases()[mainPhase - 1].length) {
-            if ((mainPhase + 1) > this.getMaxPhases().length) return;
-            this.setBattlePhase(++mainPhase, + 1);
+        String currentPhase = this.getBattlePhase();
+        String[] parts = currentPhase.split("\\.");
+
+        if (parts.length != 2) {
+            this.setBattlePhase(1, 1);
+            return;
         }
-        else {
-            this.setBattlePhase(mainPhase, ++subPhase);
+
+        try {
+            int main = Integer.parseInt(parts[0]);
+            int sub = Integer.parseInt(parts[1]);
+            int maxMain = this.getMaxPhases().length;
+
+            if (maxMain == 0) return;
+            if ((sub + 1) > this.getMaxPhases()[main - 1]) {
+                if ((main + 1) > maxMain) {
+                    this.setBattlePhase(main, 1);
+                    return;
+                }
+                this.setBattlePhase(++main, 1);
+            }
+            else this.nextSubPhase();
+
+        } catch (NumberFormatException e) {
+            this.setBattlePhase(1, 1);
+        }
+    }
+
+    public abstract void nextSubPhase();
+
+    /**
+     * 如果希望BOSS的下一个小阶段是从可选阶段中随机选择一个的话，可以使用该方法覆盖{@link YoukaiEntity#nextPhase() this.nextPhase}
+     */
+    public void nextRandomPhase(){
+        String currentPhase = this.getBattlePhase();
+        String[] parts = currentPhase.split("\\.");
+
+        if (parts.length != 2) {
+            this.setBattlePhase(1, 1);
+            return;
+        }
+
+        try {
+            final int main = Integer.parseInt(parts[0]);
+            final int currentSubPhaseCount = this.getMaxPhases()[main - 1];
+            this.setBattlePhase(main, this.random.nextInt(currentSubPhaseCount) + 1);
+        } catch (NumberFormatException e) {
+            this.setBattlePhase(1, 1);
         }
     }
 
@@ -98,9 +144,7 @@ public abstract class YoukaiEntity extends RetreatableEntity implements Enemy {
         return Integer.parseInt(phase.split("\\.")[1]);
     }
 
-    public int[][] getMaxPhases(){
-        return new int[0][];
-    }
+    public abstract int[] getMaxPhases();
     public boolean isPhaseMatches(String phase){
         return this.getBattlePhase().equals(phase);
     }

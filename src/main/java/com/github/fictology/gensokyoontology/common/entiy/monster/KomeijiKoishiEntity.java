@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class KomeijiKoishiEntity extends YoukaiEntity {
+public class KomeijiKoishiEntity extends RetreatableEntity{
 
     public static final String KEY_FAVORABILITY = "favourability";
     private int angerTime;

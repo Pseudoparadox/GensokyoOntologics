@@ -2,16 +2,11 @@ package com.github.fictology.gensokyoontology.client.model;
 
 import com.github.fictology.gensokyoontology.client.renderer.state.FlandreState;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.world.entity.HumanoidArm;
-
-import java.util.Set;
 
 public class FlandreScarletModel extends HumanoidModel<FlandreState> {
 

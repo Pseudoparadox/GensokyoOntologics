@@ -3,22 +3,19 @@ package com.github.fictology.gensokyoontology.common.combat;
 import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
 import com.github.fictology.gensokyoontology.common.entiy.misc.DestructiveEyeEntity;
 import com.github.fictology.gensokyoontology.common.entiy.misc.Laser;
-import com.github.fictology.gensokyoontology.common.entiy.monster.YoukaiEntity;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
-import java.util.function.BiConsumer;
 
-public class SpecialSkill {
+public final class Sorceries {
     private static final int MAX_DISTANCE = 8;
-    public static final YoukaiSkill DESTRUCTIVE_EYE = (level, entity) -> {
+    public static final YoukaiSorcery DESTRUCTIVE_EYE = (level, entity) -> {
         var target = entity.getTarget();
         var list = new ArrayList<Entity>();
 
@@ -40,8 +37,7 @@ public class SpecialSkill {
         if (entity.tickCount >= 500) entity.nextPhase();
     };
 
-
-    public static final YoukaiSkill LASER_RAIN = (level, youkai) -> {
+    public static final YoukaiSorcery LASER_RAIN = (level, youkai) -> {
         if (!(level instanceof ServerLevel serverLevel)) return;
         if (youkai.tickCount % 18 == 0) {
             var laser = new Laser(level, youkai);
@@ -56,7 +52,7 @@ public class SpecialSkill {
         }
     };
 
-    public static final YoukaiSkill SNOW_STORM = (level, youkai) -> {
+    public static final YoukaiSorcery SNOW_STORM = (level, youkai) -> {
         if (!(level instanceof ServerLevel serverLevel)) return;
         var crystalVec = new Vec3(1,0,0);
         var rotSpeed = 0.01f;
@@ -82,8 +78,5 @@ public class SpecialSkill {
         }
     };
 
-    public interface YoukaiSkill extends BiConsumer<Level, YoukaiEntity>{
-        @Override
-        void accept(Level level, YoukaiEntity youkai);
-    }
+
 }

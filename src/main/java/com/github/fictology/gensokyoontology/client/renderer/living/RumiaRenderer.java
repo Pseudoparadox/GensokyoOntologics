@@ -1,6 +1,5 @@
 package com.github.fictology.gensokyoontology.client.renderer.living;
 
-import com.github.fictology.gensokyoontology.client.model.FlandreScarletModel;
 import com.github.fictology.gensokyoontology.client.model.RumiaModel;
 import com.github.fictology.gensokyoontology.client.renderer.state.RumiaState;
 import com.github.fictology.gensokyoontology.common.entiy.monster.RumiaEntity;
@@ -10,14 +9,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.LightLayer;
-import org.joml.Vector4f;
 import org.joml.Vector4i;
 
 public class RumiaRenderer extends MobRenderer<RumiaEntity, RumiaState, RumiaModel> {

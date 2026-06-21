@@ -1,7 +1,5 @@
 package com.github.fictology.gensokyoontology.common.entiy.monster;
 
-import com.github.fictology.gensokyoontology.common.combat.SpellBehaviors;
-import com.github.fictology.gensokyoontology.common.entiy.ai.goal.SpellCardAttackGoal;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.*;
@@ -18,10 +16,20 @@ public class RemiliaScarletEntity extends YoukaiEntity {
     }
 
     @Override
+    public void nextSubPhase() {
+
+    }
+
+    @Override
+    public int[] getMaxPhases() {
+        return new int[0];
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(2, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1D, true));
-        this.goalSelector.addGoal(4, new SpellCardAttackGoal(this, SpellBehaviors.REMILIA_LASER_SPIRAL));
+//        this.goalSelector.addGoal(4, new SpellCardAttackGoal(this, SpellBehaviors.REMILIA_LASER_SPIRAL));
         this.goalSelector.addGoal(5, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.4f));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 0.8f));
