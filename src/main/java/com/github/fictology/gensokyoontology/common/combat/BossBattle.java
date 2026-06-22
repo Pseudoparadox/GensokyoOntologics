@@ -4,24 +4,27 @@ import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
 import com.github.fictology.gensokyoontology.common.entiy.monster.RumiaEntity;
 import com.github.fictology.gensokyoontology.common.entiy.monster.YoukaiEntity;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.projectile.Projectile;
 
 public final class BossBattle {
     /** 在Goal中添加该空白阶段以便让玩家拥有反击BOSS的喘息时间，降低玩家BOSS战生存难度。 */
     public static final YoukaiCombat.SorceryAction<YoukaiEntity> BLANK_PHASE = (world, youkaiEntity) -> {};
 
-    public static final YoukaiCombat.TargetAction<RumiaEntity> WALL_SHOOT_RUMIA = (world, rumia, target) -> {
+    public static final YoukaiCombat.TargetAction<RumiaEntity> WALL_SHOOT_RUMIA = (level, rumia, target) -> {
         if (target == null) return;
         if (rumia.tickCount % 20 != 0) return;
+        if (!(level instanceof ServerLevel serverLevel)) return;
         for (int i = -4; i <= 4; i++) {
             for (int j = -4; j < 4; j++) {
                 var shootVec = DanmakuUtil.getAimedVec(rumia, target)
                         .yRot(Mth.DEG_TO_RAD * (j * 5))
                         .add(0, i * 0.1, 0)
                         .normalize();
-                Danmaku.create(world, ItemRegistry.SMALL_SHOT_BLUE.get(), rumia)
-                        .damage(3F)
-                        .shoot(shootVec.x, shootVec.y, shootVec.z, 0.6F, 1F);
+
+                Projectile.spawnProjectileUsingShoot(Danmaku::new, serverLevel, ItemRegistry.SMALL_SHOT_GREEN.toStack(),
+                        rumia, shootVec.x, shootVec.y, shootVec.z, 0.6F, 0F);
             }
         }
     };
@@ -38,9 +41,7 @@ public final class BossBattle {
                 var shootVec = vector3d
                         .yRot(DanmakuUtil.rad(j * 5))
                         .add(0, i * 0.1, 0).normalize();
-                Danmaku.create(world, ItemRegistry.SMALL_SHOT_GREEN.get(), rumiaEntity)
-                        .damage(3F)
-                        .shoot(shootVec, 0.55F);
+                Danmaku.shoot(rumiaEntity, ItemRegistry.SMALL_SHOT_BLUE.get(), shootVec, 0.55F);
             }
         }
         currentTimer.set(currentTimer.get() + 1);

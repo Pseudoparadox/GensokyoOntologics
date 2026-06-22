@@ -4,6 +4,7 @@ package com.github.fictology.gensokyoontology.common.entiy.misc;
 import com.github.fictology.gensokyoontology.GensokyoOntology;
 import com.github.fictology.gensokyoontology.client.renderer.state.DanmakuNormalState;
 import com.github.fictology.gensokyoontology.common.combat.GSKODamage;
+import com.github.fictology.gensokyoontology.common.item.DanmakuItem;
 import com.github.fictology.gensokyoontology.data.DanmakuColor;
 import com.github.fictology.gensokyoontology.registry.DataRegistry;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
@@ -28,6 +29,7 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ItemSupplier;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -261,12 +263,10 @@ public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, ID
 
     public void setDamage(float damage) {
         this.getEntityData().set(DATA_DAMAGE, damage);
-        this.damage = damage;
     }
 
     public void setLifespan(int lifespan) {
         this.getEntityData().set(DATA_DAMAGE, damage);
-        this.lifespan = lifespan;
     }
 
     public float getDamage() {
@@ -295,7 +295,7 @@ public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, ID
         if (this.getOwner() instanceof Monster || this.getOwner() instanceof Enemy) {
 
             if (this.getType() != EntityRegistry.FAKE_LUNAR.get())
-                this.hurtLiving(living, serverLevel, DamageTypes.MAGIC, 12f);
+                this.hurtLiving(living, serverLevel, DamageTypes.MAGIC, 4f);
 
             this.setRemoved(RemovalReason.DISCARDED);
             return;
@@ -308,7 +308,7 @@ public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, ID
         }
 
         if (!(living instanceof Player)) {
-            this.hurtLiving(living, serverLevel, DamageTypes.MAGIC, this.damage);
+            this.hurtLiving(living, serverLevel, DamageTypes.MAGIC, this.getDamage());
             this.setRemoved(RemovalReason.KILLED);
         }
     }
@@ -331,7 +331,9 @@ public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, ID
         return GSKOUtil.key("textures/item/" + fileName + ".png");
     }
 
-    public void shoot(Vec3 shootVec, float velocity) {
-        this.shoot(shootVec.x, shootVec.y, shootVec.z, velocity, 1.0F);
+    public static void shoot(LivingEntity owner, DanmakuItem danmakuItem, Vec3 shootVec, float velocity) {
+        if (!(owner.level() instanceof ServerLevel serverLevel)) return;
+        Projectile.spawnProjectileUsingShoot(Danmaku::create, serverLevel, danmakuItem.getDefaultInstance(), owner,
+                shootVec.x, shootVec.y, shootVec.z, velocity, 0F);
     }
 }

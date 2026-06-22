@@ -10,6 +10,7 @@ import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.api.IRayTraceReader;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -18,8 +19,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.function.Consumer;
 
 import static com.github.fictology.gensokyoontology.registry.ItemRegistry.YINYANG_JADE_RED;
 import static com.github.fictology.gensokyoontology.registry.ItemRegistry.SC_DREAM_SEAL;
@@ -41,11 +46,16 @@ public class HakureiGohei extends Item implements IRayTraceReader {
         if (playerIn.getCooldowns().isOnCooldown(playerIn.getItemInHand(handIn)) && !playerIn.isCreative())
             return InteractionResult.PASS;
 
-        ItemStack stack = playerIn.getItemInHand(handIn);
-        if (level instanceof ServerLevel serverLevel){
-            Projectile.spawnProjectileFromRotation(YinyangJade::new, serverLevel,
-                    YINYANG_JADE_RED.toStack(), playerIn, 0F, 1.2F, 1F);
-        }
+        var mainStack = playerIn.getMainHandItem();
+        var offStack = playerIn.getOffhandItem();
+        if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.PASS;
+        if (!(offStack.getItem() instanceof YinyangJadeItem)) return InteractionResult.PASS;
+
+        Projectile.spawnProjectileFromRotation(YinyangJade::new, serverLevel,
+                YINYANG_JADE_RED.toStack(), playerIn, 0F, 1.2F, 1F);
+        offStack.shrink(1);
+        if (playerIn.isCreative()) return InteractionResult.SUCCESS;
+        playerIn.getCooldowns().addCooldown(mainStack, 10);
 //        var magic = stack.get(DataRegistry.SPECIAL_MAGIC);
 //        if (magic != null) {
 //
@@ -59,12 +69,12 @@ public class HakureiGohei extends Item implements IRayTraceReader {
 //            }
 //        }
 
-        if (playerIn.isCreative()) return InteractionResult.PASS;
-        playerIn.getCooldowns().addCooldown(stack, 10);
-
-        var hakurei = new HakureiReimuEntity(EntityRegistry.HAKUREI_REIMU.get(), level);
-        level.addFreshEntity(hakurei);
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
     }
 
     public static void fireDreamSeal(Level worldIn, Player playerIn) {

@@ -353,7 +353,7 @@ public final class ItemRegistry {
     public static final DeferredItem<Item> SCRIPTED_SPELL_CARD = registerSpell("scripted_spell_card", SpellCardItem::new, (_l, _p) -> {});
     
     // --------------------- 投掷物：弹幕 阴阳玉 灵符 -----------------------//
-    public static final DeferredItem<Item> DANMAKU_SHOT = registerDanmaku("danmaku_shot");
+    public static final DeferredItem<DanmakuItem> DANMAKU_SHOT = registerDanmaku("danmaku_shot");
 
     // public static final DeferredItem<Item> SC_HANA_SHIGURE = copy(
     //         "sc_hana_shigure", SC_HanaShigure::new);
@@ -362,32 +362,32 @@ public final class ItemRegistry {
     // public static final DeferredItem<Item> SC_GALACTIC_SPIRAL_ARMS = copy(
     //         "sc_galactic_spiral_arms", SC_GalacticSpiralArms::new);
     /////////////////////////// 所有的灰色弹幕 ////////////////////////////////
-    public static final DeferredItem<Item> LARGE_SHOT = registerDanmaku("large_shot");
-    public static final DeferredItem<Item> SMALL_SHOT = registerDanmaku("small_shot");
-    public static final DeferredItem<Item> RICE_SHOT = registerDanmaku("rice_shot");
-    public static final DeferredItem<Item> SCALE_SHOT = registerDanmaku("scale_shot");
-    public static final DeferredItem<Item> TALISMAN_SHOT = registerDanmaku("talisman_shot");
+    public static final DeferredItem<DanmakuItem> LARGE_SHOT = registerDanmaku("large_shot");
+    public static final DeferredItem<DanmakuItem> SMALL_SHOT = registerDanmaku("small_shot");
+    public static final DeferredItem<DanmakuItem> RICE_SHOT = registerDanmaku("rice_shot");
+    public static final DeferredItem<DanmakuItem> SCALE_SHOT = registerDanmaku("scale_shot");
+    public static final DeferredItem<DanmakuItem> TALISMAN_SHOT = registerDanmaku("talisman_shot");
     /////////////////////////// 所有颜色的大弹 ////////////////////////////////
-    public static final DeferredItem<Item> LARGE_SHOT_RED = registerDanmaku("large_shot_red");
-    public static final DeferredItem<Item> LARGE_SHOT_ORANGE = registerDanmaku("large_shot_orange");
-    public static final DeferredItem<Item> LARGE_SHOT_YELLOW = registerDanmaku("large_shot_yellow");
-    public static final DeferredItem<Item> LARGE_SHOT_GREEN = registerDanmaku("large_shot_green");
-    public static final DeferredItem<Item> LARGE_SHOT_AQUA = registerDanmaku("large_shot_aqua");
-    public static final DeferredItem<Item> LARGE_SHOT_BLUE = registerDanmaku("large_shot_blue");
-    public static final DeferredItem<Item> LARGE_SHOT_PURPLE = registerDanmaku("large_shot_purple");
-    public static final DeferredItem<Item> LARGE_SHOT_MAGENTA = registerDanmaku("large_shot_magenta");
+    public static final DeferredItem<DanmakuItem> LARGE_SHOT_RED = registerDanmaku("large_shot_red");
+    public static final DeferredItem<DanmakuItem> LARGE_SHOT_ORANGE = registerDanmaku("large_shot_orange");
+    public static final DeferredItem<DanmakuItem> LARGE_SHOT_YELLOW = registerDanmaku("large_shot_yellow");
+    public static final DeferredItem<DanmakuItem> LARGE_SHOT_GREEN = registerDanmaku("large_shot_green");
+    public static final DeferredItem<DanmakuItem> LARGE_SHOT_AQUA = registerDanmaku("large_shot_aqua");
+    public static final DeferredItem<DanmakuItem> LARGE_SHOT_BLUE = registerDanmaku("large_shot_blue");
+    public static final DeferredItem<DanmakuItem> LARGE_SHOT_PURPLE = registerDanmaku("large_shot_purple");
+    public static final DeferredItem<DanmakuItem> LARGE_SHOT_MAGENTA = registerDanmaku("large_shot_magenta");
     /////////////////////////// 所有颜色的小弹 ////////////////////////////////
-    public static final DeferredItem<Item> SMALL_SHOT_RED = registerDanmaku("small_shot_red");
-    public static final DeferredItem<Item> SMALL_SHOT_ORANGE = registerDanmaku("small_shot_orange");
-    public static final DeferredItem<Item> SMALL_SHOT_YELLOW = registerDanmaku("small_shot_yellow");
-    public static final DeferredItem<Item> SMALL_SHOT_GREEN = registerDanmaku("small_shot_green");
-    public static final DeferredItem<Item> SMALL_SHOT_AQUA = registerDanmaku("small_shot_aqua");
-    public static final DeferredItem<Item> SMALL_SHOT_BLUE = registerDanmaku("small_shot_blue");
-    public static final DeferredItem<Item> SMALL_SHOT_PURPLE = registerDanmaku("small_shot_purple");
+    public static final DeferredItem<DanmakuItem> SMALL_SHOT_RED = registerDanmaku("small_shot_red");
+    public static final DeferredItem<DanmakuItem> SMALL_SHOT_ORANGE = registerDanmaku("small_shot_orange");
+    public static final DeferredItem<DanmakuItem> SMALL_SHOT_YELLOW = registerDanmaku("small_shot_yellow");
+    public static final DeferredItem<DanmakuItem> SMALL_SHOT_GREEN = registerDanmaku("small_shot_green");
+    public static final DeferredItem<DanmakuItem> SMALL_SHOT_AQUA = registerDanmaku("small_shot_aqua");
+    public static final DeferredItem<DanmakuItem> SMALL_SHOT_BLUE = registerDanmaku("small_shot_blue");
+    public static final DeferredItem<DanmakuItem> SMALL_SHOT_PURPLE = registerDanmaku("small_shot_purple");
     // public static final List<Item> SMALL_SHOTS = List.of(SMALL_SHOT_RED.get(), SMALL_SHOT_ORANGE.get(),
     //         SMALL_SHOT_YELLOW.get(), SMALL_SHOT_GREEN.get(), SMALL_SHOT_AQUA.get(), SMALL_SHOT_BLUE.get(),
     //         SMALL_SHOT_PURPLE.get());
-    public static final DeferredItem<Item> SMALL_SHOT_MAGENTA = registerDanmaku("small_shot_magenta");
+    public static final DeferredItem<DanmakuItem> SMALL_SHOT_MAGENTA = registerDanmaku("small_shot_magenta");
 
     ////////////////////////////// 所有颜色的环玉  /////////////////////////////////
     // public static final DeferredItem<Item> CIRCLE_SHOT = copy("rice_shot",
@@ -395,52 +395,52 @@ public final class ItemRegistry {
     // public static final DeferredItem<Item> CIRCLE_SHOT_GREEN = copy("circle_shot_green",
     //         () -> new DanmakuItem(danmaku(EntityRegistry.CICLE_SHOT.get())));
 
-    public static final DeferredItem<Item> CIRCLE_SHOT_BLUE = registerDanmaku("circle_shot_blue");
-    public static final DeferredItem<Item> CIRCLE_SHOT_MAGENTA = registerDanmaku("circle_shot_magenta");
+    public static final DeferredItem<DanmakuItem> CIRCLE_SHOT_BLUE = registerDanmaku("circle_shot_blue");
+    public static final DeferredItem<DanmakuItem> CIRCLE_SHOT_MAGENTA = registerDanmaku("circle_shot_magenta");
 
     ////////////////////////////// 所有颜色的米弹  /////////////////////////////////
-    public static final DeferredItem<Item> RICE_SHOT_RED = registerDanmaku("rice_shot_red");
-    public static final DeferredItem<Item> RICE_SHOT_BLUE = registerDanmaku("rice_shot_blue");
-    public static final DeferredItem<Item> RICE_SHOT_PURPLE = registerDanmaku("rice_shot_purple");
+    public static final DeferredItem<DanmakuItem> RICE_SHOT_RED = registerDanmaku("rice_shot_red");
+    public static final DeferredItem<DanmakuItem> RICE_SHOT_BLUE = registerDanmaku("rice_shot_blue");
+    public static final DeferredItem<DanmakuItem> RICE_SHOT_PURPLE = registerDanmaku("rice_shot_purple");
 
     ////////////////////////////// 所有颜色的鳞弹  /////////////////////////////////
-    public static final DeferredItem<Item> SCALE_SHOT_RED = registerDanmaku("scale_shot_red");
-    public static final DeferredItem<Item> SCALE_SHOT_YELLOW = registerDanmaku("scale_shot_yellow");
-    public static final DeferredItem<Item> SCALE_SHOT_GREEN = registerDanmaku("scale_shot_green");
-    public static final DeferredItem<Item> SCALE_SHOT_BLUE = registerDanmaku("scale_shot_blue");
-    public static final DeferredItem<Item> SCALE_SHOT_PURPLE = registerDanmaku("scale_shot_purple");
+    public static final DeferredItem<DanmakuItem> SCALE_SHOT_RED = registerDanmaku("scale_shot_red");
+    public static final DeferredItem<DanmakuItem> SCALE_SHOT_YELLOW = registerDanmaku("scale_shot_yellow");
+    public static final DeferredItem<DanmakuItem> SCALE_SHOT_GREEN = registerDanmaku("scale_shot_green");
+    public static final DeferredItem<DanmakuItem> SCALE_SHOT_BLUE = registerDanmaku("scale_shot_blue");
+    public static final DeferredItem<DanmakuItem> SCALE_SHOT_PURPLE = registerDanmaku("scale_shot_purple");
 
     ////////////////////////////// 所有颜色的心弹  /////////////////////////////////
-    public static final DeferredItem<Item> HEART_SHOT = registerDanmaku("heart_shot");
-    public static final DeferredItem<Item> HEART_SHOT_PINK = registerDanmaku("heart_shot_pink");
-    public static final DeferredItem<Item> HEART_SHOT_RED = registerDanmaku("heart_shot_red");
-    public static final DeferredItem<Item> HEART_SHOT_AQUA = registerDanmaku("heart_shot_aqua");
-    public static final DeferredItem<Item> HEART_SHOT_BLUE = registerDanmaku("heart_shot_blue");
+    public static final DeferredItem<DanmakuItem> HEART_SHOT = registerDanmaku("heart_shot");
+    public static final DeferredItem<DanmakuItem> HEART_SHOT_PINK = registerDanmaku("heart_shot_pink");
+    public static final DeferredItem<DanmakuItem> HEART_SHOT_RED = registerDanmaku("heart_shot_red");
+    public static final DeferredItem<DanmakuItem> HEART_SHOT_AQUA = registerDanmaku("heart_shot_aqua");
+    public static final DeferredItem<DanmakuItem> HEART_SHOT_BLUE = registerDanmaku("heart_shot_blue");
 
     ////////////////////////////// 所有颜色的小型星弹  /////////////////////////////////
-    public static final DeferredItem<Item> SMALL_STAR_SHOT = registerDanmaku("small_star_shot");
-    public static final DeferredItem<Item> SMALL_STAR_SHOT_RED = registerDanmaku("small_star_shot_red");
-    public static final DeferredItem<Item> SMALL_STAR_SHOT_YELLOW = registerDanmaku("small_star_shot_yellow");
-    public static final DeferredItem<Item> SMALL_STAR_SHOT_GREEN = registerDanmaku("small_star_shot_green");
-    public static final DeferredItem<Item> SMALL_STAR_SHOT_AQUA = registerDanmaku("small_star_shot_aqua");
-    public static final DeferredItem<Item> SMALL_STAR_SHOT_BLUE = registerDanmaku("small_star_shot_blue");
-    public static final DeferredItem<Item> SMALL_STAR_SHOT_PURPLE = registerDanmaku("small_star_shot_purple");
+    public static final DeferredItem<DanmakuItem> SMALL_STAR_SHOT = registerDanmaku("small_star_shot");
+    public static final DeferredItem<DanmakuItem> SMALL_STAR_SHOT_RED = registerDanmaku("small_star_shot_red");
+    public static final DeferredItem<DanmakuItem> SMALL_STAR_SHOT_YELLOW = registerDanmaku("small_star_shot_yellow");
+    public static final DeferredItem<DanmakuItem> SMALL_STAR_SHOT_GREEN = registerDanmaku("small_star_shot_green");
+    public static final DeferredItem<DanmakuItem> SMALL_STAR_SHOT_AQUA = registerDanmaku("small_star_shot_aqua");
+    public static final DeferredItem<DanmakuItem> SMALL_STAR_SHOT_BLUE = registerDanmaku("small_star_shot_blue");
+    public static final DeferredItem<DanmakuItem> SMALL_STAR_SHOT_PURPLE = registerDanmaku("small_star_shot_purple");
 
     ////////////////////////////// 所有颜色的大型星弹  /////////////////////////////////
-    public static final DeferredItem<Item> LARGE_STAR_SHOT        = registerDanmaku("large_star_shot");
-    public static final DeferredItem<Item> LARGE_STAR_SHOT_RED    = registerDanmaku("large_star_shot_red");
-    public static final DeferredItem<Item> LARGE_STAR_SHOT_YELLOW = registerDanmaku("large_star_shot_yellow");
-    public static final DeferredItem<Item> LARGE_STAR_SHOT_GREEN  = registerDanmaku("large_star_shot_green");
-    public static final DeferredItem<Item> LARGE_STAR_SHOT_AQUA   = registerDanmaku("large_star_shot_aqua");
-    public static final DeferredItem<Item> LARGE_STAR_SHOT_BLUE   = registerDanmaku("large_star_shot_blue");
-    public static final DeferredItem<Item> LARGE_STAR_SHOT_PURPLE = registerDanmaku("large_star_shot_purple");
+    public static final DeferredItem<DanmakuItem> LARGE_STAR_SHOT        = registerDanmaku("large_star_shot");
+    public static final DeferredItem<DanmakuItem> LARGE_STAR_SHOT_RED    = registerDanmaku("large_star_shot_red");
+    public static final DeferredItem<DanmakuItem> LARGE_STAR_SHOT_YELLOW = registerDanmaku("large_star_shot_yellow");
+    public static final DeferredItem<DanmakuItem> LARGE_STAR_SHOT_GREEN  = registerDanmaku("large_star_shot_green");
+    public static final DeferredItem<DanmakuItem> LARGE_STAR_SHOT_AQUA   = registerDanmaku("large_star_shot_aqua");
+    public static final DeferredItem<DanmakuItem> LARGE_STAR_SHOT_BLUE   = registerDanmaku("large_star_shot_blue");
+    public static final DeferredItem<DanmakuItem> LARGE_STAR_SHOT_PURPLE = registerDanmaku("large_star_shot_purple");
 
     ////////////////////////////// 所有颜色的札弹  /////////////////////////////////
-    public static final DeferredItem<Item> TALISMAN_SHOT_RED    = registerDanmaku("talisman_shot_red");
-    public static final DeferredItem<Item> TALISMAN_SHOT_GREEN  = registerDanmaku("talisman_shot_green");
-    public static final DeferredItem<Item> TALISMAN_SHOT_AQUA   = registerDanmaku("talisman_shot_aqua");
-    public static final DeferredItem<Item> TALISMAN_SHOT_BLUE   = registerDanmaku("talisman_shot_blue");
-    public static final DeferredItem<Item> TALISMAN_SHOT_PURPLE = registerDanmaku("talisman_shot_purple");
+    public static final DeferredItem<DanmakuItem> TALISMAN_SHOT_RED    = registerDanmaku("talisman_shot_red");
+    public static final DeferredItem<DanmakuItem> TALISMAN_SHOT_GREEN  = registerDanmaku("talisman_shot_green");
+    public static final DeferredItem<DanmakuItem> TALISMAN_SHOT_AQUA   = registerDanmaku("talisman_shot_aqua");
+    public static final DeferredItem<DanmakuItem> TALISMAN_SHOT_BLUE   = registerDanmaku("talisman_shot_blue");
+    public static final DeferredItem<DanmakuItem> TALISMAN_SHOT_PURPLE = registerDanmaku("talisman_shot_purple");
 
     ////////////////////////////// 所有颜色的阴阳玉 ///////////////////////////////////
     public static final DeferredItem<YinyangJadeItem> YINYANG_JADE_BLACK  = ITEMS.registerItem("yinyang_jade_black", YinyangJadeItem::new);
@@ -451,7 +451,7 @@ public final class ItemRegistry {
     public static final DeferredItem<YinyangJadeItem> YINYANG_JADE_BLUE   = ITEMS.registerItem("yinyang_jade_blue", YinyangJadeItem::new);
     public static final DeferredItem<YinyangJadeItem> YINYANG_JADE_PURPLE = ITEMS.registerItem("yinyang_jade_purple", YinyangJadeItem::new);
     //////////////////////////// 道具：B点、残机 ////////////////////////////////
-    public static final DeferredItem<Item> FAKE_LUNAR_ITEM = registerDanmaku("fake_lunar");
+    public static final DeferredItem<DanmakuItem> FAKE_LUNAR_ITEM = registerDanmaku("fake_lunar");
 
     // public static final List<Item> SHOTS = List.of(SMALL_SHOTS)
     public static final DeferredItem<Item> POWER_ITEM = ITEMS.registerSimpleItem("power_item", Item.Properties::new);
@@ -664,7 +664,7 @@ public final class ItemRegistry {
                 name, p -> new SpawnEggItem(p.spawnEgg(entityGetter.get())));
     }
 
-    public static DeferredItem<Item> registerDanmaku(String name){
+    public static DeferredItem<DanmakuItem> registerDanmaku(String name){
         return ITEMS.registerItem(name, DanmakuItem::new);
     }
 

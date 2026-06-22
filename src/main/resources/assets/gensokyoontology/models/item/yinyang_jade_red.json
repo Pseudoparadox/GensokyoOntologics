@@ -1,15 +1,6 @@
 {
-  "parent": "block/block",
-  "loader": "neoforge:obj",
-  "model": "gensokyoontology:models/entity/jade_red.obj",
-  "flip-v": true,
-  "display": {
-    "ground": {
-      "scale": [5, 5, 5]
-    },
-    "gui": {
-      "translation": [0, 4, 0],
-      "scale": [0.8, 0.8, 0.8]
-    }
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "gensokyoontology:item/inyo_jade_red"
   }
 }

@@ -48,7 +48,7 @@ public class FlandreScarletEntity extends YoukaiEntity{
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1D, true));
+        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 0.9, true));
         this.goalSelector.addGoal(3, new YoukaiSorceryGoal<>(this, Sorceries.DESTRUCTIVE_EYE, 1, 1, 800));
         this.goalSelector.addGoal(3, new YoukaiEventGoal<>(this, Sorceries.BECOME_BAT, 2, 2, 1200));
         this.goalSelector.addGoal(4, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
@@ -104,6 +104,15 @@ public class FlandreScarletEntity extends YoukaiEntity{
     @Override
     public EventCallbackInfo subscribeAIEvent() {
         return EventCallbackInfo.onExit("exit_bat_state", 0, 1200);
+    }
+
+    @Override
+    public void nextPhase() {
+        if (this.getHealth() <= this.getMaxHealth()){
+            this.setBattlePhase(2, 1);
+        }else {
+            super.nextRandomPhase();
+        }
     }
 
     /*
