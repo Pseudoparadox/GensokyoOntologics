@@ -13,6 +13,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -95,7 +96,7 @@ public class Laser extends AffiliatedEntity implements IRayTraceReader, IDamageH
             rayTrace(this.level(), this, start, end).ifPresent(entity -> {
                 // 这里检测 ref 里存储的实体所有者是否和射线检测的实体是同一个实体
                 // 为确保安全，Teacon 中只允许伤害敌对生物
-                if(this.isHostile(entity)) hurtLiving((LivingEntity) entity, level(), GSKODamage.LASER, 5F);
+                if(this.isHostile(entity)) hurtLiving((LivingEntity) entity, level(), DamageTypes.MAGIC, 5F);
 //                if (this.canAttack(ref.get(), entity))
 //                    hurtLiving((LivingEntity) entity, level(), GSKODamage.LASER, 5f);
             });
@@ -170,7 +171,7 @@ public class Laser extends AffiliatedEntity implements IRayTraceReader, IDamageH
     @Override
     public void hurtLiving(LivingEntity hurtLiving, Level level, ResourceKey<DamageType> damageType, float amount) {
         if (level instanceof ServerLevel serverLevel)
-            hurtLiving.hurtServer(serverLevel, createDamage(level, damageType), amount);
+            hurtLiving.hurtServer(serverLevel, level.damageSources().source(damageType), amount);
     }
 
     @Override

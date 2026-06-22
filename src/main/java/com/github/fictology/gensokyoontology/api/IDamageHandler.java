@@ -19,7 +19,7 @@ public interface IDamageHandler {
     }
 
     default DamageSource createDamage(Level level, ResourceKey<DamageType> damageType) {
-        return new DamageSource(level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(damageType));
+        return level.damageSources().source(damageType);
     }
 
     default DamageSource createDamage(Level level, Entity directEntity, ResourceKey<DamageType> damageType) {

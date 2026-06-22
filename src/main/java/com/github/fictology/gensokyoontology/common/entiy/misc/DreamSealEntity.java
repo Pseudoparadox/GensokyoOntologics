@@ -9,6 +9,7 @@ import com.github.fictology.gensokyoontology.api.IRayTraceReader;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -92,10 +93,10 @@ public class DreamSealEntity extends Danmaku implements IRayTraceReader, IDamage
         }
         if (result.getEntity() instanceof YoukaiEntity youkai) {
             float value = youkai.getMaxHealth() < 400 ? youkai.getMaxHealth() * 0.1f : youkai.getMaxHealth() * 0.075f;
-            hurtLiving(youkai, level(), GSKODamage.HAKUREI_POWER, value);
+            hurtLiving(youkai, level(), DamageTypes.MAGIC, value);
         }
         if (result.getEntity() instanceof FairyEntity fairy) {
-            hurtLiving(fairy, level(), GSKODamage.HAKUREI_POWER, 999999f);
+            hurtLiving(fairy, level(), DamageTypes.MAGIC, 999999f);
         }
     }
 
@@ -104,9 +105,4 @@ public class DreamSealEntity extends Danmaku implements IRayTraceReader, IDamage
         return ItemStack.EMPTY;
     }
 
-    @Override
-    public void hurtLiving(LivingEntity hurtLiving, Level level, ResourceKey<DamageType> damageType, float amount) {
-        if (level instanceof ServerLevel serverLevel)
-            hurtLiving.hurtServer(serverLevel, createDamage(level, damageType), amount);
-    }
 }

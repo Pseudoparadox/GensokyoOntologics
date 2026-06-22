@@ -1,9 +1,12 @@
 package com.github.fictology.gensokyoontology.common.entiy.ai.goal;
 
 import com.github.fictology.gensokyoontology.common.entiy.monster.YoukaiEntity;
+import com.github.fictology.gensokyoontology.util.GSKOUtil;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class BattlePhaseGoal<Y extends YoukaiEntity> extends Goal {
     protected final int mainPhase;
@@ -23,8 +26,7 @@ public class BattlePhaseGoal<Y extends YoukaiEntity> extends Goal {
 
     @Override
     public boolean canUse() {
-        var target = this.youkai.getTarget();
-        return target != null && target.isAlive();
+        return this.tryGetTarget(GSKOUtil.atomic());
     }
 
     @Override
@@ -35,13 +37,18 @@ public class BattlePhaseGoal<Y extends YoukaiEntity> extends Goal {
     @Override
     public void tick() {
         super.tick();
-        var target = this.youkai.getTarget();
-        if (target == null) return;
-        this.youkai.getLookControl().setLookAt(target, 30.0F, 30.0F);
-        if (!this.youkai.getSensing().hasLineOfSight(target)) {
+        this.ticksExecuted++;
+        var ref = GSKOUtil.<LivingEntity>atomic();
+        if (!this.tryGetTarget(ref)) return;
+
+        this.youkai.getLookControl().setLookAt(ref.get(), 30.0F, 30.0F);
+        if (!this.youkai.getSensing().hasLineOfSight(ref.get())) {
             this.youkai.getNavigation().stop();
         }
     }
-
-
+    public boolean tryGetTarget(AtomicReference<LivingEntity> ref){
+        if (this.youkai.getTarget() == null) return false;
+        ref.set(this.youkai.getTarget());
+        return true;
+    }
 }

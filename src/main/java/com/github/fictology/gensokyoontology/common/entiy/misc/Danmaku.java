@@ -22,6 +22,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
@@ -294,7 +295,7 @@ public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, ID
         if (this.getOwner() instanceof Monster || this.getOwner() instanceof Enemy) {
 
             if (this.getType() != EntityRegistry.FAKE_LUNAR.get())
-                this.hurtLiving(living, serverLevel, GSKODamage.DANMAKU_TYPE, 12f);
+                this.hurtLiving(living, serverLevel, DamageTypes.MAGIC, 12f);
 
             this.setRemoved(RemovalReason.DISCARDED);
             return;
@@ -307,7 +308,7 @@ public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, ID
         }
 
         if (!(living instanceof Player)) {
-            this.hurtLiving(living, serverLevel, GSKODamage.DANMAKU_TYPE, this.damage);
+            this.hurtLiving(living, serverLevel, DamageTypes.MAGIC, this.damage);
             this.setRemoved(RemovalReason.KILLED);
         }
     }
@@ -328,5 +329,9 @@ public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, ID
         var registryName = BuiltInRegistries.ITEM.getKey(this.getItem().getItem());
         var fileName = registryName.toString().replace(GensokyoOntology.MODID + ":", "");
         return GSKOUtil.key("textures/item/" + fileName + ".png");
+    }
+
+    public void shoot(Vec3 shootVec, float velocity) {
+        this.shoot(shootVec.x, shootVec.y, shootVec.z, velocity, 1.0F);
     }
 }

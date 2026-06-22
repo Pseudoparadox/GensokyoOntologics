@@ -2,6 +2,7 @@ package com.github.fictology.gensokyoontology.common.combat;
 
 import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
 import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -17,6 +18,9 @@ public class DanmakuUtil {
                 prevVec.y, prevVec.z * radius * Math.signum(angle));
     }
 
+    public static float rad(float deg){
+        return Mth.DEG_TO_RAD * deg;
+    }
 
     public static Vec3 rotateRandomAngle(Vec3 preVec, float yawBounds, float pitchBounds) {
         Vec3 nextVec = preVec.yRot(GSKOMathUtil.randomRange(0f, yawBounds));

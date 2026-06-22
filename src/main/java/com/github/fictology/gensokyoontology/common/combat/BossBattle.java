@@ -25,4 +25,24 @@ public final class BossBattle {
             }
         }
     };
+
+    public static final YoukaiCombat.TimerAction<RumiaEntity> DARK_BORDER_LINE = (world, rumiaEntity, target, currentTimer) -> {
+        if (target == null) return;
+        if (rumiaEntity.tickCount % 7 != 0) return;
+        int unit = currentTimer.get() % 10;
+        int increment = currentTimer.get() % 10 > 5 ? 3 * unit : -3 * unit;
+        var vector3d = DanmakuUtil.getAimedVec(rumiaEntity, target).yRot(DanmakuUtil.rad(increment) * rumiaEntity.tickCount);
+
+        for (int i = -2; i <= 2; i++) {
+            for (int j = -2; j < 2; j++) {
+                var shootVec = vector3d
+                        .yRot(DanmakuUtil.rad(j * 5))
+                        .add(0, i * 0.1, 0).normalize();
+                Danmaku.create(world, ItemRegistry.SMALL_SHOT_GREEN.get(), rumiaEntity)
+                        .damage(3F)
+                        .shoot(shootVec, 0.55F);
+            }
+        }
+        currentTimer.set(currentTimer.get() + 1);
+    };
 }
