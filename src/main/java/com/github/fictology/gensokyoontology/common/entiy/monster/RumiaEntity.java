@@ -2,6 +2,7 @@ package com.github.fictology.gensokyoontology.common.entiy.monster;
 
 
 import com.github.fictology.gensokyoontology.common.combat.BossBattle;
+import com.github.fictology.gensokyoontology.common.entiy.ai.goal.YoukaiSorceryGoal;
 import com.github.fictology.gensokyoontology.common.entiy.ai.goal.YoukaiTargetGoal;
 import com.github.fictology.gensokyoontology.common.entiy.ai.goal.YoukaiTimerGoal;
 import net.minecraft.core.BlockPos;
@@ -24,14 +25,16 @@ public class RumiaEntity extends YoukaiEntity{
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(2, new SitWhenOrderedToGoal(this));
-        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1D, true));
-        this.goalSelector.addGoal(4, new YoukaiTargetGoal<>(this, BossBattle.WALL_SHOOT_RUMIA, 1,1, 800));
-        this.goalSelector.addGoal(4, new YoukaiTimerGoal<>(this, BossBattle.DARK_BORDER_LINE, 1, 2, 800));
-        this.goalSelector.addGoal(5, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
-        this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.4f));
-        this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 0.8f));
-        this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
+        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1D, true));
+        this.goalSelector.addGoal(3, new YoukaiTargetGoal<>(this, BossBattle.WALL_SHOOT_RUMIA, 1,1, 800));
+        this.goalSelector.addGoal(3, new YoukaiTimerGoal<>(this, BossBattle.DARK_BORDER_LINE, 1, 2, 800));
+        this.goalSelector.addGoal(3, new YoukaiSorceryGoal<>(this, BossBattle.BLANK_PHASE, 1, 3, 800));
+
+        this.goalSelector.addGoal(4, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
+        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.4f));
+        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 0.8f));
+        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
 
         this.targetSelector.addGoal(1, (new HurtByTargetGoal(this, Mob.class)));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, TsumiBukuroEntity.class, true));

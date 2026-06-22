@@ -9,7 +9,11 @@ import com.github.fictology.gensokyoontology.registry.ItemRegistry;
 import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
@@ -36,6 +40,33 @@ public final class Sorceries {
         }
 
         if (entity.tickCount >= 500) entity.nextPhase();
+    };
+
+    public static final YoukaiCombat.EventAction<YoukaiEntity> BECOME_BAT = (youkai, event, timer) -> {
+        if (!(youkai.level() instanceof ServerLevel serverLevel)) return;
+        if (timer.get() == 0){
+            var bat = EntityType.BAT.spawn(serverLevel, youkai.getOnPos().above(), EntitySpawnReason.EVENT);
+            if (bat == null) return;
+            youkai.startRiding(bat);
+            youkai.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY));
+            youkai.setInvulnerable(true);
+            return;
+        }
+        if (timer.get() >= event.maxTick()){
+            var bat = youkai.getControllingPassenger();
+            if (bat == null) return;
+            bat.remove(Entity.RemovalReason.DISCARDED);
+            youkai.removeAllEffects();
+            youkai.setInvulnerable(false);
+            return;
+        }
+
+        if (youkai.tickCount % 18 != 0) return;
+        DanmakuUtil.spheroidPos(1, 10).forEach(vec3 -> {
+            var shot = Danmaku.create(serverLevel, ItemRegistry.SMALL_SHOT_RED.get(), youkai);
+            shot.shoot(vec3.x, vec3.y, vec3.z, 0.7f, 0f);
+            serverLevel.addFreshEntity(shot);
+        });
     };
 
     public static final YoukaiCombat.SorceryAction<YoukaiEntity> LASER_RAIN = (level, youkai) -> {

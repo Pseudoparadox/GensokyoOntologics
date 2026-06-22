@@ -1,6 +1,8 @@
 package com.github.fictology.gensokyoontology.common.combat;
 
 import com.github.fictology.gensokyoontology.common.entiy.monster.YoukaiEntity;
+import com.github.fictology.gensokyoontology.data.EventCallbackInfo;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
@@ -26,7 +28,7 @@ public final class YoukaiCombat {
     }
 
     @FunctionalInterface
-    public interface KeyframeAction<Y extends YoukaiEntity> {
-        void invoke(Map<Integer, TimerAction<Y>> map);
+    public interface EventAction<Y extends YoukaiEntity> {
+        void invoke(Y youkai, EventCallbackInfo event, AtomicInteger currentTick);
     }
 }

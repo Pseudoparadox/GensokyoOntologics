@@ -1,6 +1,8 @@
 package com.github.fictology.gensokyoontology.common.entiy.monster;
 
 import com.github.fictology.gensokyoontology.common.combat.YoukaiCombat;
+import com.github.fictology.gensokyoontology.common.entiy.ai.goal.YoukaiEventGoal;
+import com.github.fictology.gensokyoontology.data.EventCallbackInfo;
 import com.mojang.datafixers.util.Pair;
 import com.github.fictology.gensokyoontology.common.combat.Sorceries;
 import com.github.fictology.gensokyoontology.common.entiy.ai.goal.YoukaiSorceryGoal;
@@ -45,13 +47,14 @@ public class FlandreScarletEntity extends YoukaiEntity{
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(2, new SitWhenOrderedToGoal(this));
-        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1D, true));
-        this.goalSelector.addGoal(4, new YoukaiSorceryGoal<>(this, Sorceries.DESTRUCTIVE_EYE, 1, 1, 800));
-        this.goalSelector.addGoal(5, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
-        this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.4f));
-        this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 0.8f));
-        this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
+        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1D, true));
+        this.goalSelector.addGoal(3, new YoukaiSorceryGoal<>(this, Sorceries.DESTRUCTIVE_EYE, 1, 1, 800));
+        this.goalSelector.addGoal(3, new YoukaiEventGoal<>(this, Sorceries.BECOME_BAT, 2, 2, 1200));
+        this.goalSelector.addGoal(4, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
+        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.4f));
+        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 0.8f));
+        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
 
         this.targetSelector.addGoal(1, (new HurtByTargetGoal(this, Mob.class)));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, TsumiBukuroEntity.class, true));
@@ -96,6 +99,11 @@ public class FlandreScarletEntity extends YoukaiEntity{
     @Override
     public AgeableMob getBreedOffspring(ServerLevel serverLevel, AgeableMob ageableMob) {
         return null;
+    }
+
+    @Override
+    public EventCallbackInfo subscribeAIEvent() {
+        return EventCallbackInfo.onExit("exit_bat_state", 0, 1200);
     }
 
     /*

@@ -1,6 +1,7 @@
 package com.github.fictology.gensokyoontology.common.entiy.monster;
 
 import com.github.fictology.gensokyoontology.common.entiy.ai.goal.BattlePhaseGoal;
+import com.github.fictology.gensokyoontology.data.EventCallbackInfo;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -201,7 +202,13 @@ public abstract class YoukaiEntity extends RetreatableEntity implements Enemy {
     //     return animation;
     // }
 
-    public abstract void danmakuAttack(LivingEntity target);
+    public void danmakuAttack(LivingEntity target){
+
+    }
+
+    public EventCallbackInfo subscribeAIEvent(){
+        return EventCallbackInfo.EMPTY;
+    }
 
     public DamageSource createDamage(ResourceKey<DamageType> damageType) {
         return new DamageSource(this.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(damageType));

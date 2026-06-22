@@ -30,11 +30,6 @@ public class YoukaiTargetGoal<Y extends YoukaiEntity> extends BattlePhaseGoal<Y>
         super.start();
     }
 
-    @Override
-    public void stop() {
-        super.stop();
-        this.youkai.nextPhase();
-    }
 
     @Override
     public boolean requiresUpdateEveryTick() {

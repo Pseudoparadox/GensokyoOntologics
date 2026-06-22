@@ -16,6 +16,7 @@ public class YoukaiTimerGoal<Y extends YoukaiEntity> extends BattlePhaseGoal<Y>{
     @Override
     public void tick() {
         super.tick();
+        this.timer.incrementAndGet();
         action.invoke(this.youkai.level(), youkai, youkai.getTarget(), this.timer);
     }
 

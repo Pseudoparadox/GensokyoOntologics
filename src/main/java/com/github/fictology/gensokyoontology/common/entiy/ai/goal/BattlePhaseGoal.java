@@ -51,4 +51,10 @@ public class BattlePhaseGoal<Y extends YoukaiEntity> extends Goal {
         ref.set(this.youkai.getTarget());
         return true;
     }
+
+    @Override
+    public void stop() {
+        super.stop();
+        this.youkai.nextPhase();
+    }
 }
