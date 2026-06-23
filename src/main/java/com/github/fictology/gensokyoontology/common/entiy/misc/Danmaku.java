@@ -180,7 +180,6 @@ public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, ID
     @Override
     public void tick() {
         super.tick();
-        GSKOUtil.info(String.valueOf(this.onGround()));
         if (this.tickCount >= this.lifespan) this.remove(RemovalReason.DISCARDED);
         if (this.getKnownSpeed().length() <= 1e-4 && this.tickCount > 1) this.remove(RemovalReason.DISCARDED);
 //        if (this.getDefaultItem() != ItemRegistry.DANMAKU_SHOT.get()) this.onBehaviorTick();

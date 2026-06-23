@@ -6,7 +6,9 @@ import com.github.fictology.gensokyoontology.common.entiy.misc.YinyangJade;
 import com.github.fictology.gensokyoontology.common.entiy.monster.FlandreScarletEntity;
 import com.github.fictology.gensokyoontology.common.entiy.monster.RumiaEntity;
 import com.github.fictology.gensokyoontology.common.entiy.monster.YoukaiEntity;
+import com.github.fictology.gensokyoontology.data.EventCallbackInfo;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
+import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -16,16 +18,27 @@ public final class BossBattle {
     public static final YoukaiCombat.SorceryAction<YoukaiEntity> BLANK_PHASE = (world, youkaiEntity) -> {};
 
     public static final YoukaiCombat.SorceryAction<FlandreScarletEntity> SPHERE_SHOOT_FLANDRE = (level, flandre) -> {
-        if (flandre.tickCount % 50 != 0) return;
-        if (!(level instanceof ServerLevel serverLevel)) return;
+        if (flandre.tickCount % 40 != 0) return;
         DanmakuUtil.spheroidPos(1F, 10).forEach(shootVec ->
                 Danmaku.shoot(flandre, ItemRegistry.SMALL_SHOT_RED.get(), shootVec, 0.5F));
     };
 
-    public static final YoukaiCombat.SorceryAction<FlandreScarletEntity> FORBIDDEN_LAEVATEIN = (level, flandre) -> {
-        if (flandre.tickCount % 50 != 0) return;
-        if (!(level instanceof ServerLevel serverLevel)) return;
-        var laser = new Laser(serverLevel, flandre);
+    public static final YoukaiCombat.EventAction<FlandreScarletEntity> FORBIDDEN_LAEVATEIN = (flandre, event, timer) -> {
+        if (!(flandre.level() instanceof ServerLevel serverLevel)) return;
+        if (timer.get() == 0){
+            var laser = new Laser(serverLevel, flandre);
+            laser.setLifespan(400);
+            laser.setXRot(flandre.getXRot());
+            laser.setYRot(flandre.getYRot());
+            serverLevel.addFreshEntity(laser);
+            event.callbackData().putInt("laser", laser.getId());
+            return;
+        }
+        var entity = serverLevel.getEntity(event.callbackData().getIntOr("laser", -1));
+        if (!(entity instanceof Laser laser)) return;
+        if (timer.get() > laser.getPreparation()){
+            entity.setYRot(timer.get() * 2);
+        }
     };
 
     public static final YoukaiCombat.TargetAction<RumiaEntity> WALL_SHOOT_RUMIA = (level, rumia, target) -> {

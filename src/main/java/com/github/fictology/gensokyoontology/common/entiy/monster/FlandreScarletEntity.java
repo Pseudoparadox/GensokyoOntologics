@@ -51,18 +51,18 @@ public class FlandreScarletEntity extends YoukaiEntity{
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 0.4, true));
-//        this.goalSelector.addGoal(3, new YoukaiSorceryGoal<>(this, Sorceries.DESTRUCTIVE_EYE, 1, 1, 800));
-        this.goalSelector.addGoal(3, new YoukaiSorceryGoal<>(this, BossBattle.BLANK_PHASE, 1, 1, 800));
-        this.goalSelector.addGoal(3, new YoukaiEventGoal<>(this, Sorceries.BECOME_BAT, 2, 2, 1200));
-        this.goalSelector.addGoal(4, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
-        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.4f));
-        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 0.8f));
-        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(2, new YoukaiSorceryGoal<>(this, BossBattle.SPHERE_SHOOT_FLANDRE, 1, 1, 800));
+        this.goalSelector.addGoal(2, new YoukaiSorceryGoal<>(this, BossBattle.BLANK_PHASE, 1, 2, 200));
+        this.goalSelector.addGoal(2, new YoukaiSorceryGoal<>(this, BossBattle.BLANK_PHASE, 2, 1, 200));
+
+        this.goalSelector.addGoal(3, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
+        this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.4f));
+        this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 0.8f));
+        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
 
         this.targetSelector.addGoal(1, (new HurtByTargetGoal(this, Mob.class)));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, TsumiBukuroEntity.class, true));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, true));
-        // this.targetSelector.addGoal(5, new Grief<>(this, true));
     }
 
 

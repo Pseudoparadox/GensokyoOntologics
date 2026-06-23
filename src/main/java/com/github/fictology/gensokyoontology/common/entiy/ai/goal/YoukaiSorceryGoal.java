@@ -7,9 +7,9 @@ import com.github.fictology.gensokyoontology.common.entiy.monster.YoukaiEntity;
 public class YoukaiSorceryGoal<Y extends YoukaiEntity> extends BattlePhaseGoal<Y> {
     protected int mainPhase;
     protected int subPhase;
-    protected YoukaiCombat.SorceryAction<YoukaiEntity> youkaiSkill;
+    protected YoukaiCombat.SorceryAction<Y> youkaiSkill;
 
-    public YoukaiSorceryGoal(Y youkai, YoukaiCombat.SorceryAction<YoukaiEntity> youkaiSkill, int mainPhase, int subPhase, int maxTicks) {
+    public YoukaiSorceryGoal(Y youkai, YoukaiCombat.SorceryAction<Y> youkaiSkill, int mainPhase, int subPhase, int maxTicks) {
         super(youkai, mainPhase, subPhase, maxTicks);
         this.mainPhase = mainPhase;
         this.subPhase = subPhase;
