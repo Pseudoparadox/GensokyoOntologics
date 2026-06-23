@@ -27,7 +27,6 @@ import net.minecraft.world.phys.Vec3;
 import java.util.function.Consumer;
 
 import static com.github.fictology.gensokyoontology.registry.ItemRegistry.YINYANG_JADE_RED;
-import static com.github.fictology.gensokyoontology.registry.ItemRegistry.SC_DREAM_SEAL;
 
 /**
  * 博丽灵梦的御币

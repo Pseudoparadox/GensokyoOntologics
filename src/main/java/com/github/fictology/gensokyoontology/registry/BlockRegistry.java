@@ -2,8 +2,6 @@ package com.github.fictology.gensokyoontology.registry;
 
 import com.github.fictology.gensokyoontology.GensokyoOntology;
 import com.github.fictology.gensokyoontology.common.block.DanmakuTableBlock;
-import com.github.fictology.gensokyoontology.common.block.DisposableSpawnerBlock;
-import com.github.fictology.gensokyoontology.common.block.GapBlock;
 //import com.github.fictology.gensokyoontology.common.block.SpellCardConsoleBlock;
 import com.github.fictology.gensokyoontology.common.block.decoration.SaisenBoxBlock;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
@@ -140,26 +138,26 @@ public final class BlockRegistry {
     /////////////                     实用类方块                          ///////////////
     ///////////////////////////////////////////////////////////////////////////////////
 //    public static final DeferredBlock<Block> BISHAMONTEN_PAGODA = register("bishamonten_pagoda", BishamontenPagoda::new, Blocks.BEDROCK);
-    public static final DeferredBlock<Block> ISHI_ZAKURA = copy("ishi_zakura", Blocks.STONE);
+//    public static final DeferredBlock<Block> ISHI_ZAKURA = copy("ishi_zakura", Blocks.STONE);
     // ============================== 矿石类方块 ================================== //
-    public static final DeferredBlock<Block> IZANO_OBJECT_ORE = ore("izano_object_ore", 3, 7, Blocks.IRON_ORE);
-    public static final DeferredBlock<Block> DRAGON_SPHERE_ORE = ore("dragon_sphere_ore", 5, 10, Blocks.DIAMOND_ORE);
-    public static final DeferredBlock<Block> CRIMSON_ALLOY_BLOCK = copy("crimson_alloy_block", Blocks.NETHERITE_BLOCK);
-    public static final DeferredBlock<Block> CRIMSON_METAL_BLOCK = copy("crimson_metal_block", Blocks.ANCIENT_DEBRIS);
-    public static final DeferredBlock<Block> IMMEMORIAL_ALLOY_BLOCK = copy("immemorial_alloy_block", Blocks.ANCIENT_DEBRIS);
-    public static final DeferredBlock<Block> JADE_ORE = copy("jade_ore", Blocks.DEEPSLATE);
-    public static final DeferredBlock<Block> JADE_BLOCK = copy("jade_block", Blocks.GLASS);
+//    public static final DeferredBlock<Block> IZANO_OBJECT_ORE = ore("izano_object_ore", 3, 7, Blocks.IRON_ORE);
+//    public static final DeferredBlock<Block> DRAGON_SPHERE_ORE = ore("dragon_sphere_ore", 5, 10, Blocks.DIAMOND_ORE);
+//    public static final DeferredBlock<Block> CRIMSON_ALLOY_BLOCK = copy("crimson_alloy_block", Blocks.NETHERITE_BLOCK);
+//    public static final DeferredBlock<Block> CRIMSON_METAL_BLOCK = copy("crimson_metal_block", Blocks.ANCIENT_DEBRIS);
+//    public static final DeferredBlock<Block> IMMEMORIAL_ALLOY_BLOCK = copy("immemorial_alloy_block", Blocks.ANCIENT_DEBRIS);
+//    public static final DeferredBlock<Block> JADE_ORE = copy("jade_ore", Blocks.DEEPSLATE);
+//    public static final DeferredBlock<Block> JADE_BLOCK = copy("jade_block", Blocks.GLASS);
     // ==============================流体方块 ================================== //
-    // public static final DeferredBlock<HotSpringBlock> HOT_SPRING_BLOCK = register("hot_spring_block",
-    //         () -> new HotSpringBlock(FluidRegistry.HOTSPRING_SOURCE, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
-    public static final DeferredBlock<Block> ONION_CROP_BLOCK = copy("onion_crop", Blocks.CARROTS);
+//    public static final DeferredBlock<HotSpringBlock> HOT_SPRING_BLOCK = register("hot_spring_block",
+//            () -> new HotSpringBlock(FluidRegistry.HOTSPRING_SOURCE, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+//    public static final DeferredBlock<Block> ONION_CROP_BLOCK = copy("onion_crop", Blocks.CARROTS);
     /// 方块实体
-    public static final DeferredBlock<Block> DANMAKU_TABLE = register("danmaku_table", DanmakuTableBlock::new, Blocks.CRAFTING_TABLE);
-    // public static final DeferredBlock<Block> SORCERY_EXTRACTOR = BLOCKS.copy("sorcery_extractor", SorceryExtractorBlock::new);
-    public static final DeferredBlock<Block> DISPOSABLE_SPAWNER = register("disposable_spawner", DisposableSpawnerBlock::new, Blocks.SPAWNER);
-    // public static final DeferredBlock<Block> SPACE_FISSURE_BLOCK = BLOCKS.copy("space_fissure_block", SpaceFissureBlock::new);
-    public static final DeferredBlock<Block> GAP_BLOCK = register("gap", GapBlock::new, Blocks.NETHER_PORTAL);
-    public static final DeferredBlock<Block> SAISEN_BOX = register("saisen_box", SaisenBoxBlock::new, WOODS_PROP);
+//    public static final DeferredBlock<Block> DANMAKU_TABLE = register("danmaku_table", DanmakuTableBlock::new, Blocks.CRAFTING_TABLE);
+//    public static final DeferredBlock<Block> SORCERY_EXTRACTOR = BLOCKS.copy("sorcery_extractor", SorceryExtractorBlock::new);
+//    public static final DeferredBlock<Block> DISPOSABLE_SPAWNER = register("disposable_spawner", DisposableSpawnerBlock::new, Blocks.SPAWNER);
+//    public static final DeferredBlock<Block> SPACE_FISSURE_BLOCK = BLOCKS.copy("space_fissure_block", SpaceFissureBlock::new);
+//    public static final DeferredBlock<Block> GAP_BLOCK = register("gap", GapBlock::new, Blocks.NETHER_PORTAL);
+//    public static final DeferredBlock<Block> SAISEN_BOX = register("saisen_box", SaisenBoxBlock::new, WOODS_PROP);
 //    public static final DeferredBlock<Block> SPELL_CARD_CONSOLE = register("spell_card_console", SpellCardConsoleBlock::new, Blocks.ENDER_CHEST);
     // public static final DeferredBlock<Block> COASTER_RAIL = register("coaster_rail", p -> block(Blocks.IRON_BARS));
     public static BlockBehaviour.Properties property(Block block) {

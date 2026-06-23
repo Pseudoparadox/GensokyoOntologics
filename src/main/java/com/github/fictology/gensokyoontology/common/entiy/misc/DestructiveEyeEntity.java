@@ -57,7 +57,7 @@ public class DestructiveEyeEntity extends AffiliatedEntity implements ItemSuppli
 
     @Override
     public ItemStack getItem() {
-        return new ItemStack(ItemRegistry.DESTRUCTIVE_EYE.get());
+        return ItemStack.EMPTY;
     }
 
     @Override

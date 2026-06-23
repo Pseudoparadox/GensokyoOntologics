@@ -112,6 +112,7 @@ public class DanmakuCraftMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return stillValid(this.access, player, BlockRegistry.DANMAKU_TABLE.get());
+//        return stillValid(this.access, player, BlockRegistry.DANMAKU_TABLE.get());
+        return false;
     }
 }

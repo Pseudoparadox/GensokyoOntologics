@@ -32,7 +32,7 @@ public record InscriptionInfo(List<Identifier> inscriptions,
 
     public static final Map<ResourceKey<Item>, ResourceKey<Item>> ITEM_SPELLS = Util.make(() -> {
         var map = new HashMap<ResourceKey<Item>, ResourceKey<Item>>();
-        map.put(ItemRegistry.HAKUREI_GOHEI.getKey(), ItemRegistry.SPELL_CARD_BLANK.getKey());
+//        map.put(ItemRegistry.HAKUREI_GOHEI.getKey(), ItemRegistry.SPELL_CARD_BLANK.getKey());
         return map;
     });
 

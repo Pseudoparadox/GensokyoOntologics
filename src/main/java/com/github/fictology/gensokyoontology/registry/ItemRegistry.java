@@ -166,63 +166,63 @@ public final class ItemRegistry {
 //            "haniwa", BlockRegistry.HANIWA_BLOCK);
     // ======================= GSKO杂项：功能性方块 =========================//
     //----------------------------- 合成台 --------------------------//
-    public static final DeferredItem<BlockItem> DANMAKU_TABLE_ITEM = ITEMS.registerSimpleBlockItem(
-            "danmaku_table", BlockRegistry.DANMAKU_TABLE);
-    public static final DeferredItem<BlockItem> SAISEN_BOX_ITEM = ITEMS.registerSimpleBlockItem(
-            "saisen_box", BlockRegistry.SAISEN_BOX);
+//    public static final DeferredItem<BlockItem> DANMAKU_TABLE_ITEM = ITEMS.registerSimpleBlockItem(
+//            "danmaku_table", BlockRegistry.DANMAKU_TABLE);
+//    public static final DeferredItem<BlockItem> SAISEN_BOX_ITEM = ITEMS.registerSimpleBlockItem(
+//            "saisen_box", BlockRegistry.SAISEN_BOX);
 //    public static final DeferredItem<BlockItem> SPELL_CONSOLE_ITEM = ITEMS.registerSimpleBlockItem(
 //            "spell_card_console", BlockRegistry.SPELL_CARD_CONSOLE);
     // -------------------------------- 矿石 ---------------------------------//
-    public static final DeferredItem<BlockItem> IZANO_OBJECT_ORE_ITEM = ITEMS.registerSimpleBlockItem(
-            "izano_object_ore", BlockRegistry.IZANO_OBJECT_ORE);
-    public static final DeferredItem<BlockItem> DRAGON_SPHERE_ORE_ITEM = ITEMS.registerSimpleBlockItem(
-            "dragon_sphere_ore", BlockRegistry.DRAGON_SPHERE_ORE);
+//    public static final DeferredItem<BlockItem> IZANO_OBJECT_ORE_ITEM = ITEMS.registerSimpleBlockItem(
+//            "izano_object_ore", BlockRegistry.IZANO_OBJECT_ORE);
+//    public static final DeferredItem<BlockItem> DRAGON_SPHERE_ORE_ITEM = ITEMS.registerSimpleBlockItem(
+//            "dragon_sphere_ore", BlockRegistry.DRAGON_SPHERE_ORE);
 
-    public static final DeferredItem<BlockItem> JADE_ORE_ITEM = ITEMS.register(
-            "jade_ore", () -> new BlockItem(BlockRegistry.JADE_ORE.get(), new Item.Properties()
-                    .setId(GSKOUtil.resource(Registries.ITEM, "jade_ore"))
-                    .useBlockDescriptionPrefix()){
-                @Override
-                public @NotNull InteractionResult useOn(@NotNull UseOnContext context) {
-                    Level world = context.getLevel();
-                    Block block = world.getBlockState(context.getClickedPos()).getBlock();
-                    var player = context.getPlayer();
-                    Random random = new Random();
-
-                    var matchesStoneCutter = block == Blocks.STONECUTTER;
-                    if (!matchesStoneCutter) return super.useOn(context);
-                    if (context.getPlayer() == null) return super.useOn(context);
-
-                    context.getPlayer().playSound(SoundEvents.UI_STONECUTTER_TAKE_RESULT, 1.0f, 1.0f);
-                    var state = context.getLevel().getBlockState(context.getClickedPos());
-
-                    if (world.isClientSide()) return InteractionResult.PASS;
-                    if (!player.isScoping()) return InteractionResult.PASS;
-                    if (random.nextInt(6) != 1) return InteractionResult.FAIL;
-
-                    // 如果手里的石头多于十个则进行十连抽赌石
-                    if (context.getItemInHand().getCount() >= 10) {
-                        context.getItemInHand().shrink(10);
-                        for (int i = 0; i < 10; i++) {
-                            Block.dropResources(state, world, context.getClickedPos(), null, context.getPlayer(),
-                                    StoneGambleHelper.rollItemToDrop(StoneGambleHelper.GSKO_10_PROB));
-                        }
-                        return InteractionResult.SUCCESS;
-                    }
-                    context.getItemInHand().shrink(1);
-                    Block.dropResources(state, world, context.getClickedPos(), null, context.getPlayer(),
-                            StoneGambleHelper.rollItemToDrop(StoneGambleHelper.GSKO_1_PROB));
-                    return InteractionResult.SUCCESS;
-                }
-            });
-    public static final DeferredItem<BlockItem> IMMEMORIAL_ALLOY_BLOCK_ITEM = ITEMS.registerSimpleBlockItem(
-            "immemorial_alloy_block", BlockRegistry.IMMEMORIAL_ALLOY_BLOCK);
+//    public static final DeferredItem<BlockItem> JADE_ORE_ITEM = ITEMS.register(
+//            "jade_ore", () -> new BlockItem(BlockRegistry.JADE_ORE.get(), new Item.Properties()
+//                    .setId(GSKOUtil.resource(Registries.ITEM, "jade_ore"))
+//                    .useBlockDescriptionPrefix()){
+//                @Override
+//                public @NotNull InteractionResult useOn(@NotNull UseOnContext context) {
+//                    Level world = context.getLevel();
+//                    Block block = world.getBlockState(context.getClickedPos()).getBlock();
+//                    var player = context.getPlayer();
+//                    Random random = new Random();
+//
+//                    var matchesStoneCutter = block == Blocks.STONECUTTER;
+//                    if (!matchesStoneCutter) return super.useOn(context);
+//                    if (context.getPlayer() == null) return super.useOn(context);
+//
+//                    context.getPlayer().playSound(SoundEvents.UI_STONECUTTER_TAKE_RESULT, 1.0f, 1.0f);
+//                    var state = context.getLevel().getBlockState(context.getClickedPos());
+//
+//                    if (world.isClientSide()) return InteractionResult.PASS;
+//                    if (!player.isScoping()) return InteractionResult.PASS;
+//                    if (random.nextInt(6) != 1) return InteractionResult.FAIL;
+//
+//                    // 如果手里的石头多于十个则进行十连抽赌石
+//                    if (context.getItemInHand().getCount() >= 10) {
+//                        context.getItemInHand().shrink(10);
+//                        for (int i = 0; i < 10; i++) {
+//                            Block.dropResources(state, world, context.getClickedPos(), null, context.getPlayer(),
+//                                    StoneGambleHelper.rollItemToDrop(StoneGambleHelper.GSKO_10_PROB));
+//                        }
+//                        return InteractionResult.SUCCESS;
+//                    }
+//                    context.getItemInHand().shrink(1);
+//                    Block.dropResources(state, world, context.getClickedPos(), null, context.getPlayer(),
+//                            StoneGambleHelper.rollItemToDrop(StoneGambleHelper.GSKO_1_PROB));
+//                    return InteractionResult.SUCCESS;
+//                }
+//            });
+//    public static final DeferredItem<BlockItem> IMMEMORIAL_ALLOY_BLOCK_ITEM = ITEMS.registerSimpleBlockItem(
+//            "immemorial_alloy_block", BlockRegistry.IMMEMORIAL_ALLOY_BLOCK);
     // ------------------------------- 技术性道具 ----------------------------------//
-    public static final DeferredItem<BlockItem> DISPOSABLE_SPAWNER_ITEM = ITEMS.registerSimpleBlockItem(
-            "disposable_spawner", BlockRegistry.DISPOSABLE_SPAWNER);
+//    public static final DeferredItem<BlockItem> DISPOSABLE_SPAWNER_ITEM = ITEMS.registerSimpleBlockItem(
+//            "disposable_spawner", BlockRegistry.DISPOSABLE_SPAWNER);
 
-    public static final DeferredItem<Item> DESTRUCTIVE_EYE = ITEMS.registerSimpleItem("destructive_eye",
-            Item.Properties::new);
+//    public static final DeferredItem<Item> DESTRUCTIVE_EYE = ITEMS.registerSimpleItem("destructive_eye",
+//            Item.Properties::new);
     // ======================= GSKO杂项：道具类物品 =========================//
     // ----------------------- 东方project特殊功能道具 ----------------------//
     public static final DeferredItem<HakureiGohei> HAKUREI_GOHEI = ITEMS.registerItem("hakurei_gohei",
@@ -230,7 +230,7 @@ public final class ItemRegistry {
     public static final DeferredItem<MarisaHakkeiro> MARISA_HAKKEIRO = ITEMS.registerItem("marisa_hakkeiro",
             MarisaHakkeiro::new);
 
-    public static final DeferredItem<BlockItem> GAP_BLOCK = ITEMS.registerSimpleBlockItem(BlockRegistry.GAP_BLOCK);
+//    public static final DeferredItem<BlockItem> GAP_BLOCK = ITEMS.registerSimpleBlockItem(BlockRegistry.GAP_BLOCK);
 
 
     // public static final DeferredItem<Item> EIRIN_YAGOKORO_ARROW = ITEMS.registerSimpleItem(
@@ -238,8 +238,8 @@ public final class ItemRegistry {
     //                 ));
     public static final DeferredItem<AyaFans> AYA_FANS = ITEMS.registerItem("aya_fans",
             AyaFans::new, () -> new Item.Properties().stacksTo(1));
-    public static final DeferredItem<KoishiEyeOpen> KOISHI_EYE_OPEN = ITEMS.registerItem("koishi_eye_open",
-            KoishiEyeOpen::new);
+//    public static final DeferredItem<KoishiEyeOpen> KOISHI_EYE_OPEN = ITEMS.registerItem("koishi_eye_open",
+//            KoishiEyeOpen::new);
     public static final DeferredItem<KoishiEyeClosed> KOISHI_EYE_CLOSED = ITEMS.registerItem("koishi_eye_closed",
             KoishiEyeClosed::new);
     // ----------------------------------- 杂项物品 --------------------------------------//
@@ -256,9 +256,9 @@ public final class ItemRegistry {
     //         () -> new BucketItem(FluidRegistry.PAPER_PULP_SOURCE, new Item.Properties()
     //                 .stacksTo(1).containerItem(BUCKET)));
     // ========================== GSKO杂项：合成消耗品 =========================//
-    public static final DeferredItem<Item> BAT_WING = ITEMS.registerSimpleItem("bat_wing", Item.Properties::new);
-    public static final DeferredItem<Item> ISHI_ZAKURA_FRAGMENT = ITEMS.registerSimpleItem("ishi_zakura_fragment",
-            Item.Properties::new);
+//    public static final DeferredItem<Item> BAT_WING = ITEMS.registerSimpleItem("bat_wing", Item.Properties::new);
+//    public static final DeferredItem<Item> ISHI_ZAKURA_FRAGMENT = ITEMS.registerSimpleItem("ishi_zakura_fragment",
+//            Item.Properties::new);
     // public static final DeferredItem<Item> ISHI_ZAKURA = ITEMS.registerSimpleItem("ishi_zakura",
     //         BlockRegistry.ISHI_ZAKURA.get(), new Item.Properties()));
     public static final DeferredItem<Item> CHERRY_BLOSSOM = ITEMS.registerSimpleItem("cherry_blossom",
@@ -272,14 +272,14 @@ public final class ItemRegistry {
 
     // public static final DeferredItem<Item> PAPER_SHIDE = ITEMS.registerSimpleItem("paper_shide",
     //         new Item.Properties());
-    public static final DeferredItem<Item> DRAGON_SPHERE_FRAGMENT = ITEMS.registerSimpleItem("dragon_sphere_fragment",
-            Item.Properties::new);
-    public static final DeferredItem<Item> DRAGON_SPHERE = ITEMS.registerSimpleItem("dragon_sphere",
-            Item.Properties::new);
-    public static final DeferredItem<Item> CRIMSON_ALLOY_INGOT = ITEMS.registerSimpleItem("crimson_alloy_ingot",
-            Item.Properties::new);
-    public static final DeferredItem<Item> CRIMSON_ALLOY_FRAGMENT = ITEMS.registerSimpleItem("crimson_alloy_fragment",
-            Item.Properties::new);
+//    public static final DeferredItem<Item> DRAGON_SPHERE_FRAGMENT = ITEMS.registerSimpleItem("dragon_sphere_fragment",
+//            Item.Properties::new);
+//    public static final DeferredItem<Item> DRAGON_SPHERE = ITEMS.registerSimpleItem("dragon_sphere",
+//            Item.Properties::new);
+//    public static final DeferredItem<Item> CRIMSON_ALLOY_INGOT = ITEMS.registerSimpleItem("crimson_alloy_ingot",
+//            Item.Properties::new);
+//    public static final DeferredItem<Item> CRIMSON_ALLOY_FRAGMENT = ITEMS.registerSimpleItem("crimson_alloy_fragment",
+//            Item.Properties::new);
     ////////////////////////////////////  各个等级的玉石  ///////////////////////////////////////
     public static final DeferredItem<Item> JADE_LEVEL_B = ITEMS.registerSimpleItem("jade_level_b",
             Item.Properties::new);
@@ -298,24 +298,24 @@ public final class ItemRegistry {
     public static final DeferredItem<Item> LIGHT_SPIRIT = ITEMS.registerSimpleItem("light_spirit",
             Item.Properties::new);
     // ---------------------------- 食物原材料 -----------------------------//
-    public static final DeferredItem<Item> KITCHEN_KNIFE = ITEMS.registerSimpleItem("kitchen_knife", Item.Properties::new);
-    public static final DeferredItem<Item> BUTTER = ITEMS.registerSimpleItem("butter",
-            Item.Properties::new);
-    public static final DeferredItem<Item> MILK_BOTTLE = ITEMS.registerSimpleItem("milk_bottle", Item.Properties::new);
-    public static final DeferredItem<Item> SQUID_TENTACLE = ITEMS.registerSimpleItem("squid_tentacle", Item.Properties::new);
-    // public static final DeferredItem<BlockItem> ONION = ITEMS.registerSimpleBlockItem("onion", BlockRegistry.ONION_CROP_BLOCK);
-    public static final DeferredItem<Item> YATTSUME_UNA =
-            ITEMS.registerSimpleItem("yattsume_una", Item.Properties::new);
+//    public static final DeferredItem<Item> KITCHEN_KNIFE = ITEMS.registerSimpleItem("kitchen_knife", Item.Properties::new);
+//    public static final DeferredItem<Item> BUTTER = ITEMS.registerSimpleItem("butter",
+//            Item.Properties::new);
+//    public static final DeferredItem<Item> MILK_BOTTLE = ITEMS.registerSimpleItem("milk_bottle", Item.Properties::new);
+//    public static final DeferredItem<Item> SQUID_TENTACLE = ITEMS.registerSimpleItem("squid_tentacle", Item.Properties::new);
+// public static final DeferredItem<BlockItem> ONION = ITEMS.registerSimpleBlockItem("onion", BlockRegistry.ONION_CROP_BLOCK);
+//    public static final DeferredItem<Item> YATTSUME_UNA =
+//            ITEMS.registerSimpleItem("yattsume_una", Item.Properties::new);
     // ------------------------------- 食物 -------------------------------//
-    public static final DeferredItem<Item> YATTSUME_UNA_YAKI = ITEMS.registerSimpleItem("yattsume_una_yaki",
-            Item.Properties::new);
-    public static final DeferredItem<Item> KOISHI_HAT_MOUSSE = ITEMS.registerSimpleItem("koishi_hat_mousse", Item.Properties::new);
-    public static final DeferredItem<Item> CAKE_SCARLET_DEMON = ITEMS.registerSimpleItem("cake_scarlet_demon", Item.Properties::new);
-    public static final DeferredItem<Item> LINGOAME = ITEMS.registerSimpleItem("lingoame", Item.Properties::new);
-    public static final DeferredItem<Item> TAKO_YAKI = ITEMS.registerSimpleItem("tako_yaki", Item.Properties::new);
-    public static final DeferredItem<Item> WHITE_SNOW = ITEMS.registerSimpleItem("white_snow", Item.Properties::new);
-    public static final DeferredItem<Item> BURGER_MEAT_RAW = ITEMS.registerSimpleItem("burger_meat_raw", Item.Properties::new);
-    public static final DeferredItem<Item> BURGER_MEAT = ITEMS.registerSimpleItem("burger_meat", Item.Properties::new);
+//    public static final DeferredItem<Item> YATTSUME_UNA_YAKI = ITEMS.registerSimpleItem("yattsume_una_yaki",
+//            Item.Properties::new);
+//    public static final DeferredItem<Item> KOISHI_HAT_MOUSSE = ITEMS.registerSimpleItem("koishi_hat_mousse", Item.Properties::new);
+//    public static final DeferredItem<Item> CAKE_SCARLET_DEMON = ITEMS.registerSimpleItem("cake_scarlet_demon", Item.Properties::new);
+//    public static final DeferredItem<Item> LINGOAME = ITEMS.registerSimpleItem("lingoame", Item.Properties::new);
+//    public static final DeferredItem<Item> TAKO_YAKI = ITEMS.registerSimpleItem("tako_yaki", Item.Properties::new);
+//    public static final DeferredItem<Item> WHITE_SNOW = ITEMS.registerSimpleItem("white_snow", Item.Properties::new);
+//    public static final DeferredItem<Item> BURGER_MEAT_RAW = ITEMS.registerSimpleItem("burger_meat_raw", Item.Properties::new);
+//    public static final DeferredItem<Item> BURGER_MEAT = ITEMS.registerSimpleItem("burger_meat", Item.Properties::new);
     //////////////////////////////////// 被遗忘的传说 /////////////////////////////////
     public static final DeferredItem<Item> TALES_SCARLET_MIST = ITEMS.registerSimpleItem(
             "oblivious_tales_scarlet_mist", Item.Properties::new);
@@ -340,17 +340,17 @@ public final class ItemRegistry {
             "flandre_scarlet_spawn_egg", EntityRegistry.FLANDRE_SCARLET);
     // ======================== GSKO战斗类物品 ============================//
     // ----------------------------- 符卡 --------------------------------//
-    public static final DeferredItem<Item> SPELL_CARD_BLANK = registerSpell("spell_card_blank", SpellCardItem::new, (_l, _p) -> {});
-    public static final DeferredItem<Item> SC_DREAM_SEAL = ITEMS.registerSimpleItem("sc_dream_seal", Item.Properties::new);
-    public static final DeferredItem<Item> SC_HYPERBOLOID_LASER = registerSpell("sc_hyperboloid_laser", SpellCardItem::new, (_l, _p) -> {});
-    public static final DeferredItem<Item> SC_WAVE_AND_PARTICLE = registerSpell("sc_wave_and_particle", SpellCardItem::new, SpellBehaviors.WAVE_PARTICLE);
-    public static final DeferredItem<Item> SC_IDO_NO_KAIHO = registerSpell("sc_ido_no_kaiho", SpellCardItem::new, (_l, _p) -> {});
-    public static final DeferredItem<Item> SC_SUPER_EGO = registerSpell("sc_super_ego", SpellCardItem::new, (_l, _p) -> {});
-    public static final DeferredItem<Item> SC_HELL_ECLIPSE = registerSpell("sc_hell_eclipse", SpellCardItem::new, (_l, _p) -> {});
-    public static final DeferredItem<Item> SC_MOBIUS_RING_WORLD = registerSpell("sc_mobius_ring_world", SpellCardItem::new, (_l, _p) -> {});
-    public static final DeferredItem<Item> SC_FULL_CHERRY_BLOSSOM = registerSpell("sc_full_cherry_blossom", SpellCardItem::new, (_l, _p) -> {});
-    public static final DeferredItem<Item> SC_RORSHACH_DANMAKU = registerSpell("sc_rorshach_danmaku", SpellCardItem::new, (_l, _p) -> {});
-    public static final DeferredItem<Item> SCRIPTED_SPELL_CARD = registerSpell("scripted_spell_card", SpellCardItem::new, (_l, _p) -> {});
+//    public static final DeferredItem<Item> SPELL_CARD_BLANK = registerSpell("spell_card_blank", SpellCardItem::new, (_l, _p) -> {});
+//    public static final DeferredItem<Item> SC_DREAM_SEAL = ITEMS.registerSimpleItem("sc_dream_seal", Item.Properties::new);
+//    public static final DeferredItem<Item> SC_HYPERBOLOID_LASER = registerSpell("sc_hyperboloid_laser", SpellCardItem::new, (_l, _p) -> {});
+//    public static final DeferredItem<Item> SC_WAVE_AND_PARTICLE = registerSpell("sc_wave_and_particle", SpellCardItem::new, SpellBehaviors.WAVE_PARTICLE);
+//    public static final DeferredItem<Item> SC_IDO_NO_KAIHO = registerSpell("sc_ido_no_kaiho", SpellCardItem::new, (_l, _p) -> {});
+//    public static final DeferredItem<Item> SC_SUPER_EGO = registerSpell("sc_super_ego", SpellCardItem::new, (_l, _p) -> {});
+//    public static final DeferredItem<Item> SC_HELL_ECLIPSE = registerSpell("sc_hell_eclipse", SpellCardItem::new, (_l, _p) -> {});
+//    public static final DeferredItem<Item> SC_MOBIUS_RING_WORLD = registerSpell("sc_mobius_ring_world", SpellCardItem::new, (_l, _p) -> {});
+//    public static final DeferredItem<Item> SC_FULL_CHERRY_BLOSSOM = registerSpell("sc_full_cherry_blossom", SpellCardItem::new, (_l, _p) -> {});
+//    public static final DeferredItem<Item> SC_RORSHACH_DANMAKU = registerSpell("sc_rorshach_danmaku", SpellCardItem::new, (_l, _p) -> {});
+//    public static final DeferredItem<Item> SCRIPTED_SPELL_CARD = registerSpell("scripted_spell_card", SpellCardItem::new, (_l, _p) -> {});
     
     // --------------------- 投掷物：弹幕 阴阳玉 灵符 -----------------------//
     public static final DeferredItem<DanmakuItem> DANMAKU_SHOT = registerDanmaku("danmaku_shot");
@@ -481,11 +481,11 @@ public final class ItemRegistry {
             new Item.Properties().humanoidArmor(GSKOArmorMaterial.JADE, ArmorType.BOOTS));
 
      */
-    public static final DeferredItem<Item> RAIL_WRENCH = ITEMS.registerSimpleItem("rail_wrench",
-            Item.Properties::new);
+//    public static final DeferredItem<Item> RAIL_WRENCH = ITEMS.registerSimpleItem("rail_wrench",
+//            Item.Properties::new);
     // ====================================== 技术性物品 ====================================== //
-    public static final DeferredItem<Item> DREAM_SEAL_ITEM = ITEMS.registerSimpleItem("dream_seal", Item.Properties::new);
-    public static final DeferredItem<Item> SPHERE_EFFECT_ITEM = ITEMS.registerSimpleItem("sphere", Item.Properties::new);
+//    public static final DeferredItem<Item> DREAM_SEAL_ITEM = ITEMS.registerSimpleItem("dream_seal", Item.Properties::new);
+//    public static final DeferredItem<Item> SPHERE_EFFECT_ITEM = ITEMS.registerSimpleItem("sphere", Item.Properties::new);
     /*
     public static final DeferredItem<Item> RAIL_CONNECTOR = ITEMS.registerSimpleItem("rail_connector", () -> new Item(
             new Item.Properties()) {
