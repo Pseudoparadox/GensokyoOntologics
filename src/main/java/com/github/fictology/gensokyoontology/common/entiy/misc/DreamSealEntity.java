@@ -1,7 +1,6 @@
 package com.github.fictology.gensokyoontology.common.entiy.misc;
 
 import com.github.fictology.gensokyoontology.common.combat.GSKODamage;
-import com.github.fictology.gensokyoontology.common.entiy.monster.FairyEntity;
 import com.github.fictology.gensokyoontology.common.entiy.monster.YoukaiEntity;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.api.IDamageHandler;
@@ -95,9 +94,9 @@ public class DreamSealEntity extends Danmaku implements IRayTraceReader, IDamage
             float value = youkai.getMaxHealth() < 400 ? youkai.getMaxHealth() * 0.1f : youkai.getMaxHealth() * 0.075f;
             hurtLiving(youkai, level(), DamageTypes.MAGIC, value);
         }
-        if (result.getEntity() instanceof FairyEntity fairy) {
-            hurtLiving(fairy, level(), DamageTypes.MAGIC, 999999f);
-        }
+//        if (result.getEntity() instanceof FairyEntity fairy) {
+//            hurtLiving(fairy, level(), DamageTypes.MAGIC, 999999f);
+//        }
     }
 
     @Override

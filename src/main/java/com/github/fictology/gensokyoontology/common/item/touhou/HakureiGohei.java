@@ -1,6 +1,5 @@
 package com.github.fictology.gensokyoontology.common.item.touhou;
 
-import com.github.fictology.gensokyoontology.common.entiy.HakureiReimuEntity;
 import com.github.fictology.gensokyoontology.common.entiy.misc.Danmaku;
 import com.github.fictology.gensokyoontology.common.entiy.misc.DreamSealEntity;
 import com.github.fictology.gensokyoontology.common.entiy.misc.YinyangJade;

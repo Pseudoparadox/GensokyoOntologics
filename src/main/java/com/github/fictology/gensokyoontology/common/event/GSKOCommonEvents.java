@@ -19,29 +19,29 @@ public class GSKOCommonEvents {
 
     @SubscribeEvent
     public static void onAddAttributes(EntityAttributeCreationEvent event){
-        event.put(EntityRegistry.FAIRY_ENTITY.get(),
-                LivingEntity.createLivingAttributes()
-                        .add(Attributes.MOVEMENT_SPEED)
-                        .add(Attributes.MAX_HEALTH, 20)
-                        .add(Attributes.ATTACK_DAMAGE, 2)
-                        .build());
+//        event.put(EntityRegistry.FAIRY_ENTITY.get(),
+//                LivingEntity.createLivingAttributes()
+//                        .add(Attributes.MOVEMENT_SPEED)
+//                        .add(Attributes.MAX_HEALTH, 20)
+//                        .add(Attributes.ATTACK_DAMAGE, 2)
+//                        .build());
 
-        event.put(EntityRegistry.LILY_WHITE.get(),
-                LivingEntity.createLivingAttributes()
-                        .add(Attributes.MOVEMENT_SPEED)
-                        .add(Attributes.MAX_HEALTH, 100)
-                        .add(Attributes.ATTACK_DAMAGE, 3)
-                        .add(Attributes.FOLLOW_RANGE, 10)
-                        .build());
+//        event.put(EntityRegistry.LILY_WHITE.get(),
+//                LivingEntity.createLivingAttributes()
+//                        .add(Attributes.MOVEMENT_SPEED)
+//                        .add(Attributes.MAX_HEALTH, 100)
+//                        .add(Attributes.ATTACK_DAMAGE, 3)
+//                        .add(Attributes.FOLLOW_RANGE, 10)
+//                        .build());
 
-        event.put(EntityRegistry.HAKUREI_REIMU.get(),
-                LivingEntity.createLivingAttributes()
-                        .add(Attributes.MOVEMENT_SPEED)
-                        .add(Attributes.ARMOR, 10)
-                        .add(Attributes.MAX_HEALTH, 200)
-                        .add(Attributes.ATTACK_DAMAGE, 10)
-                        .add(Attributes.FOLLOW_RANGE, 10)
-                        .build());
+//        event.put(EntityRegistry.HAKUREI_REIMU.get(),
+//                LivingEntity.createLivingAttributes()
+//                        .add(Attributes.MOVEMENT_SPEED)
+//                        .add(Attributes.ARMOR, 10)
+//                        .add(Attributes.MAX_HEALTH, 200)
+//                        .add(Attributes.ATTACK_DAMAGE, 10)
+//                        .add(Attributes.FOLLOW_RANGE, 10)
+//                        .build());
 
         event.put(EntityRegistry.RUMIA.get(),
                 LivingEntity.createLivingAttributes()
@@ -61,14 +61,14 @@ public class GSKOCommonEvents {
                         .add(Attributes.FOLLOW_RANGE, 10)
                         .build());
 
-        event.put(EntityRegistry.REMILIA_SCARLET.get(),
-                LivingEntity.createLivingAttributes()
-                        .add(Attributes.MOVEMENT_SPEED, 0.8)
-                        .add(Attributes.ARMOR, 15)
-                        .add(Attributes.MAX_HEALTH, 500)
-                        .add(Attributes.ATTACK_DAMAGE, 10)
-                        .add(Attributes.FOLLOW_RANGE, 10)
-                        .build());
+//        event.put(EntityRegistry.REMILIA_SCARLET.get(),
+//                LivingEntity.createLivingAttributes()
+//                        .add(Attributes.MOVEMENT_SPEED, 0.8)
+//                        .add(Attributes.ARMOR, 15)
+//                        .add(Attributes.MAX_HEALTH, 500)
+//                        .add(Attributes.ATTACK_DAMAGE, 10)
+//                        .add(Attributes.FOLLOW_RANGE, 10)
+//                        .build());
     }
 
     public static void redirectAttribute(RangedAttribute attribute, double min, double max){

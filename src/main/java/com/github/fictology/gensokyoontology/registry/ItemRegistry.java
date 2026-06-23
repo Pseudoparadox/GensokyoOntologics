@@ -327,15 +327,15 @@ public final class ItemRegistry {
             "oblivious_tales_occult_ball", Item.Properties::new);
     // ============================ GSKO生物刷怪蛋 ================================//
 
-    public static final DeferredItem<Item> HAKURE_REIMU_SPAWN_EGG = ITEMS.registerItem(
-            "hakurei_reimu_spawn_egg", p -> new SpawnEggItem(p.spawnEgg(EntityRegistry.HAKUREI_REIMU.get())));
+//    public static final DeferredItem<Item> HAKURE_REIMU_SPAWN_EGG = ITEMS.registerItem(
+//            "hakurei_reimu_spawn_egg", p -> new SpawnEggItem(p.spawnEgg(EntityRegistry.HAKUREI_REIMU.get())));
 
-    public static final DeferredItem<Item> FAIRY_SPAWN_EGG = registerSpawnEgg(
-            "fairy_spawn_egg", EntityRegistry.FAIRY_ENTITY);
-    public static final DeferredItem<Item> LILY_WHITE_SPAWN_EGG = registerSpawnEgg(
-            "lily_white_spawn_egg", EntityRegistry.LILY_WHITE);
-    public static final DeferredItem<Item> REMILIA_SCARLET_SAWN_EGG = registerSpawnEgg(
-            "remilia_scarlet_spawn_egg", EntityRegistry.REMILIA_SCARLET);
+//    public static final DeferredItem<Item> FAIRY_SPAWN_EGG = registerSpawnEgg(
+//            "fairy_spawn_egg", EntityRegistry.FAIRY_ENTITY);
+//    public static final DeferredItem<Item> LILY_WHITE_SPAWN_EGG = registerSpawnEgg(
+//            "lily_white_spawn_egg", EntityRegistry.LILY_WHITE);
+//    public static final DeferredItem<Item> REMILIA_SCARLET_SAWN_EGG = registerSpawnEgg(
+//            "remilia_scarlet_spawn_egg", EntityRegistry.REMILIA_SCARLET);
     public static final DeferredItem<Item> FLANDRE_SCARLET_SPAWN_EGG = registerSpawnEgg(
             "flandre_scarlet_spawn_egg", EntityRegistry.FLANDRE_SCARLET);
     // ======================== GSKO战斗类物品 ============================//
