@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class YoukaiEventGoal<Y extends YoukaiEntity> extends BattlePhaseGoal<Y>{
     protected final YoukaiCombat.EventAction<Y> action;
-    protected EventCallbackInfo event;
     protected AtomicInteger timer = new AtomicInteger(0);
     public YoukaiEventGoal(Y youkai, YoukaiCombat.EventAction<Y> action, int mainPhase, int subPhase, int maxTicks) {
         super(youkai, mainPhase, subPhase, maxTicks);
@@ -34,6 +33,6 @@ public class YoukaiEventGoal<Y extends YoukaiEntity> extends BattlePhaseGoal<Y>{
     public void tick() {
         super.tick();
         this.timer.incrementAndGet();
-        this.action.invoke(this.youkai, this.event, this.timer);
+        this.action.invoke(this.youkai, this.youkai.subscribeAIEvent(), this.timer);
     }
 }

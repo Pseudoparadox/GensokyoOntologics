@@ -110,21 +110,18 @@ public class YinyangJade extends ThrowableItemProjectile implements ItemSupplier
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
 
+        var hitEntity = result.getEntity();
         if (this.level().isClientSide()) return;
-
-        Entity hitEntity = result.getEntity();
-
-        // 如果是玩家或生物，触发伤害逻辑
+        if (this.getOwner() != null && hitEntity.getUUID() == this.getOwner().getUUID()) return;
         if (hitEntity instanceof LivingEntity living) {
-            hurtLiving(living, this.level(),
-                    this.level().damageSources().thrown(this, this.getOwner()).typeHolder().unwrapKey().orElse(null),
-                    4.0f); // 基础伤害值
+            hurtLiving(living, this.level(), this.level().damageSources()
+                    .thrown(this, this.getOwner()).typeHolder().unwrapKey().orElse(null), 4.0f);
+        }
+        if (hitEntity instanceof Danmaku danmaku){
+            danmaku.setRemoved(RemovalReason.DISCARDED);
         }
 
-        // 实体碰撞弹跳（不同于方块碰撞）
         bounceOffEntity(hitEntity);
-
-        // 播放碰撞音效
         this.playSound(SoundEvents.TRIDENT_HIT, 0.7f, 1.2f);
     }
 
@@ -135,16 +132,13 @@ public class YinyangJade extends ThrowableItemProjectile implements ItemSupplier
         Vec3 velocity = this.getDeltaMovement();
 
         // 根据碰撞面法向量计算反射
-        Vec3 normal = Vec3.atLowerCornerOf(hitFace.getUnitVec3i());
-        double dot = velocity.dot(normal);
-
         // 反射公式: v' = v - 2*(v·n)*n
-        Vec3 reflected = velocity.subtract(normal.scale(2 * dot));
-
         // 应用阻尼衰减
-        Vec3 damped = reflected.scale(BOUNCE_DAMPING);
-
         // 轻微随机化弹跳方向，避免无限循环弹跳
+        var normal = Vec3.atLowerCornerOf(hitFace.getUnitVec3i());
+        var dot = velocity.dot(normal);
+        var reflected = velocity.subtract(normal.scale(2 * dot));
+        var damped = reflected.scale(BOUNCE_DAMPING);
         damped = damped.add(
                 (this.random.nextDouble() - 0.5) * 0.1,
                 (this.random.nextDouble() - 0.5) * 0.05,
@@ -168,21 +162,17 @@ public class YinyangJade extends ThrowableItemProjectile implements ItemSupplier
         Vec3 entityVelocity = hitEntity.getDeltaMovement();
 
         // 计算从实体到阴阳玉的方向
-        Vec3 toJade = this.position().subtract(hitEntity.position()).normalize();
-
         // 结合实体速度和自身速度计算弹跳
-        Vec3 combinedVelocity = velocity.scale(0.7).add(entityVelocity.scale(0.3));
-
         // 沿法线方向反射
-        double dot = combinedVelocity.dot(toJade);
-        Vec3 reflected = combinedVelocity.subtract(toJade.scale(2 * dot));
-
         // 应用实体碰撞特有的衰减
-        Vec3 damped = reflected.scale(ENTITY_BOUNCE_MULTIPLIER);
-
         // 添加垂直分量，避免水平滑动
-        damped = damped.add(0, Math.abs(damped.y) * 0.3, 0);
+        var toJade = this.position().subtract(hitEntity.position()).normalize();
+        var combinedVelocity = velocity.scale(0.7).add(entityVelocity.scale(0.3));
+        var dot = combinedVelocity.dot(toJade);
+        var reflected = combinedVelocity.subtract(toJade.scale(2 * dot));
+        var damped = reflected.scale(ENTITY_BOUNCE_MULTIPLIER);
 
+        damped = damped.add(0, Math.abs(damped.y) * 0.3, 0);
         this.setDeltaMovement(damped);
 
         // 稍微推开一点距离

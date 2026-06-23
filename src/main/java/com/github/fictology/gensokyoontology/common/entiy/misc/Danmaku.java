@@ -10,6 +10,7 @@ import com.github.fictology.gensokyoontology.registry.DataRegistry;
 import com.github.fictology.gensokyoontology.registry.EntityRegistry;
 import com.github.fictology.gensokyoontology.registry.Expressions;
 import com.github.fictology.gensokyoontology.registry.ItemRegistry;
+import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.api.IDamageHandler;
 import com.github.fictology.gensokyoontology.api.render.ITextureGetter;
@@ -51,7 +52,6 @@ import java.util.Map;
  * 弹幕的生命周期或存在时间：125 个游戏刻<br>
  * 弹幕的tick()方法<br>
  * 弹幕击中生物时的逻辑<br>
- * TODO: 弹幕攻击伤害的数值设定 <br>
  * （待补充……）
  */
 public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, IDamageHandler, ITextureGetter {
@@ -180,9 +180,10 @@ public class Danmaku extends ThrowableItemProjectile implements ItemSupplier, ID
     @Override
     public void tick() {
         super.tick();
-        if (this.level().isClientSide()) return;
-        if (this.tickCount >= this.lifespan) this.setRemoved(RemovalReason.DISCARDED);
-        if (this.getDefaultItem() != ItemRegistry.DANMAKU_SHOT.get()) this.onBehaviorTick();
+        GSKOUtil.info(String.valueOf(this.onGround()));
+        if (this.tickCount >= this.lifespan) this.remove(RemovalReason.DISCARDED);
+        if (this.getKnownSpeed().length() <= 1e-4 && this.tickCount > 1) this.remove(RemovalReason.DISCARDED);
+//        if (this.getDefaultItem() != ItemRegistry.DANMAKU_SHOT.get()) this.onBehaviorTick();
     }
 
     public void onBehaviorTick(){

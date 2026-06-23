@@ -40,8 +40,6 @@ public class NormalVectorRenderer extends EntityRenderer<Danmaku, DanmakuNormalS
     public void submit(DanmakuNormalState state, PoseStack poseStack, SubmitNodeCollector node, CameraRenderState camera) {
 
         poseStack.pushPose();
-        poseStack.translate(0, 0.5F, 0);
-
         if (state.hasNormal){
             poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(state.partialTick, state.danmaku.yRotO, state.danmaku.getYRot()) - 90f));
             poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(state.partialTick, state.danmaku.xRotO, state.danmaku.getXRot()) - 90f));

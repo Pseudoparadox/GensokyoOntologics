@@ -32,10 +32,10 @@ public final class Sorceries {
 
         if (canSummon) {
             for (int i = 0; i < 3; i++) {
-                var eye = new DestructiveEyeEntity(entity.level());
-                var vector3d = DanmakuUtil.getRandomPosWithin(MAX_DISTANCE, DanmakuUtil.Plane.XYZ).add(target.getPosition(0));
-                eye.setOldPosAndRot(new Vec3(vector3d.x, vector3d.y, vector3d.z), 0F, 0F);
-                level.addFreshEntity(eye);
+//                var eye = new DestructiveEyeEntity(entity.level());
+//                var vector3d = DanmakuUtil.getRandomPosWithin(MAX_DISTANCE, DanmakuUtil.Plane.XYZ).add(target.getPosition(0));
+//                eye.setOldPosAndRot(new Vec3(vector3d.x, vector3d.y, vector3d.z), 0F, 0F);
+//                level.addFreshEntity(eye);
             }
         }
 

@@ -21,7 +21,7 @@ public class YoukaiTargetGoal<Y extends YoukaiEntity> extends BattlePhaseGoal<Y>
         if (!this.tryGetTarget(ref)) return;
         if (this.youkai.getSensing().hasLineOfSight(ref.get())) {
             this.bossSpell.invoke(this.youkai.level(), this.youkai, ref.get());
-            this.youkai.getNavigation().moveTo(ref.get(), 0.7);
+            this.youkai.getNavigation().moveTo(ref.get(), 0.4);
         }
     }
 

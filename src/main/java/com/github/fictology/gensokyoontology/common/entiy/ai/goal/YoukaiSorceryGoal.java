@@ -28,7 +28,6 @@ public class YoukaiSorceryGoal<Y extends YoukaiEntity> extends BattlePhaseGoal<Y
         var target = this.youkai.getTarget();
         if (target == null) return;
         if (this.youkai.getSensing().hasLineOfSight(target)) {
-            this.youkai.getNavigation().moveTo(this.youkai.getTarget(), 0.7);
             this.youkaiSkill.invoke(this.youkai.level(), this.youkai);
         }
     }

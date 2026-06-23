@@ -54,8 +54,8 @@ public class LaserRenderer extends ShaderedRenderer<Laser, SimpleState<Laser>> {
         GSKOMathUtil.rotateMatrixToLookVec(matrixStackIn, state.entity.getLookAngle().scale(-1));
 
         if (state.entity.tickCount <= state.entity.getPreparation()) {
-            submitNodeCollector.submitCustomGeometry(matrixStackIn, RenderTypes.debugQuads(), (pose, buffer) -> {
-                drawLaser(buffer, pose, length, 1.0f, 1.0F, 1.0F, 0.7F, 0.02f);
+            submitNodeCollector.submitCustomGeometry(matrixStackIn, RenderTypes.lightning(), (pose, buffer) -> {
+                drawLaser(buffer, pose, length, 1.0f, 1.0F, 1.0F, 1F, 0.02f);
             });
             matrixStackIn.popPose();
             return;

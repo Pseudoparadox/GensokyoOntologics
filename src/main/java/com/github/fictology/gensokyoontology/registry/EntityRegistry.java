@@ -66,7 +66,7 @@ public final class EntityRegistry {
     public static final Supplier<EntityType<Laser>> LASER_SOURCE = register(
             "laser_source", Laser::new, MobCategory.MISC, 1f, 1f);
     public static final Supplier<EntityType<Danmaku>> DANMAKU = register("danmaku", Danmaku::new,
-            MobCategory.MISC, 1f, 1f);
+            MobCategory.MISC, 0.2f, 0.2f);
     public static final Supplier<EntityType<SpellCardEntity>> SPELL_CARD = register("spell_card", SpellCardEntity::new,
             MobCategory.MISC, 1f, 1f);
 
