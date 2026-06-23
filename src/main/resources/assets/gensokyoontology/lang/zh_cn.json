@@ -588,6 +588,8 @@
   "story.gensokyoontology.chapter_1_2.page_1": "That was a cold spring which I was starved to die. Snows fall until May 1st. I have wandered around on this icy land for many years ever since then. I was unreconciled, why me? why only my vitality was been taken altogether with the spring?",
   "story.gensokyoontology.chapter_1_3.page_1": "Quite a lengthy night!\nThis is the only thing that I can remember.",
   "tooltip.blank_line": "",
+
+  "tooltip.gensokyoontology.hakurei_gohei.yinyang": "主手持§c御币§r副手持§a任意§r§e阴阳玉物品§r时，右键点击可以消耗阴阳玉物品来发射可以多次弹跳的§c阴阳玉实体§r",
   "tooltip.gensokyoontology.aya_fans": "§e右键点击时释放可以将生物和弹幕吹走的天狗风",
   "tooltip.gensokyoontology.binary_builder.left_type": "左值类型： %s",
   "tooltip.gensokyoontology.binary_builder.operation_type": "表达式类型： %s",
@@ -597,7 +599,7 @@
   "tooltip.gensokyoontology.danmaku_type": "弹幕类型： %s",
   "tooltip.gensokyoontology.idealism_sword_info": "按住 §9SHIFT§r 查看更多信息",
   "tooltip.gensokyoontology.idealism_sword_shift": "§5右键释放现实裂缝§r",
-  "tooltip.gensokyoontology.koishi_eye_closed": "§9右键点击时清除弹幕",
+  "tooltip.gensokyoontology.koishi_eye_closed": "§9右键点击发射激光",
   "tooltip.gensokyoontology.koishi_eye_closed.comment": "§7你能看得见恋恋吗！哇，这是我们之间的秘密哦~",
   "tooltip.gensokyoontology.koishi_eye_open": "§a右键点击时对指向的生物实体造成巨额伤害",
   "tooltip.gensokyoontology.koishi_eye_open.comment": "§7恋恋在看着你呢~",

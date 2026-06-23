@@ -1,5 +1,6 @@
 package com.github.fictology.gensokyoontology.common.item.touhou;
 
+import com.github.fictology.gensokyoontology.api.IHasCooldown;
 import com.github.fictology.gensokyoontology.util.GSKOMathUtil;
 import com.github.fictology.gensokyoontology.util.GSKOUtil;
 import com.github.fictology.gensokyoontology.api.IRayTraceReader;
@@ -22,7 +23,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class AyaFans extends Item implements IRayTraceReader {
+public class AyaFans extends Item implements IRayTraceReader, IHasCooldown {
     public AyaFans(Properties properties) {
         super(properties);
     }
@@ -55,6 +56,7 @@ public class AyaFans extends Item implements IRayTraceReader {
             }
         }
 
+        this.setCD(player, player.getItemInHand(hand), 240);
         return super.use(level, player, hand);
     }
 

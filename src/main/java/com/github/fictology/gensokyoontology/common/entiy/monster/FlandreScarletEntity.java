@@ -53,7 +53,8 @@ public class FlandreScarletEntity extends YoukaiEntity{
         this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 0.4, true));
         this.goalSelector.addGoal(2, new YoukaiSorceryGoal<>(this, BossBattle.SPHERE_SHOOT_FLANDRE, 1, 1, 800));
         this.goalSelector.addGoal(2, new YoukaiSorceryGoal<>(this, BossBattle.BLANK_PHASE, 1, 2, 200));
-        this.goalSelector.addGoal(2, new YoukaiSorceryGoal<>(this, BossBattle.BLANK_PHASE, 2, 1, 200));
+        this.goalSelector.addGoal(2, new YoukaiSorceryGoal<>(this, BossBattle.SPHERE_SHOOT_FLANDRE, 2, 1, 800));
+        this.goalSelector.addGoal(2, new YoukaiSorceryGoal<>(this, BossBattle.BLANK_PHASE, 2, 2, 200));
 
         this.goalSelector.addGoal(3, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.4f));

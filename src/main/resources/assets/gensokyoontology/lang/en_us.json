@@ -578,12 +578,12 @@
   "tooltip.gensokyoontology.praxis_sword_shift": "You can do coding in game, why not in reality.",
 
   "tooltip.blank_line": "",
-
+  "tooltip.gensokyoontology.hakurei_gohei.yinyang": "§eShooting Yinyang orb by holding Gohei on main hand and any Yinyang Orb on off hand and then right click mouse. This action will consume Yinyang Orb.",
   "tooltip.gensokyoontology.aya_fans": "§eRight click to release Ten-gu Wind to blow up entities away.",
   "tooltip.gensokyoontology.sakuya_stop_watch": "§eRight click entity to freeze or unfreeze it.",
 
   "tooltip.gensokyoontology.koishi_eye_open": "§aRight click cause player damage to the living you point at",
-  "tooltip.gensokyoontology.koishi_eye_closed": "§9Righ click to clear danmaku",
+  "tooltip.gensokyoontology.koishi_eye_closed": "§9Righ click to emit laser",
   "tooltip.gensokyoontology.koishi_eye_open.comment": "§7Koishi is watching you ~",
   "tooltip.gensokyoontology.koishi_eye_closed.comment": "§7You can see me? Wow! This is the secret between us~",
 

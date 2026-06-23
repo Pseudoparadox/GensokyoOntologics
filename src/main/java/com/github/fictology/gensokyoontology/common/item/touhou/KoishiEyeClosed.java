@@ -37,7 +37,7 @@ public class KoishiEyeClosed extends Item implements IRayTraceReader, IHasCooldo
         laserSource.setXRot(playerIn.getXRot());
         laserSource.setPos(playerIn.getEyePosition());
         level.addFreshEntity(laserSource);
-        this.setCD(playerIn, stack, 1200);
+        this.setCD(playerIn, stack, 120);
         return super.use(level, playerIn, handIn);
 //        if (player.getCooldowns().isOnCooldown(player.getItemInHand(hand)))
 //            return InteractionResult.PASS;
@@ -52,7 +52,7 @@ public class KoishiEyeClosed extends Item implements IRayTraceReader, IHasCooldo
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {
-        tooltipAdder.accept(GSKOUtil.translate("tooltip.", ".koishi_eye_closed"));
+        tooltipAdder.accept(GSKOUtil.translate("tooltip", "koishi_eye_closed"));
     }
 
 }

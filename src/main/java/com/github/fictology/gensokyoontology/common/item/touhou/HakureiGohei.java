@@ -73,6 +73,7 @@ public class HakureiGohei extends Item implements IRayTraceReader {
     @Override
     public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
+        builder.accept(GSKOUtil.translate("tooltip", "hakurei_gohei.yinyang"));
     }
 
     public static void fireDreamSeal(Level worldIn, Player playerIn) {
