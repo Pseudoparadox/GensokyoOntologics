@@ -2,45 +2,35 @@ package github.thelawf.gensokyoontology.common.world;
 
 import com.mojang.datafixers.util.Pair;
 import github.thelawf.gensokyoontology.common.tileentity.GapTileEntity;
-import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.common.world.dimension.biome.GSKOBiomes;
 import github.thelawf.gensokyoontology.core.init.BlockRegistry;
-import net.minecraft.advancements.criterion.AbstractCriterionTrigger;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.command.impl.LocateBiomeCommand;
-import net.minecraft.command.impl.TeleportCommand;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.feature.structure.WoodlandMansionPieces;
-import net.minecraft.world.gen.feature.structure.WoodlandMansionStructure;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.fluids.IFluidBlock;
 import org.apache.logging.log4j.LogManager;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class TeleportHelper {
     public static void teleport(ServerPlayerEntity player, ServerWorld destination, BlockPos pos) {
-        // Pair<Boolean, BlockPos> pair = findHumanVillage(destination, pos);
-        // if (!pair.getFirst()) return;
 
-        if (canTeleport(player, destination, pos)) {
+        AtomicReference<BlockPos> ref = new AtomicReference<>();
+        if (!tryFindHumanVillage(destination, pos, ref)) return;
+        if (canTeleport(player, destination, ref.get())) {
             player.changeDimension(destination, new ITeleporter() {
                 @Override
                 public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld,
                                           float yaw, Function<Boolean, Entity> repositionEntity) {
-                    BlockPos validPos = findValidPos(destination, pos).getSecond();
-
+                    BlockPos validPos = findValidPos(destination, ref.get()).getSecond();
                     entity = repositionEntity.apply(false);
                     entity.setPosition(validPos.getX(), validPos.getY(), validPos.getZ());
                     return entity;
@@ -51,13 +41,6 @@ public class TeleportHelper {
 
     public static void applyGapTeleport(ServerPlayerEntity player, ServerWorld destination, GapTileEntity gapTile) {
         BlockPos pos = gapTile.getDestinationPos();
-        // if (isInSameDimension(player.world.getDimensionKey(), destination.getDimensionKey())) {
-        //     player.setPositionAndUpdate(pos.getX(), pos.getY(), pos.getZ());
-        //     // player.connection.setPlayerLocation(pos.getX(), pos.getY(), pos.getZ(), player.rotationYaw, player.rotationPitch);
-        //     gapTile.setCooldown(400);
-        //     return;
-        // }
-
         player.changeDimension(destination, new ITeleporter() {
             @Override
             public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
@@ -89,12 +72,8 @@ public class TeleportHelper {
 
         if (eyeBlock.equals(Blocks.AIR.getDefaultState()) && legBlock.equals(Blocks.AIR.getDefaultState())) {
             if (standBlock.getBlock().equals(Blocks.AIR)) {
-                // GSKOUtil.showChatMsg(player, "Pos Valid", 1);
-                // destination.setBlockState(standPos, BlockRegistry.SAKURA_PLANKS.get().getDefaultState());
                 return setBlocks(destination, standPos);
             } else if (standBlock.getBlock() instanceof IFluidBlock) {
-                // destination.setBlockState(standPos, BlockRegistry.SAKURA_PLANKS.get().getDefaultState());
-                // GSKOUtil.showChatMsg(player, "Stand Pos is Fluid", 1);
                 return setBlocks(destination, standPos);
             }
             return true;
@@ -129,10 +108,10 @@ public class TeleportHelper {
     }
 
     private static boolean setBlocks(ServerWorld destination, BlockPos pos){
-        final BlockState sakuraPlanks = BlockRegistry.SAKURA_PLANKS.get().getDefaultState();
+        final BlockState sakuraBricks = BlockRegistry.SAKURA_PATTERN_BRICKS.get().getDefaultState();
         for (int x = -1; x < 1; x++) {
             for (int z = -1; z < 1; z++) {
-                destination.setBlockState(new BlockPos(pos.getX() + x, pos.getY(), pos.getZ() + z), sakuraPlanks);
+                destination.setBlockState(new BlockPos(pos.getX() + x, pos.getY(), pos.getZ() + z), sakuraBricks);
             }
         }
         return true;
@@ -161,16 +140,13 @@ public class TeleportHelper {
         return departureWorld == destination;
     }
 
-    private static Pair<Boolean, BlockPos> findHumanVillage(ServerWorld serverWorld, BlockPos pos){
-        AtomicReference<Pair<Boolean, BlockPos>> pairRef = new AtomicReference<>();
-        pairRef.set(Pair.of(false, null));
-
-        if (serverWorld.getDimensionKey() != GSKODimensions.GENSOKYO) return pairRef.get();
+    private static boolean tryFindHumanVillage(ServerWorld serverWorld, BlockPos pos, AtomicReference<BlockPos> ref){
+        if (serverWorld.getDimensionKey() != GSKODimensions.GENSOKYO) return false;
         serverWorld.getServer().getDynamicRegistries().getRegistry(Registry.BIOME_KEY)
                 .getOptionalValue(GSKOBiomes.HUMAN_VILLAGE_KEY).ifPresent(biome -> {
-                    pairRef.set(Pair.of(true, serverWorld.getBiomeLocation(biome, pos, 6400, 8)));
+                    ref.set(serverWorld.getBiomeLocation(biome, pos, 6400, 8));
                 });
-        return pairRef.get();
+        return ref.get() != null;
     }
 
 }

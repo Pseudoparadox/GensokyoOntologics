@@ -38,7 +38,7 @@ public class SLifeTickPacket {
         if (mc.world != null && mc.player != null) {
             mc.player.getCapability(GSKOCapabilities.SECULAR_LIFE).ifPresent(cap -> {
                 cap.setLifetime(packet.getLifetime());
-                LogManager.getLogger().info("[Server] Player Life: {}",cap.getLifetime());
+                // LogManager.getLogger().info("[Server] Player Life: {}",cap.getLifetime());
             });
         }
     }

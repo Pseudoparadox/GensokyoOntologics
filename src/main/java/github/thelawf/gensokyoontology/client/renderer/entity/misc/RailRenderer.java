@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 public class RailRenderer extends EntityRenderer<RailEntity> {
-    public static final double RAIL_WIDTH = 0.25;
+    public static final double RAIL_WIDTH = 0.5;
     public static final float RAIL_RADIUS = 0.07F;
     public static final float SEGMENTS = 32;
 
@@ -64,177 +64,221 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         this.renderHermite3(startRail, targetRail, builder, matrixStack);
     }
 
-    public void renderSegments(RailEntity startRail, RailEntity targetRail, IVertexBuilder builder, MatrixStack matrixStack) {
+    public void renderByHermite3(RailEntity startRail, RailEntity targetRail, IVertexBuilder builder, MatrixStack matrixStack) {
+        // 获取起点和终点的旋转
         Quaternion startRot = startRail.getRotation();
         Quaternion endRot = targetRail.getRotation();
 
-        // 预计算全局桶滚角度变化范围（限制最大旋转）
-        float maxRollChange = 180.0f; // 桶滚最大角度变化限制
-        float startRoll = GSKOMathUtil.getEulerAngle(startRot).roll();
-        float endRoll = GSKOMathUtil.getEulerAngle(endRot).roll();
+        // 计算欧拉角
+        EulerAngle startEuler = GSKOMathUtil.getEulerAngle(startRot);
+        EulerAngle endEuler = GSKOMathUtil.getEulerAngle(endRot);
+
+        // 计算桶滚角差值（限制在[-180°, 180°]范围内）
+        float startRoll = startEuler.roll(); // 假设z是roll
+        float endRoll = endEuler.roll();
         float rollDelta = MathHelper.wrapDegrees(endRoll - startRoll);
 
-        // 约束桶滚角度变化（避免多圈旋转）
-        if (Math.abs(rollDelta) > maxRollChange) {
-            rollDelta = Math.signum(rollDelta) * maxRollChange;
+        // 限制最大旋转角度变化
+        final float MAX_ROLL_CHANGE = 180.0f;
+        if (Math.abs(rollDelta) > MAX_ROLL_CHANGE) {
+            rollDelta = Math.signum(rollDelta) * MAX_ROLL_CHANGE;
         }
 
-        Vector3d startVec = Vector3d.copy(startRail.getPosition());
-        Vector3d start = Vector3d.ZERO;
-        Vector3d end = Vector3d.copy(targetRail.getPosition()).subtract(startVec);
+        // 获取起点和终点的位置（相对坐标）
+        Vector3d startPos = Vector3d.ZERO;
+        Vector3d endPos = Vector3d.copy(targetRail.getPosition()).subtract(startRail.getPositionVec());
 
-        Vector3f startDirection = startRail.getOrientation().copy();
-        Vector3f endDirection = targetRail.getOrientation().copy();
+        // 获取方向向量（切线方向）
+        Vector3f startDir = startRail.getOrientation().copy();
+        Vector3f endDir = targetRail.getOrientation().copy();
 
-        startDirection.mul(25);
-        endDirection.mul(25);
+        // 缩放方向向量作为控制点
+        startDir.mul(25);
+        endDir.mul(25);
 
         final int segments = 32;
 
-        Vector3d prevLeft = null;
-        Vector3d prevRight = null;
+        // 存储上一帧的左右轨道位置
+        Vector3d prevLeftRail = null;
+        Vector3d prevRightRail = null;
 
-        for (int i = 0; i < segments; i++) {
-            float t0 = (float) i / segments;
-            float t1 = (float) (i + 1) / segments;
-            float t2 = (float) (i + 2) / segments;
+        for (int i = 0; i <= segments; i++) {
+            float t = (float) i / segments;
 
-            Vector3d prev = CurveUtil.hermite3(start,end, startDirection, endDirection, t0);
-            Vector3d next = CurveUtil.hermite3(start,end, startDirection, endDirection, t1);
+            // 计算Hermite插值得到中心线位置
+            Vector3d centerPos = CurveUtil.hermite3(startPos, endPos, startDir, endDir, t);
 
-            double length = prev.distanceTo(next);
-            Vector3d binormal = CurveUtil.hermiteBinormal(start, end,
-                    new Vector3d(startDirection), new Vector3d(endDirection), t1);
-            Vector3d tangent = CurveUtil.hermiteTangent(start, end, new Vector3d(startDirection),
-                    new Vector3d(endDirection),t0);
+            // 计算切线（使用导数）
+            Vector3d tangent = CurveUtil.hermiteTangent(startPos, endPos, new Vector3d(startDir), new Vector3d(endDir), t).normalize();
 
-            // 2. 动态计算法线（考虑桶滚角度）
-            float currentRoll = startRoll + t0 * rollDelta; // 线性插值桶滚角
-            Vector3d baseUp = new Vector3d(0, 1, 0); // 初始法线参考
-            Vector3d rotatedUp = GSKOMathUtil.rotateVector(
-                    new Quaternion(new Vector3f(tangent), currentRoll, true),
-                    baseUp);
+            // 计算当前桶滚角
+            float currentRoll = startRoll + t * rollDelta;
 
-            // 3. 构建旋转矩阵
-            RotMatrix rotMatrix = RotMatrix.from(tangent, rotatedUp);
-            Quaternion rotation = rotMatrix.toQuaternion();
+            // 使用球面线性插值(SLERP)平滑旋转
+            Quaternion currentRotation = GSKOMathUtil.slerp(startRot, endRot, t);
 
-            Vector3d currentLeft =  GSKOMathUtil.rotateBy(new Vector3d(0, -0.5, 0),  rotation);
-            Vector3d nextLeft =  GSKOMathUtil.rotateBy(new Vector3d(   0, -0.5, length), rotation);
-            Vector3d currentRight = GSKOMathUtil.rotateBy(new Vector3d(0, 0.5 , 0),  rotation);
-            Vector3d nextRight = GSKOMathUtil.rotateBy(new Vector3d(   0, 0.5 , length),rotation);
+            // 构建旋转矩阵 - 使用轨道实体的旋转
+            RotMatrix rotMatrix = new RotMatrix(currentRotation);
 
-            Color4f color = new Color4i(255,0,0,255).toColor4f();
-            matrixStack.push();
-            matrixStack.translate(prev.x, prev.y, prev.z);
+            // 应用桶滚旋转到法线方向
+            Vector3f normal = rotMatrix.normal(); // 获取法线（X轴）
+            Vector3f binormal = rotMatrix.binormal(); // 获取副法线（Y轴）
+            Vector3f tangentAxis = rotMatrix.tangent(); // 获取切线（Z轴）
 
-            GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
-                    currentLeft, nextLeft,
-                    RAIL_RADIUS, 32, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            // 创建桶滚四元数并应用到法线
+            Quaternion rollQuat = new Quaternion(tangentAxis, currentRoll, true);
+            Vector3f rolledNormal = GSKOMathUtil.rotateVector(rollQuat, normal);
 
-            GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
-                    currentRight, nextRight,
-                    RAIL_RADIUS, 32, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            // 重新构建旋转矩阵
+            RotMatrix finalMatrix = new RotMatrix();
+            finalMatrix.setColumn(0, new Vector3d(rolledNormal));     // X轴 = 滚动后的法线
+            finalMatrix.setColumn(1, new Vector3d(binormal));         // Y轴 = 副法线
+            finalMatrix.setColumn(2, new Vector3d(tangentAxis));      // Z轴 = 切线
 
-            matrixStack.pop();
+            // 计算轨道横截面的两个轨道位置（相对于中心线）
+            double halfWidth = RAIL_WIDTH;
 
-            prevLeft = nextLeft;
-            prevRight = nextRight;
+            // 左侧轨道（负X方向）
+            Vector3d leftOffset = new Vector3d(-halfWidth, 0, 0);
+            Vector3d leftRail = finalMatrix.multiply(leftOffset).add(centerPos);
+
+            // 右侧轨道（正X方向）
+            Vector3d rightOffset = new Vector3d(halfWidth, 0, 0);
+            Vector3d rightRail = finalMatrix.multiply(rightOffset).add(centerPos);
+
+            // 渲染连接部分
+            if (i > 0) {
+                Color4f color = new Color4i(255, 0, 0, 255).toColor4f();
+
+                // 左轨道
+                GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
+                        prevLeftRail, leftRail,
+                        RAIL_RADIUS, 8,
+                        color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+
+                // 右轨道
+                GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
+                        prevRightRail, rightRail,
+                        RAIL_RADIUS, 8,
+                        color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+
+                // 渲染连接左右轨道的横梁
+//                if (i % 4 == 0) { // 每4段渲染一个横梁
+//                    Color4f crossColor = new Color4i(200, 200, 200, 255).toColor4f();
+//                    GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
+//                            leftRail, rightRail,
+//                            RAIL_RADIUS * 0.7f, 8,
+//                            crossColor.getRed(), crossColor.getGreen(), crossColor.getBlue(), crossColor.getAlpha());
+//                }
+            }
+
+            prevLeftRail = leftRail;
+            prevRightRail = rightRail;
         }
     }
 
     public void renderHermite3(RailEntity startRail, RailEntity targetRail, IVertexBuilder builder, MatrixStack matrixStack) {
+        // 1. 获取世界坐标下的起点和终点
+        Vector3d startWorldPos = startRail.getPositionVec();
+        Vector3d endWorldPos = targetRail.getPositionVec();
+
+        // 2. 计算相对偏移量（局部坐标），这是修复断开的关键！
+        // 无论前面连了多少段，当前这段总是从 (0,0,0) 画到 endWorldPos.subtract(startWorldPos)
+        Vector3d startOffset = Vector3d.ZERO;
+        Vector3d endOffset = endWorldPos.subtract(startWorldPos);
+
+        // 3. 获取旋转信息
         Quaternion startRot = startRail.getRotation();
         Quaternion endRot = targetRail.getRotation();
 
-        // 预计算全局桶滚角度变化范围（限制最大旋转）
-        float maxRollChange = 180.0f; // 桶滚最大角度变化限制
+        // 预计算全局桶滚角度变化范围
+        float maxRollChange = 180.0f;
         float startRoll = GSKOMathUtil.getEulerAngle(startRot).roll();
         float endRoll = GSKOMathUtil.getEulerAngle(endRot).roll();
         float rollDelta = MathHelper.wrapDegrees(endRoll - startRoll);
-
-        // 约束桶滚角度变化（避免多圈旋转）
         if (Math.abs(rollDelta) > maxRollChange) {
             rollDelta = Math.signum(rollDelta) * maxRollChange;
         }
 
-        Vector3d startVec = Vector3d.copy(startRail.getPosition());
-        Vector3d start = Vector3d.ZERO;
-        Vector3d end = Vector3d.copy(targetRail.getPosition()).subtract(startVec);
-
+        // 获取方向向量
         Vector3f startDirection = startRail.getOrientation().copy();
         Vector3f endDirection = targetRail.getOrientation().copy();
-
         startDirection.mul(25);
         endDirection.mul(25);
 
-        Vector3d left = null;
-        Vector3d right = null;
-
         final int segments = 32;
+        // 临时变量存储上一段的端点，用于连线
+        Vector3d prevLeft = null;
+        Vector3d prevRight = null;
+
+        // 保存初始矩阵状态，以便在渲染完这一整条轨道后恢复
+        matrixStack.push();
+
+        // 【关键】将矩阵平移到起点实体的世界坐标位置
+        // 这样后续所有的局部坐标计算都会自动对齐到世界坐标
+        // matrixStack.translate(startWorldPos.x, startWorldPos.y, startWorldPos.z);
 
         for (int i = 0; i < segments; i++) {
             float t0 = (float) i / segments;
             float t1 = (float) (i + 1) / segments;
 
-            Vector3d prev = CurveUtil.hermite3(start, end, startDirection, endDirection, t0);
-            Vector3d next = CurveUtil.hermite3(start, end, startDirection, endDirection, t1);
+            // 使用相对偏移量计算曲线点
+            Vector3d prev = CurveUtil.hermite3(startOffset, endOffset, startDirection, endDirection, t0);
+            Vector3d next = CurveUtil.hermite3(startOffset, endOffset, startDirection, endDirection, t1);
 
-            double length = prev.distanceTo(next);
-            Vector3d vector = next.subtract(prev);
+            // 计算切向量（用于旋转）
+            // 注意：这里使用局部坐标计算切线，因为矩阵已经平移了
+            Vector3d tangentVec = tangent(startOffset, endOffset, startDirection, endDirection, t0).normalize();
 
-            Vector3d binormal = CurveUtil.hermiteBinormal(start, end,
-                    new Vector3d(startDirection), new Vector3d(endDirection), t1);
-            Vector3d tangent = tangent(start, end, startDirection, endDirection, t0);
+            // 应用桶滚 (Roll)
+            float currentRoll = startRoll + t0 * rollDelta;
 
-            float currentRoll = startRoll + t0 * rollDelta; // 线性插值桶滚角
-            Vector3d baseUp = new Vector3d(0, 1, 0); // 初始法线参考
-            Vector3d rotatedUp = GSKOMathUtil.rotateVector(
-                    new Quaternion(new Vector3f(tangent), currentRoll, true),
-                    baseUp);
+            // 使用球面线性插值(SLERP)平滑旋转
+            Quaternion currentRotation = GSKOMathUtil.slerp(startRot, endRot, t0);
 
-            // 3. 构建旋转矩阵
-            RotMatrix rotMatrix = RotMatrix.from(tangent, rotatedUp);
-            Quaternion rotation = rotMatrix.toQuaternion();
+            // 构建旋转矩阵 - 使用轨道实体的旋转
+            RotMatrix rotMatrix = new RotMatrix(currentRotation);
 
-            Vector3d currentLeft =  GSKOMathUtil.rotateBy(new Vector3d(0, -0.5, 0),  rotation);
-            Vector3d currentRight = GSKOMathUtil.rotateBy(new Vector3d(0, 0.5, 0),   rotation);
-            Vector3d nextLeft =     GSKOMathUtil.rotateBy(new Vector3d(0, -0.5, length), rotation);
-            Vector3d nextRight =    GSKOMathUtil.rotateBy(new Vector3d(0, 0.5,  length), rotation);
+            // 应用桶滚旋转到法线方向
+            Vector3f normal = rotMatrix.normal(); // 获取法线（X轴）
+            Vector3f binormal = rotMatrix.binormal(); // 获取副法线（Y轴）
+            Vector3f tangentAxis = rotMatrix.tangent(); // 获取切线（Z轴）
 
-//            Vector3d currentLeft =  new Vector3d(0, 0, 0);
-//            Vector3d currentRight = new Vector3d(1, 0, 0);
-//            Vector3d nextLeft =     new Vector3d(0, 0, length);
-//            Vector3d nextRight =    new Vector3d(1, 0, length);
+            // 创建桶滚四元数并应用到法线
+            Quaternion rollQuat = new Quaternion(tangentAxis, currentRoll, true);
+            Vector3f rolledNormal = GSKOMathUtil.rotateVector(rollQuat, normal);
+
+            // 重新构建旋转矩阵
+            RotMatrix matrix = new RotMatrix();
+            matrix.setColumn(0, new Vector3d(rolledNormal));     // X轴 = 滚动后的法线
+            matrix.setColumn(1, new Vector3d(binormal));         // Y轴 = 副法线
+            matrix.setColumn(2, new Vector3d(tangentAxis));      // Z轴 = 切线
+
+            Vector3d localLeftOffset  = new Vector3d(-RAIL_WIDTH,0, 0);
+            Vector3d localRightOffset = new Vector3d(RAIL_WIDTH, 0, 0);
+
+            // 转换到世界坐标（因为外层 matrixStack 已经 translate 过了，这里只需乘 rotMatrix）
+            Vector3d leftStart = matrix.multiply(localLeftOffset).add(prev);
+            Vector3d rightStart = matrix.multiply(localRightOffset).add(prev);
+            Vector3d leftEnd = matrix.multiply(localLeftOffset).add(next);
+            Vector3d rightEnd = matrix.multiply(localRightOffset).add(next);
 
             Color4f color = new Color4i(255, 0, 0, 255).toColor4f();
-            matrixStack.push();
-//            matrixStack.translate(prev.x, prev.y, prev.z);
-            currentLeft = currentLeft.add(prev);
-            currentRight = currentRight.add(prev);
-            nextLeft = nextLeft.add(prev);
-            nextRight = nextRight.add(prev);
 
-//            if (startRail.ticksExisted % 20 == 0) {
-//                GSKOUtil.log(this.getClass(), "index = " + i);
-//                GSKOUtil.log(this.getClass(), "prev left: " + left);
-//                GSKOUtil.log(this.getClass(), "current left: " + currentLeft);
-//                GSKOUtil.log(this.getClass(), "next left: " + nextLeft);
-//                GSKOUtil.log("");
-//            }
-
+            // 渲染左轨道
             GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
-                    i == 0 ? currentLeft : left, nextLeft,
-                    RAIL_RADIUS, 32, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+                    leftStart, leftEnd,
+                    RAIL_RADIUS, 8,
+                    color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+
+            // 渲染右轨道
             GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
-                    i == 0 ? currentRight : right, nextRight,
-                    RAIL_RADIUS, 32, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-
-            left = nextLeft;
-            right = nextRight;
-            matrixStack.pop();
-
+                    rightStart, rightEnd,
+                    RAIL_RADIUS, 8,
+                    color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
         }
+        // 恢复矩阵状态
+        matrixStack.pop();
     }
 
     public void renderUnconnectedTrack(IVertexBuilder builder, MatrixStack matrixStackIn, RailEntity rail) {

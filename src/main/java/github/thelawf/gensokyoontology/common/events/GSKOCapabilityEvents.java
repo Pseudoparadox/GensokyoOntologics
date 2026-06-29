@@ -139,7 +139,7 @@ public class GSKOCapabilityEvents {
         player.getCapability(GSKOCapabilities.SECULAR_LIFE).ifPresent(cap -> {
             // GSKOUtil.showChatMsg(player, cap.isDirty(), 20);
             cap.addTime(1L);
-            GSKONetworking.sendToClientPlayer(new SLifeTickPacket(cap.getLifetime()), player);
+            // GSKONetworking.sendToClientPlayer(new SLifeTickPacket(cap.getLifetime()), player);
         });
 
     }

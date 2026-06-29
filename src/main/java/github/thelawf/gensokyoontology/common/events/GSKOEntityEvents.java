@@ -99,7 +99,7 @@ public class GSKOEntityEvents {
                 GSKONetworking.sendToClientPlayer(new PowerChangedPacket(gskoCap.getCount()), player);
                 GSKOPowerCapability.INSTANCE = gskoCap; // FIXME: 在玩家第一次进入游戏时由于能力系统未创建导致渲染p点点数时闪退
             });
-            player.getCapability(GSKOCapabilities.SECULAR_LIFE).ifPresent(SecularLifeCapability::markDirty);
+            // player.getCapability(GSKOCapabilities.SECULAR_LIFE).ifPresent(SecularLifeCapability::markDirty);
             player.getCapability(GSKOCapabilities.IDENTITY).ifPresent(belief -> IdentityCapability.INSTANCE = belief);
         }
     }
@@ -160,8 +160,8 @@ public class GSKOEntityEvents {
                 if (world.getGameTime() % 5 == 0) {
                     capability.addTime(1);
                 }
-                if (capability.getLifetime() == 45_000L) GSKOUtil.showChatMsg(player, "You Feel yourself have no time to live",1);
-                if (capability.getLifetime() == 50_000L) player.setHealth(0);
+                // if (capability.getLifetime() == 45_000L) GSKOUtil.showChatMsg(player, "You Feel yourself have no time to live",1);
+                // if (capability.getLifetime() == 50_000L) player.setHealth(0);
             }));
         }
     }

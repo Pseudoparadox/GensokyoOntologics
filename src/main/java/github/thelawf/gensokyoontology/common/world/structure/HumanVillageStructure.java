@@ -26,12 +26,13 @@ import net.minecraft.world.gen.feature.structure.*;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HumanVillageStructure extends Structure<NoFeatureConfig> {
 
     private static final ImmutableList<MobSpawnInfo.Spawners> HUMAN_RESIDENTS = ImmutableList.of(
-            new MobSpawnInfo.Spawners(EntityRegistry.HUMAN_RESIDENT_ENTITY.get(), 1, 20, 35));
+            new MobSpawnInfo.Spawners(EntityRegistry.HUMAN_RESIDENT_ENTITY.get(), 1, 3, 5));
 
     public HumanVillageStructure(Codec<NoFeatureConfig> codec) {
         super(codec);
@@ -45,7 +46,7 @@ public class HumanVillageStructure extends Structure<NoFeatureConfig> {
 
     @Override
     public List<MobSpawnInfo.Spawners> getDefaultSpawnList() {
-        return HUMAN_RESIDENTS;
+        return new ArrayList<>();
     }
 
     @Override

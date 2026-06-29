@@ -26,19 +26,6 @@ try to find out the initiator of the incidents.<br><br>
 - Retreating hostile creatures to find out their stories.<br>
 - Get along with all the beings in Gensokyo though it lasts short.<br>
 
-## TODO:
-Maybe we can convert svg to vertices to render 2D objects so that we can render anything we paint in PS. Like this:
-```xml
-<svg xmlns="http://www.w3.org/2000/svg" 
-     xmlns:xlink="http://www.w3.org/1999/xlink" 
-     width="1282px" height="465px">
-    <path fill-rule="evenodd"  fill="rgb(0, 0, 0)" 
-          d="M0.126,465.000 C17.000,245.000 397.673,0.650 642.000,-0.000 C888.492,-0.656 1282.030,246.589 1282.000,465.000 C1132.000,125.000 152.000,125.000 0.126,465.000 Z"/>
-</svg>
-```
-If you want to parse it, use `org.w3c.dom.Document`.
-
-
 ## Game Process (Developing)
 - 节分
 - 夏越大祓祭：消除所有负面效果，净化/提升/纯化物品，多用作将初始材料进一步进行加工为中间材料

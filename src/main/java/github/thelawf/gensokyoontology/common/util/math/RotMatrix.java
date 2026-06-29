@@ -13,6 +13,11 @@ public class RotMatrix {
     public static final RotMatrix IDENTITY = new RotMatrix(1F, 0F, 0F,
                                                            0F, 1F, 0F,
                                                            0F, 0F, 1F);
+    public RotMatrix() {
+        this(1F, 0F, 0F,
+                0F, 1F, 0F,
+                0F, 0F, 1F);
+    }
 
     public RotMatrix(Quaternion quaternionIn) {
         float f = quaternionIn.getX();
@@ -45,6 +50,52 @@ public class RotMatrix {
 
     public static RotMatrix from(EulerAngle eulerAngleIn) {
         return new RotMatrix(GSKOMathUtil.toQuaternion(eulerAngleIn));
+    }
+
+    // 添加setColumn方法
+    public void setColumn(int columnIndex, Vector3d vector) {
+        switch (columnIndex) {
+            case 0: // X轴（法线）
+                this.m00 = (float) vector.x;
+                this.m10 = (float) vector.y;
+                this.m20 = (float) vector.z;
+                break;
+            case 1: // Y轴（副法线）
+                this.m01 = (float) vector.x;
+                this.m11 = (float) vector.y;
+                this.m21 = (float) vector.z;
+                break;
+            case 2: // Z轴（切线）
+                this.m02 = (float) vector.x;
+                this.m12 = (float) vector.y;
+                this.m22 = (float) vector.z;
+                break;
+            default:
+                throw new IllegalArgumentException("Column index must be 0, 1, or 2");
+        }
+    }
+
+    // 添加setColumn方法的重载版本，接受Vector3f
+    public void setColumn(int columnIndex, Vector3f vector) {
+        switch (columnIndex) {
+            case 0: // X轴（法线）
+                this.m00 = vector.getX();
+                this.m10 = vector.getY();
+                this.m20 = vector.getZ();
+                break;
+            case 1: // Y轴（副法线）
+                this.m01 = vector.getX();
+                this.m11 = vector.getY();
+                this.m21 = vector.getZ();
+                break;
+            case 2: // Z轴（切线）
+                this.m02 = vector.getX();
+                this.m12 = vector.getY();
+                this.m22 = vector.getZ();
+                break;
+            default:
+                throw new IllegalArgumentException("Column index must be 0, 1, or 2");
+        }
     }
 
     public static RotMatrix from(Vector3d tangent, Vector3d upReference) {
@@ -191,6 +242,14 @@ public class RotMatrix {
                 sin, cos, 0,
                 0, 0, 1);
         return matrix;
+    }
+
+
+    public Vector3d multiply(Vector3d vector) {
+        double x = this.m00 * vector.x + this.m01 * vector.y + this.m02 * vector.z;
+        double y = this.m10 * vector.x + this.m11 * vector.y + this.m12 * vector.z;
+        double z = this.m20 * vector.x + this.m21 * vector.y + this.m22 * vector.z;
+        return new Vector3d(x, y, z);
     }
 
 

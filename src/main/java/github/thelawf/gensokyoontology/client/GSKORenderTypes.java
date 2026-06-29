@@ -20,7 +20,7 @@ public class GSKORenderTypes extends RenderType {
         super(nameIn, formatIn, drawModeIn, bufferSizeIn, useDelegateIn, needsSortingIn, setupTaskIn, clearTaskIn);
     }
 
-    public static final RenderType LASER_LINE = makeType("laser_line",
+    public static final RenderType LASER_LINE = RenderType.makeType("laser_line",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINES, 256,
             RenderType.State.getBuilder().line(getLaserLine(5.0))
                     .layer(VIEW_OFFSET_Z_LAYERING)
@@ -33,9 +33,10 @@ public class GSKORenderTypes extends RenderType {
     public static final RenderType MULTI_FACE_SOLID = makeType("multiface_solid",
             DefaultVertexFormats.POSITION_COLOR, 7, 256,
             RenderType.State.getBuilder()
-                    .transparency(NO_TRANSPARENCY)
+                    .transparency(TRANSLUCENT_TRANSPARENCY)
+                    .depthTest(DEPTH_LEQUAL)
                     .shadeModel(SHADE_ENABLED)
-                    .writeMask(COLOR_WRITE)
+                    .writeMask(COLOR_DEPTH_WRITE)
                     .cull(CULL_DISABLED)
                     .build(true));
 

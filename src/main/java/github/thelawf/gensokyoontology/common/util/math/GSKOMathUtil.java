@@ -887,6 +887,32 @@ public class GSKOMathUtil {
         return new Vector3d(rx, ry, rz);
     }
 
+    public static Vector3f rotateVector(Quaternion quaternion, Vector3f vector) {
+        // 提取四元数分量
+        double qx = quaternion.getX();
+        double qy = quaternion.getY();
+        double qz = quaternion.getZ();
+        double qw = quaternion.getW();
+
+        // 提取向量分量
+        float vx = vector.getX();
+        float vy = vector.getY();
+        float vz = vector.getZ();
+
+        // 计算 q * v
+        double ix = qw * vx + qy * vz - qz * vy;
+        double iy = qw * vy + qz * vx - qx * vz;
+        double iz = qw * vz + qx * vy - qy * vx;
+        double iw = -qx * vx - qy * vy - qz * vz;
+
+        // 计算 (q * v) * q⁻¹
+        double rx = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+        double ry = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+        double rz = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+
+        return new Vector3f((float) rx, (float) ry, (float) rz);
+    }
+
     public static boolean isBetween(int num, int min, int max) {
         return num >= min && num < max;
     }
@@ -945,6 +971,7 @@ public class GSKOMathUtil {
         }
         return newMatrix;
     }
+
 
     public static Vector3d getMidPointOf(Vector3d prev, Vector3d next) {
         return new Vector3d((prev.x + next.x) / 2, (prev.y + next.y) / 2, (prev.z + next.z) / 2);
