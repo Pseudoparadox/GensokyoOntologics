@@ -4,6 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import github.thelawf.gensokyoontology.api.Color4f;
 import github.thelawf.gensokyoontology.api.Color4i;
+import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.client.GSKORenderTypes;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
@@ -50,17 +51,17 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         IVertexBuilder builder = bufferIn.getBuffer(RenderType.getEntityCutoutNoCull(TEXTURE));
         IVertexBuilder buffer = bufferIn.getBuffer(GSKORenderTypes.MULTI_FACE_SOLID);
 
-        Optional<Entity> optional = startRail.getTargetRail();
-        if (!optional.isPresent()) {
+        Maybe<Entity> maybe = startRail.tryGetNextRail(Maybe.empty());
+        if (!maybe.isPresent()) {
             this.renderUnconnectedTrack(buffer, matrixStack, startRail);
             return;
         }
-        if (!(optional.get() instanceof RailEntity)) return;
+        if (!(maybe.get() instanceof RailEntity)) return;
         if (player != null && player.getHeldItemMainhand().getItem() == ItemRegistry.RAIL_WRENCH.get()){
             this.renderUnconnectedTrack(buffer, matrixStack, startRail);
         }
 
-        RailEntity targetRail = (RailEntity) optional.get();
+        RailEntity targetRail = (RailEntity) maybe.get();
         this.renderHermite3(startRail, targetRail, builder, matrixStack);
     }
 

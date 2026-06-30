@@ -132,8 +132,7 @@ public class RailWrench extends Item implements IRayTracer {
         getStartRail(serverWorld, connector.getTag().getUniqueId("uuid")).ifPresent(entity -> {
             if (!(entity instanceof RailEntity)) return;
             RailEntity startRail = (RailEntity) entity;
-            startRail.setTargetPos(targetRail.getPosition());
-            startRail.setTargetId(targetRail.getUniqueID());
+            startRail.setNextRail(targetRail);
             connector.shrink(1);
             player.addItemStackToInventory(new ItemStack(ItemRegistry.RAIL_WRENCH.get()));
 

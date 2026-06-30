@@ -1,19 +1,14 @@
 package github.thelawf.gensokyoontology.common.network.packet;
 
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
-import github.thelawf.gensokyoontology.common.network.GSKONetworking;
-import github.thelawf.gensokyoontology.common.util.GSKOUtil;
-import github.thelawf.gensokyoontology.core.init.TileEntityRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-import java.util.UUID;
 import java.util.function.Supplier;
 
 public class SRenderRailPacket {
@@ -55,6 +50,6 @@ public class SRenderRailPacket {
         RailEntity prevRail = (RailEntity) prev;
         RailEntity nextRail = (RailEntity) next;
         nextRail.setPrevRail(prevRail);
-        prevRail.setTargetRail(nextRail);
+        prevRail.setNextRail(nextRail);
     }
 }

@@ -1,6 +1,7 @@
 package github.thelawf.gensokyoontology.common.entity.misc;
 
 import github.thelawf.gensokyoontology.api.Color4i;
+import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.util.math.CurveUtil;
 import github.thelawf.gensokyoontology.common.util.math.RotMatrix;
 import github.thelawf.gensokyoontology.core.init.EntityRegistry;
@@ -87,10 +88,10 @@ public class RailEntity extends Entity {
         this.setRotation(new Quaternion(qx, qy, qz, qw));
 
         if (nbt.contains("prevID")) this.setPrevId(nbt.getUniqueId("prevID"));
-        if (nbt.contains("targetID")) this.setTargetId(nbt.getUniqueId("targetID"));
+        if (nbt.contains("nextID")) this.setNextId(nbt.getUniqueId("nextID"));
 
         if (nbt.contains("targetX") && nbt.contains("targetY") && nbt.contains("targetZ")){
-            this.setTargetPos(new BlockPos(nbt.getInt("targetX"), nbt.getInt("targetY"), nbt.getInt("targetZ")));
+            this.setNextPos(new BlockPos(nbt.getInt("targetX"), nbt.getInt("targetY"), nbt.getInt("targetZ")));
         }
     }
 
@@ -101,34 +102,45 @@ public class RailEntity extends Entity {
         compound.putFloat("qz", this.getRotation().getZ());
         compound.putFloat("qw", this.getRotation().getW());
 
-        this.getPrevId().ifPresent(id -> compound.putUniqueId("prevID", id));
-        this.getTargetId().ifPresent(id -> compound.putUniqueId("targetID", id));
+        this.tryGetPrevRail(Maybe.empty()).ifPresent(entity -> compound.putUniqueId("prevID", entity.getUniqueID()));
+        this.tryGetNextRail(Maybe.empty()).ifPresent(entity -> compound.putUniqueId("nextID", entity.getUniqueID()));
         compound.putInt("railInfo", this.getInfo().ordinal());
 
-        compound.putInt("targetX", this.getTargetPos().getX());
-        compound.putInt("targetY", this.getTargetPos().getY());
-        compound.putInt("targetZ", this.getTargetPos().getZ());
+        compound.putInt("targetX", this.getNextPos().getX());
+        compound.putInt("targetY", this.getNextPos().getY());
+        compound.putInt("targetZ", this.getNextPos().getZ());
 
     }
 
     @OnlyIn(Dist.CLIENT)
-    public Optional<Entity> getPrevRail() {
-        return Optional.ofNullable(this.world.getEntityByID(this.prevId));
+    public Maybe<Entity> tryGetPrevRail(Maybe<Entity> ref) {
+        if (this.world.isRemote()) return ref;
+        ServerWorld serverWorld = (ServerWorld) this.world; 
+        Maybe.from(this.getPrevId())
+                .map(serverWorld::getEntityByUuid)
+                .ifPresent(ref::set);
+        return ref;
     }
 
     @OnlyIn(Dist.CLIENT)
-    public Optional<Entity> getTargetRail() {
-        return Optional.ofNullable(this.world.getEntityByID(this.targetId));
+    public Maybe<Entity> tryGetNextRail(Maybe<Entity> ref) {
+        if (this.world.isRemote()) return ref;
+        ServerWorld serverWorld = (ServerWorld) this.world;
+        Maybe.from(this.getNextId())
+                .map(serverWorld::getEntityByUuid)
+                .ifPresent(ref::set);
+        return ref;
     }
 
     @OnlyIn(Dist.CLIENT)
     public void setPrevRail(RailEntity prevRail) {
-        this.prevId = prevRail.getEntityId();
+        this.setPrevId(prevRail.getUniqueID());
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void setTargetRail(RailEntity targetRail) {
-        this.targetId = targetRail.getEntityId();
+    public void setNextRail(RailEntity targetRail) {
+        this.setNextId(targetRail.getUniqueID());
+        this.setNextPos(targetRail.getPosition());
     }
 
     public Optional<UUID> getPrevId() {
@@ -138,10 +150,10 @@ public class RailEntity extends Entity {
         this.dataManager.set(DATA_PREV_UUID, Optional.of(uuid));
     }
 
-    public Optional<UUID> getTargetId() {
+    public Optional<UUID> getNextId() {
         return this.dataManager.get(DATA_TARGET_UUID);
     }
-    public void setTargetId(UUID uuid) {
+    public void setNextId(UUID uuid) {
         this.dataManager.set(DATA_TARGET_UUID, Optional.of(uuid));
     }
 
@@ -157,11 +169,11 @@ public class RailEntity extends Entity {
         return this.dataManager.get(DATA_ROT);
     }
 
-    public BlockPos getTargetPos() {
+    public BlockPos getNextPos() {
         return this.dataManager.get(DATA_TARGET);
     }
 
-    public void setTargetPos(BlockPos targetRailPos) {
+    public void setNextPos(BlockPos targetRailPos) {
         this.dataManager.set(DATA_TARGET, targetRailPos);
     }
 
