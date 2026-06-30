@@ -32,15 +32,6 @@ public class EulerAngle {
         return this.toRotation();
     }
 
-    public EulerAngle handleLock() {
-        // 万向锁条件：绕Y轴（Pitch）接近±90°
-        if (Math.abs(pitch) >= 89.9f) {
-            this.yaw += this.roll;
-            this.roll = 0;    // 固定Roll为0，避免歧义
-        }
-        return this;
-    }
-
     public float yaw(){
         return this.yaw;
     }

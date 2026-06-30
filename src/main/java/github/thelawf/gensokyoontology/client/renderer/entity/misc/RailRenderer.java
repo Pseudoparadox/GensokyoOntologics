@@ -30,6 +30,7 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
     public static final double RAIL_WIDTH = 0.5;
     public static final float RAIL_RADIUS = 0.07F;
     public static final float SEGMENTS = 32;
+    public static final float SCALE = 20F;
 
     public static final ResourceLocation TEXTURE = GSKOUtil.withRL("textures/entity/entity_blank.png");
 
@@ -43,6 +44,7 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         return TEXTURE;
     }
 
+    // avg: 1/seg, 1 / lenOfEach
     @Override
     public void render(@NotNull RailEntity startRail, float entityYaw, float partialTicks, @NotNull MatrixStack matrixStack, IRenderTypeBuffer bufferIn, int light) {
         super.render(startRail, entityYaw, partialTicks, matrixStack, bufferIn, light);
@@ -69,8 +71,9 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             this.renderUnconnectedTrack(buffer, matrixStack, startRail);
         }
 
-        RailEntity targetRail = (RailEntity) maybe.get();
-        this.renderHermite3(startRail, targetRail, builder, matrixStack);
+        maybe.ifPresent(nextRail -> this.renderHermite3(startRail, (RailEntity) nextRail, builder, matrixStack));
+//        RailEntity targetRail = (RailEntity) maybe.get();
+//        this.renderHermite3(startRail, targetRail, builder, matrixStack);
     }
 
     public void renderHermite3(RailEntity startRail, RailEntity targetRail, IVertexBuilder builder, MatrixStack matrixStack) {
@@ -99,8 +102,8 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         // 获取方向向量
         Vector3f startDirection = startRail.getOrientation().copy();
         Vector3f endDirection = targetRail.getOrientation().copy();
-        startDirection.mul(25);
-        endDirection.mul(25);
+        startDirection.mul(SCALE);
+        endDirection.mul(SCALE);
 
         final int segments = 32;
         // 临时变量存储上一段的端点，用于连线
@@ -226,16 +229,23 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             Color4f color = new Color4i(255, 0, 0, 255).toColor4f();
 
             // 渲染左轨道
-            GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
-                    leftStart, leftEnd,
-                    RAIL_RADIUS, 8,
+//            GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
+//                    leftStart, leftEnd,
+//                    RAIL_RADIUS, 8,
+//                    color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
+                    leftStart, leftEnd, new Vector3d(rolledNormal),  RAIL_RADIUS, 8,
+                    color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+
+            GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
+                    rightStart, rightEnd, new Vector3d(rolledNormal), RAIL_RADIUS, 8,
                     color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
 
             // 渲染右轨道
-            GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
-                    rightStart, rightEnd,
-                    RAIL_RADIUS, 8,
-                    color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+//            GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
+//                    rightStart, rightEnd,
+//                    RAIL_RADIUS, 8,
+//                    color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
         }
     }
 
