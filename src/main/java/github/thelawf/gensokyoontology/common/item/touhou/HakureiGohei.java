@@ -3,7 +3,7 @@ package github.thelawf.gensokyoontology.common.item.touhou;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import github.thelawf.gensokyoontology.api.IHasCooldown;
-import github.thelawf.gensokyoontology.api.util.IRayTracer;
+import github.thelawf.gensokyoontology.api.IRayTracer;
 import github.thelawf.gensokyoontology.client.gui.screen.skill.GoheiModeSelectScreen;
 import github.thelawf.gensokyoontology.client.particle.ParticleRegistry;
 import github.thelawf.gensokyoontology.client.particle.PowerParticleData;

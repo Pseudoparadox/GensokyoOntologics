@@ -1,6 +1,6 @@
 package github.thelawf.gensokyoontology.common.entity.misc;
 
-import github.thelawf.gensokyoontology.api.util.IRayTracer;
+import github.thelawf.gensokyoontology.api.IRayTracer;
 import github.thelawf.gensokyoontology.common.entity.projectile.Danmaku;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;

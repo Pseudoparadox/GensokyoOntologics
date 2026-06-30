@@ -1,32 +1,21 @@
 package github.thelawf.gensokyoontology.common.item.touhou;
 
-import github.thelawf.gensokyoontology.api.util.INBTRunnable;
-import github.thelawf.gensokyoontology.api.util.INBTWriter;
-import github.thelawf.gensokyoontology.common.block.GapBlock;
-import github.thelawf.gensokyoontology.common.tileentity.GapTileEntity;
-import github.thelawf.gensokyoontology.common.world.GSKODimensions;
+import github.thelawf.gensokyoontology.api.INBTRunnable;
+import github.thelawf.gensokyoontology.api.INBTWriter;
 import github.thelawf.gensokyoontology.core.init.BlockRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.system.CallbackI;
 
 import java.util.List;
 

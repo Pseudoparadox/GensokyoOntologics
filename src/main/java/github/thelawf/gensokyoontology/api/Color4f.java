@@ -1,4 +1,4 @@
-package github.thelawf.gensokyoontology.api.util;
+package github.thelawf.gensokyoontology.api;
 
 public class Color4f {
     public final float r;

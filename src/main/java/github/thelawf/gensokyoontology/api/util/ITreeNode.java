@@ -1,4 +1,4 @@
-package github.thelawf.gensokyoontology.api.util.tree;
+package github.thelawf.gensokyoontology.api.util;
 
 public interface ITreeNode<O> {
     O get();

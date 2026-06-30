@@ -1,6 +1,4 @@
-package github.thelawf.gensokyoontology.api.util.tree;
-
-import net.minecraft.util.DamageSource;
+package github.thelawf.gensokyoontology.api.util;
 
 import java.util.*;
 

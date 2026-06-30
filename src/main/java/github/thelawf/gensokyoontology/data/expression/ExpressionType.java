@@ -1,13 +1,5 @@
 package github.thelawf.gensokyoontology.data.expression;
 
-import github.thelawf.gensokyoontology.api.Tree;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.registries.ForgeRegistryEntry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-
 /*
 public abstract class ExpressionType<E extends IExpressionType> extends ForgeRegistryEntry<IExpressionType> implements IExpressionType, IForgeRegistryEntry<IExpressionType> {
 

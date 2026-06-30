@@ -1,4 +1,4 @@
-package github.thelawf.gensokyoontology.api.util;
+package github.thelawf.gensokyoontology.api;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;

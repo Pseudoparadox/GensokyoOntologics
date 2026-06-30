@@ -1,6 +1,6 @@
 package github.thelawf.gensokyoontology.common.item.touhou;
 
-import github.thelawf.gensokyoontology.api.util.IRayTracer;
+import github.thelawf.gensokyoontology.api.IRayTracer;
 import github.thelawf.gensokyoontology.common.block.decoration.ClayAdobeBlock;
 import github.thelawf.gensokyoontology.common.tileentity.AdobeTileEntity;
 import github.thelawf.gensokyoontology.core.init.BlockRegistry;

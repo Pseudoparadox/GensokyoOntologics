@@ -1,6 +1,6 @@
 package github.thelawf.gensokyoontology.common.item.tool;
 
-import github.thelawf.gensokyoontology.api.util.IRayTracer;
+import github.thelawf.gensokyoontology.api.IRayTracer;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import net.minecraft.client.util.ITooltipFlag;

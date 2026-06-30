@@ -2,7 +2,7 @@ package github.thelawf.gensokyoontology.client.renderer.entity.misc;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import github.thelawf.gensokyoontology.api.util.Color4i;
+import github.thelawf.gensokyoontology.api.Color4i;
 import github.thelawf.gensokyoontology.common.entity.misc.LunarFall;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.common.util.math.GSKOMathUtil;

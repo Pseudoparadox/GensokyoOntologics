@@ -2,7 +2,7 @@ package github.thelawf.gensokyoontology.common.container;
 
 import com.google.common.collect.Maps;
 import github.thelawf.gensokyoontology.api.client.AbstractContainer;
-import github.thelawf.gensokyoontology.api.util.INBTReader;
+import github.thelawf.gensokyoontology.api.INBTReader;
 import github.thelawf.gensokyoontology.api.util.IntRange;
 import github.thelawf.gensokyoontology.common.nbt.GSKONBTUtil;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;

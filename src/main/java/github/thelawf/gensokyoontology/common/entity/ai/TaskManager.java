@@ -1,6 +1,6 @@
 package github.thelawf.gensokyoontology.common.entity.ai;
 
-import github.thelawf.gensokyoontology.api.Tree;
+import github.thelawf.gensokyoontology.api.util.Tree;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.schedule.Activity;

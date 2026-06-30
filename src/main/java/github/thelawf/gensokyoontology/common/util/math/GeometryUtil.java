@@ -2,7 +2,7 @@ package github.thelawf.gensokyoontology.common.util.math;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import github.thelawf.gensokyoontology.api.util.Color4i;
+import github.thelawf.gensokyoontology.api.Color4i;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.math.vector.*;
 

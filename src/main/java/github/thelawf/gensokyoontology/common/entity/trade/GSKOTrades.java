@@ -1,7 +1,6 @@
 package github.thelawf.gensokyoontology.common.entity.trade;
 
 import com.google.common.collect.ImmutableMap;
-import github.thelawf.gensokyoontology.api.Tree;
 import github.thelawf.gensokyoontology.core.init.ItemRegistry;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;

@@ -2,7 +2,7 @@ package github.thelawf.gensokyoontology.common.tileentity;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
-import github.thelawf.gensokyoontology.api.util.IRayTracer;
+import github.thelawf.gensokyoontology.api.IRayTracer;
 import github.thelawf.gensokyoontology.common.util.BlessType;
 import github.thelawf.gensokyoontology.core.init.EffectRegistry;
 import github.thelawf.gensokyoontology.core.init.ItemRegistry;

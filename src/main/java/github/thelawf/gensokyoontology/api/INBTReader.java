@@ -1,13 +1,9 @@
-package github.thelawf.gensokyoontology.api.util;
+package github.thelawf.gensokyoontology.api;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public interface INBTReader {

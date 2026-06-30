@@ -1,6 +1,6 @@
 package github.thelawf.gensokyoontology.common.block;
 
-import github.thelawf.gensokyoontology.api.util.INBTWriter;
+import github.thelawf.gensokyoontology.api.INBTWriter;
 import github.thelawf.gensokyoontology.common.tileentity.GapTileEntity;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.common.world.TeleportHelper;

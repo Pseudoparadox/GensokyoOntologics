@@ -1,4 +1,6 @@
-package github.thelawf.gensokyoontology.api;
+package github.thelawf.gensokyoontology.api.util;
+
+import github.thelawf.gensokyoontology.api.CanNullObject;
 
 import java.util.*;
 import java.util.stream.Collectors;

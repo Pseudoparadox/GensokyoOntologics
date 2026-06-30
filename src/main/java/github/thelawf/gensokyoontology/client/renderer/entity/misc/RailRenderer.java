@@ -2,8 +2,8 @@ package github.thelawf.gensokyoontology.client.renderer.entity.misc;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import github.thelawf.gensokyoontology.api.util.Color4f;
-import github.thelawf.gensokyoontology.api.util.Color4i;
+import github.thelawf.gensokyoontology.api.Color4f;
+import github.thelawf.gensokyoontology.api.Color4i;
 import github.thelawf.gensokyoontology.client.GSKORenderTypes;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
@@ -62,119 +62,6 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
 
         RailEntity targetRail = (RailEntity) optional.get();
         this.renderHermite3(startRail, targetRail, builder, matrixStack);
-    }
-
-    public void renderByHermite3(RailEntity startRail, RailEntity targetRail, IVertexBuilder builder, MatrixStack matrixStack) {
-        // 获取起点和终点的旋转
-        Quaternion startRot = startRail.getRotation();
-        Quaternion endRot = targetRail.getRotation();
-
-        // 计算欧拉角
-        EulerAngle startEuler = GSKOMathUtil.getEulerAngle(startRot);
-        EulerAngle endEuler = GSKOMathUtil.getEulerAngle(endRot);
-
-        // 计算桶滚角差值（限制在[-180°, 180°]范围内）
-        float startRoll = startEuler.roll(); // 假设z是roll
-        float endRoll = endEuler.roll();
-        float rollDelta = MathHelper.wrapDegrees(endRoll - startRoll);
-
-        // 限制最大旋转角度变化
-        final float MAX_ROLL_CHANGE = 180.0f;
-        if (Math.abs(rollDelta) > MAX_ROLL_CHANGE) {
-            rollDelta = Math.signum(rollDelta) * MAX_ROLL_CHANGE;
-        }
-
-        // 获取起点和终点的位置（相对坐标）
-        Vector3d startPos = Vector3d.ZERO;
-        Vector3d endPos = Vector3d.copy(targetRail.getPosition()).subtract(startRail.getPositionVec());
-
-        // 获取方向向量（切线方向）
-        Vector3f startDir = startRail.getOrientation().copy();
-        Vector3f endDir = targetRail.getOrientation().copy();
-
-        // 缩放方向向量作为控制点
-        startDir.mul(25);
-        endDir.mul(25);
-
-        final int segments = 32;
-
-        // 存储上一帧的左右轨道位置
-        Vector3d prevLeftRail = null;
-        Vector3d prevRightRail = null;
-
-        for (int i = 0; i <= segments; i++) {
-            float t = (float) i / segments;
-
-            // 计算Hermite插值得到中心线位置
-            Vector3d centerPos = CurveUtil.hermite3(startPos, endPos, startDir, endDir, t);
-
-            // 计算切线（使用导数）
-            Vector3d tangent = CurveUtil.hermiteTangent(startPos, endPos, new Vector3d(startDir), new Vector3d(endDir), t).normalize();
-
-            // 计算当前桶滚角
-            float currentRoll = startRoll + t * rollDelta;
-
-            // 使用球面线性插值(SLERP)平滑旋转
-            Quaternion currentRotation = GSKOMathUtil.slerp(startRot, endRot, t);
-
-            // 构建旋转矩阵 - 使用轨道实体的旋转
-            RotMatrix rotMatrix = new RotMatrix(currentRotation);
-
-            // 应用桶滚旋转到法线方向
-            Vector3f normal = rotMatrix.normal(); // 获取法线（X轴）
-            Vector3f binormal = rotMatrix.binormal(); // 获取副法线（Y轴）
-            Vector3f tangentAxis = rotMatrix.tangent(); // 获取切线（Z轴）
-
-            // 创建桶滚四元数并应用到法线
-            Quaternion rollQuat = new Quaternion(tangentAxis, currentRoll, true);
-            Vector3f rolledNormal = GSKOMathUtil.rotateVector(rollQuat, normal);
-
-            // 重新构建旋转矩阵
-            RotMatrix finalMatrix = new RotMatrix();
-            finalMatrix.setColumn(0, new Vector3d(rolledNormal));     // X轴 = 滚动后的法线
-            finalMatrix.setColumn(1, new Vector3d(binormal));         // Y轴 = 副法线
-            finalMatrix.setColumn(2, new Vector3d(tangentAxis));      // Z轴 = 切线
-
-            // 计算轨道横截面的两个轨道位置（相对于中心线）
-            double halfWidth = RAIL_WIDTH;
-
-            // 左侧轨道（负X方向）
-            Vector3d leftOffset = new Vector3d(-halfWidth, 0, 0);
-            Vector3d leftRail = finalMatrix.multiply(leftOffset).add(centerPos);
-
-            // 右侧轨道（正X方向）
-            Vector3d rightOffset = new Vector3d(halfWidth, 0, 0);
-            Vector3d rightRail = finalMatrix.multiply(rightOffset).add(centerPos);
-
-            // 渲染连接部分
-            if (i > 0) {
-                Color4f color = new Color4i(255, 0, 0, 255).toColor4f();
-
-                // 左轨道
-                GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
-                        prevLeftRail, leftRail,
-                        RAIL_RADIUS, 8,
-                        color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-
-                // 右轨道
-                GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
-                        prevRightRail, rightRail,
-                        RAIL_RADIUS, 8,
-                        color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-
-                // 渲染连接左右轨道的横梁
-//                if (i % 4 == 0) { // 每4段渲染一个横梁
-//                    Color4f crossColor = new Color4i(200, 200, 200, 255).toColor4f();
-//                    GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
-//                            leftRail, rightRail,
-//                            RAIL_RADIUS * 0.7f, 8,
-//                            crossColor.getRed(), crossColor.getGreen(), crossColor.getBlue(), crossColor.getAlpha());
-//                }
-            }
-
-            prevLeftRail = leftRail;
-            prevRightRail = rightRail;
-        }
     }
 
     public void renderHermite3(RailEntity startRail, RailEntity targetRail, IVertexBuilder builder, MatrixStack matrixStack) {
