@@ -39,7 +39,7 @@ public class GSKONetworking {
         CHANNEL.messageBuilder(SRotateCameraPacket.class, next()).encoder(SRotateCameraPacket::toBytes).decoder(SRotateCameraPacket::fromBytes).consumer(SRotateCameraPacket::handle).add();
         CHANNEL.messageBuilder(SDanmakuTilePacket.class, next()).encoder(SDanmakuTilePacket::toBytes).decoder(SDanmakuTilePacket::fromBytes).consumer(SDanmakuTilePacket::handle).add();
         CHANNEL.messageBuilder(SJigsawPatternRenderPacket.class, next()).encoder(SJigsawPatternRenderPacket::toBytes).decoder(SJigsawPatternRenderPacket::fromBytes).consumer(SJigsawPatternRenderPacket::handle).add();
-        CHANNEL.messageBuilder(SRenderRailPacket.class, next()).encoder(SRenderRailPacket::toBytes).decoder(SRenderRailPacket::fromBytes).consumer(SRenderRailPacket::handle).add();
+        CHANNEL.messageBuilder(S2CRenderRailPacket.class, next()).encoder(S2CRenderRailPacket::toBytes).decoder(S2CRenderRailPacket::fromBytes).consumer(S2CRenderRailPacket::handle).add();
 
         CHANNEL.messageBuilder(SInteractCoasterPacket.class, next()).encoder(SInteractCoasterPacket::toBytes).decoder(SInteractCoasterPacket::fromBytes).consumer(SInteractCoasterPacket::handle).add();
 

@@ -2,11 +2,15 @@ package github.thelawf.gensokyoontology.common.entity.misc;
 
 import github.thelawf.gensokyoontology.api.Color4i;
 import github.thelawf.gensokyoontology.api.util.Maybe;
+import github.thelawf.gensokyoontology.common.network.GSKONetworking;
+import github.thelawf.gensokyoontology.common.network.packet.S2CRenderRailPacket;
 import github.thelawf.gensokyoontology.common.util.math.CurveUtil;
 import github.thelawf.gensokyoontology.common.util.math.RotMatrix;
 import github.thelawf.gensokyoontology.core.init.EntityRegistry;
 import github.thelawf.gensokyoontology.common.util.math.DerivativeInfo;
 import github.thelawf.gensokyoontology.data.GSKOSerializers;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
@@ -23,11 +27,12 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fml.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-
+//data get entity @e[type=gensokyoontology:rail,limit=1]
 public class RailEntity extends Entity {
     public static final int SEGMENTS = 32;
 
@@ -44,7 +49,7 @@ public class RailEntity extends Entity {
             RailEntity.class, DataSerializers.VARINT);
 
     public int prevId;
-    public int targetId;
+    public int nextId;
 
     public RailEntity(EntityType<RailEntity> entityType, World worldIn) {
         super(entityType, worldIn);
@@ -102,8 +107,8 @@ public class RailEntity extends Entity {
         compound.putFloat("qz", this.getRotation().getZ());
         compound.putFloat("qw", this.getRotation().getW());
 
-        this.tryGetPrevRail(Maybe.empty()).ifPresent(entity -> compound.putUniqueId("prevID", entity.getUniqueID()));
-        this.tryGetNextRail(Maybe.empty()).ifPresent(entity -> compound.putUniqueId("nextID", entity.getUniqueID()));
+        this.getPrevId().ifPresent(id -> compound.putUniqueId("prevID", id));
+        this.getNextId().ifPresent(id -> compound.putUniqueId("nextID", id));
         compound.putInt("railInfo", this.getInfo().ordinal());
 
         compound.putInt("targetX", this.getNextPos().getX());
@@ -112,19 +117,21 @@ public class RailEntity extends Entity {
 
     }
 
-    @OnlyIn(Dist.CLIENT)
     public Maybe<Entity> tryGetPrevRail(Maybe<Entity> ref) {
-        if (this.world.isRemote()) return ref;
-        ServerWorld serverWorld = (ServerWorld) this.world; 
+        if (this.world instanceof ClientWorld) {
+            return ref;
+        }
+        ServerWorld serverWorld = (ServerWorld) this.world;
         Maybe.from(this.getPrevId())
                 .map(serverWorld::getEntityByUuid)
                 .ifPresent(ref::set);
         return ref;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public Maybe<Entity> tryGetNextRail(Maybe<Entity> ref) {
-        if (this.world.isRemote()) return ref;
+        if (this.world instanceof ClientWorld) {
+            return ref;
+        }
         ServerWorld serverWorld = (ServerWorld) this.world;
         Maybe.from(this.getNextId())
                 .map(serverWorld::getEntityByUuid)
@@ -133,14 +140,25 @@ public class RailEntity extends Entity {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void setPrevRail(RailEntity prevRail) {
+    public void setPrevRailClient(RailEntity prevRail) {
+        this.prevId = prevRail.getEntityId();
         this.setPrevId(prevRail.getUniqueID());
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void setNextRail(RailEntity targetRail) {
-        this.setNextId(targetRail.getUniqueID());
-        this.setNextPos(targetRail.getPosition());
+    public void setNextRailClient(RailEntity nextRail) {
+        this.nextId = nextRail.getEntityId();
+        this.setNextId(nextRail.getUniqueID());
+        this.setNextPos(nextRail.getPosition());
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public Maybe<Entity> getNextRailClient(Maybe<Entity> reference){
+        if (this.world.getEntityByID(this.nextId) == null){
+            return reference;
+        }
+        reference.set(this.world.getEntityByID(this.nextId));
+        return reference;
     }
 
     public Optional<UUID> getPrevId() {

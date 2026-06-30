@@ -11,17 +11,17 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class SRenderRailPacket {
+public class S2CRenderRailPacket {
     public final int prevRailID;
     public final int nextRailID;
 
-    public SRenderRailPacket (int prevRailID, int nextRailID) {
+    public S2CRenderRailPacket(int prevRailID, int nextRailID) {
         this.prevRailID = prevRailID;
         this.nextRailID = nextRailID;
     }
 
-    public static SRenderRailPacket fromBytes(PacketBuffer buf) {
-        return new SRenderRailPacket(buf.readVarInt(), buf.readVarInt());
+    public static S2CRenderRailPacket fromBytes(PacketBuffer buf) {
+        return new S2CRenderRailPacket(buf.readVarInt(), buf.readVarInt());
     }
 
     public void toBytes(PacketBuffer buf) {
@@ -35,7 +35,7 @@ public class SRenderRailPacket {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static void setRenderInfo(SRenderRailPacket packet) {
+    public static void setRenderInfo(S2CRenderRailPacket packet) {
         Minecraft minecraft = Minecraft.getInstance();
         ClientWorld clientWorld = minecraft.world;
         if (clientWorld == null) return;
@@ -49,7 +49,7 @@ public class SRenderRailPacket {
 
         RailEntity prevRail = (RailEntity) prev;
         RailEntity nextRail = (RailEntity) next;
-        nextRail.setPrevRail(prevRail);
-        prevRail.setNextRail(nextRail);
+        nextRail.setPrevRailClient(prevRail);
+        prevRail.setNextRailClient(nextRail);
     }
 }

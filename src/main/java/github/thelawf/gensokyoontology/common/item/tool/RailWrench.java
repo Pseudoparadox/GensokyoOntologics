@@ -4,7 +4,7 @@ import github.thelawf.gensokyoontology.api.IRayTracer;
 import github.thelawf.gensokyoontology.client.gui.screen.RailDashboardScreen;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.network.GSKONetworking;
-import github.thelawf.gensokyoontology.common.network.packet.SRenderRailPacket;
+import github.thelawf.gensokyoontology.common.network.packet.S2CRenderRailPacket;
 import github.thelawf.gensokyoontology.common.tileentity.RailTileEntity;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.core.init.BlockRegistry;
@@ -132,12 +132,13 @@ public class RailWrench extends Item implements IRayTracer {
         getStartRail(serverWorld, connector.getTag().getUniqueId("uuid")).ifPresent(entity -> {
             if (!(entity instanceof RailEntity)) return;
             RailEntity startRail = (RailEntity) entity;
-            startRail.setNextRail(targetRail);
+            startRail.setNextId(targetRail.getUniqueID());
+            startRail.setNextPos(targetRail.getPosition());
             connector.shrink(1);
             player.addItemStackToInventory(new ItemStack(ItemRegistry.RAIL_WRENCH.get()));
 
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-            GSKONetworking.sendToClientPlayer(new SRenderRailPacket(startRail.getEntityId(),
+            GSKONetworking.sendToClientPlayer(new S2CRenderRailPacket(startRail.getEntityId(),
                             targetRail.getEntityId()), serverPlayer);
         });
 

@@ -41,6 +41,7 @@ public class Maybe<T> {
     }
 
     public Maybe<T> ifPresent(Consumer<T> action){
+        if (this.value == null) return this;
         action.accept(this.value);
         return this;
     }

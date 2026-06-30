@@ -4,6 +4,7 @@ import com.github.tartaricacid.touhoulittlemaid.capability.PowerCapability;
 import com.github.tartaricacid.touhoulittlemaid.capability.PowerCapabilityProvider;
 import github.thelawf.gensokyoontology.GensokyoOntology;
 import github.thelawf.gensokyoontology.api.IRayTracer;
+import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.client.renderer.world.ScarletSkyRenderer;
 import github.thelawf.gensokyoontology.common.block.nature.HotSpringBlock;
 import github.thelawf.gensokyoontology.common.capability.entity.IdentityCapability;
@@ -14,11 +15,13 @@ import github.thelawf.gensokyoontology.common.capability.GSKOCapabilities;
 import github.thelawf.gensokyoontology.common.capability.world.ImperishableNightCapability;
 import github.thelawf.gensokyoontology.common.compat.touhoulittlemaid.TouhouLittleMaidCompat;
 import github.thelawf.gensokyoontology.common.entity.misc.CoasterVehicle;
+import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.entity.monster.FairyEntity;
 import github.thelawf.gensokyoontology.common.entity.projectile.Danmaku;
 import github.thelawf.gensokyoontology.common.network.GSKONetworking;
 import github.thelawf.gensokyoontology.common.network.packet.CInteractCoasterPacket;
 import github.thelawf.gensokyoontology.common.network.packet.PowerChangedPacket;
+import github.thelawf.gensokyoontology.common.network.packet.S2CRenderRailPacket;
 import github.thelawf.gensokyoontology.common.network.packet.SScarletMistPacket;
 import github.thelawf.gensokyoontology.common.util.GSKODamageSource;
 import github.thelawf.gensokyoontology.common.potion.HypnosisEffect;
@@ -50,6 +53,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
@@ -101,6 +105,25 @@ public class GSKOEntityEvents {
             // player.getCapability(GSKOCapabilities.SECULAR_LIFE).ifPresent(SecularLifeCapability::markDirty);
             player.getCapability(GSKOCapabilities.IDENTITY).ifPresent(belief -> IdentityCapability.INSTANCE = belief);
         }
+    }
+//data get entity @e[type=gensokyoontology:rail,limit=1]
+    // "a26ec20c-96ce-42dc-8149-0fe55b231d37"
+    // "48d5f92a-b7f1-4ff8-961b-7978e8e156f3"
+    //
+    // "598ada01-e305-45ff-95ae-6993b78e246d"
+    @SubscribeEvent
+    public static void syncRailIdTick(TickEvent.PlayerTickEvent event){
+        if (!(event.player.getEntityWorld() instanceof ServerWorld)) return;
+        if (!(event.player instanceof ServerPlayerEntity)) return;
+        ServerPlayerEntity player = (ServerPlayerEntity) event.player;
+        ServerWorld serverWorld = (ServerWorld) event.player.getEntityWorld();
+        serverWorld.getEntities().filter(entity -> entity instanceof RailEntity)
+                .forEach(entity -> {
+                    RailEntity rail = (RailEntity) entity;
+                    rail.tryGetNextRail(Maybe.empty()).ifPresent(next -> {
+                        GSKONetworking.sendToClientPlayer(new S2CRenderRailPacket(rail.getEntityId(), next.getEntityId()), player);
+                    });
+                });
     }
 
     @SubscribeEvent
