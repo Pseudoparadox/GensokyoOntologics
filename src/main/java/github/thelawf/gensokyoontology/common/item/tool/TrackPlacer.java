@@ -13,6 +13,7 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -53,15 +54,7 @@ public class TrackPlacer extends Item {
         // RailEntity rail = RailEntity.place(world, pos);
 
         if (player == null) return ActionResultType.FAIL;
-        float yaw = GSKOMathUtil.getEulerAngle(player.getLookVec()).yaw();
-        VECTOR2F_MAPPING.entrySet().stream().map((entry) -> {
-            if (yaw > entry.getKey().x && yaw <= entry.getKey().y) {
-                return entry.getValue();
-            }
-            return 0;
-        }).findFirst().ifPresent(value -> {
-            rail.setRotation(EulerAngle.of(yaw, 0, 0).toQuaternion());
-        });
+        rail.setRotation(Quaternion.ONE);
         stack.shrink(1);
         return ActionResultType.CONSUME;
     }

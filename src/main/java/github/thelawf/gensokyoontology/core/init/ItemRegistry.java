@@ -900,6 +900,7 @@ public final class ItemRegistry {
             BlockRegistry.COASTER_RAIL.get(), new Item.Properties().group(GSKOItemTab.GSKO_ITEM_TAB)){
     });
 
+    public static final RegistryObject<Item> ROTATE_FRAME = ITEMS.register("rotate_frame", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> ROT_ROLL_CLOCKWISE = ITEMS.register("rot_roll_clockwise", () -> new Item(new Item.Properties().group(GSKOItemTab.GSKO_ITEM_TAB)){
         @Override
         public int getUseDuration(ItemStack stack) {

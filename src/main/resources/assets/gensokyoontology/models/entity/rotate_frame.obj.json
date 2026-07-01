@@ -1,5 +1,10 @@
 {
   "loader": "forge:obj",
   "model": "gensokyoontology:models/entity/rotate_frame.obj",
-  "flip-v": true
+  "flip-v": true,
+  "display": {
+    "gui": {
+      "translation": [8, 16, 8]
+    }
+  }
 }

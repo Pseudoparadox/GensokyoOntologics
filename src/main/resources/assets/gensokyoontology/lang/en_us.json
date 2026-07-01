@@ -475,9 +475,9 @@
   "gui.gensokyoontology.danmaku_shot_consumed": "Danmaku Shot Consumed: ",
 
   "gui.gensokyoontology.rail_adjust.title": "Rail Adjustment",
-  "gui.gensokyoontology.button.increase_roll": "+",
-  "gui.gensokyoontology.button.increase_yaw": "+",
-  "gui.gensokyoontology.button.increase_pitch": "+",
+  "gui.gensokyoontology.axis.roll": "Z Rotation: ",
+  "gui.gensokyoontology.axis.yaw": "Y Rotation: ",
+  "gui.gensokyoontology.axis.pitch": "X Rotation: ",
   "gui.gensokyoontology.button.decrease_roll": "-",
   "gui.gensokyoontology.button.decrease_yaw": "-",
   "gui.gensokyoontology.button.decrease_pitch": "-",
@@ -487,6 +487,7 @@
   "gui.gensokyoontology.silder_prefix.qz": "Z Axis Roatation: ",
   "gui.gensokyoontology.silder_prefix.qw": "W: ",
 
+  "gui.gensokyoontology.button.reset": "Reset",
   "gui.gensokyoontology.button.reset_x": "Reset X: ",
   "gui.gensokyoontology.button.reset_y": "Reset Y: ",
   "gui.gensokyoontology.button.reset_z": "Reset Z: ",

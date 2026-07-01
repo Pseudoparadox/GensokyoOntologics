@@ -6,197 +6,165 @@ import github.thelawf.gensokyoontology.common.network.GSKONetworking;
 import github.thelawf.gensokyoontology.common.network.packet.CAdjustRailPacket;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.common.util.math.EulerAngle;
-import github.thelawf.gensokyoontology.common.util.math.GSKOMathUtil;
 import github.thelawf.gensokyoontology.common.util.math.RotMatrix;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.client.gui.widget.Slider;
 import org.jetbrains.annotations.NotNull;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.Map;
 
 public class RailDashboardScreen extends LineralLayoutScreen {
-    private int startEntityId;
+
+    private final int startEntityId;
+    private final BlockPos targetPos;
     private Quaternion rotation;
-    private BlockPos targetPos;
-    private EulerAngle eulerAngle;
 
-    private final Vector3d initHandleValue;
-    private Vector3d nextHandleValue;
-
-    private Slider pitchHandle;
-    private Slider yawHandle;
-    private Slider rollHandle;
-
-    private Button resetX0;
-    private Button resetY0;
-    private Button resetZ0;
-
-    // 添加轨道预览按钮
-    private Button applyButton;
-    private Button previewButton;
-
-    private static final TranslationTextComponent QX = GSKOUtil.fromLocaleKey("gui.", ".silder_prefix.qx");
-    private static final TranslationTextComponent QY = GSKOUtil.fromLocaleKey("gui.", ".silder_prefix.qy");
-    private static final TranslationTextComponent QZ = GSKOUtil.fromLocaleKey("gui.", ".silder_prefix.qz");
-
-    private static final TranslationTextComponent RX = GSKOUtil.fromLocaleKey("gui.", ".button.reset_x");
-    private static final TranslationTextComponent RY = GSKOUtil.fromLocaleKey("gui.", ".button.reset_y");
-    private static final TranslationTextComponent RZ = GSKOUtil.fromLocaleKey("gui.", ".button.reset_z");
-
-    private static final TranslationTextComponent APPLY = GSKOUtil.fromLocaleKey("gui.", ".button.apply");
-    private static final TranslationTextComponent PREVIEW = GSKOUtil.fromLocaleKey("gui.", ".button.preview");
+    private final java.util.Map<Integer, TextFieldWidget> axisFieldMap = new java.util.HashMap<>();
+    private static final TranslationTextComponent
+            QY = GSKOUtil.fromLocaleKey("gui.", ".axis.yaw"),
+            QX = GSKOUtil.fromLocaleKey("gui.", ".axis.pitch"),
+            QZ = GSKOUtil.fromLocaleKey("gui.", ".axis.roll"),
+            APPLY   = GSKOUtil.fromLocaleKey("gui.", ".button.apply"),
+            PREVIEW = GSKOUtil.fromLocaleKey("gui.", ".button.preview"),
+            RESET   = GSKOUtil.fromLocaleKey("gui.", ".button.reset");
 
     public static final ITextComponent TITLE = GSKOUtil.translateText("gui.", ".rail_dashboard.title");
+    private static final float[] STEPS = {90f, 10f, 1f};
+    private final Quaternion initRotation;
+
 
     public RailDashboardScreen(BlockPos pos, Quaternion rotation, int startEntityId) {
         super(TITLE);
         this.targetPos = pos;
-        this.rotation = rotation;
-        this.eulerAngle = EulerAngle.from(this.rotation);
+        this.rotation = rotation.copy();
+        this.initRotation = rotation.copy();
         this.startEntityId = startEntityId;
-
-        this.initHandleValue = new RotMatrix(this.rotation).toHandleValue();
-        this.nextHandleValue = new Vector3d(this.initHandleValue.x, this.initHandleValue.y, this.initHandleValue.z);
     }
 
     public RailDashboardScreen(BlockPos pos, RotMatrix matrix, int startEntityId) {
-        super(TITLE);
-        this.targetPos = pos;
-        this.rotation = matrix.toQuaternion();
-        this.startEntityId = startEntityId;
-
-        this.initHandleValue = matrix.toHandleValue();
-        this.nextHandleValue = new Vector3d(this.initHandleValue.x, this.initHandleValue.y, this.initHandleValue.z);
+        this(pos, matrix.toQuaternion(), startEntityId);
     }
 
-    private void onPitchSlide(Slider slider) {
-        updateRotationFromSliders();
+    private void applyDelta(float dYaw, float dPitch, float dRoll) {
+        Quaternion qz = new Quaternion(Vector3f.ZP, dRoll,  true);
+        Quaternion qx = new Quaternion(Vector3f.XP, dPitch, true);
+        Quaternion qy = new Quaternion(Vector3f.YP, dYaw,   true);
+
+        qz.multiply(qx);
+        qz.multiply(qy);      // Qz * Qx * Qy
+        qz.multiply(rotation);
+        this.rotation = qz;
     }
 
-    private void onYawSlide(Slider slider) {
-        updateRotationFromSliders();
-    }
-
-    private void onRollSlide(Slider slider) {
-        updateRotationFromSliders();
-    }
-
-    private void updateRotationFromSliders() {
-        double pitch = this.pitchHandle == null ? 0 : this.pitchHandle.getValue();
-        double yaw = this.yawHandle == null ? 0 : this.yawHandle.getValue();
-        double roll = this.rollHandle == null ? 0 : this.rollHandle.getValue();
-
-        // 使用正确的欧拉角顺序：Yaw -> Pitch -> Roll
-        this.eulerAngle = EulerAngle.of((float)yaw, (float)pitch, (float)roll);
-        this.rotation = this.eulerAngle.toQuaternion();
-
-        // 更新显示值
-        this.setSliderValue();
+    private void step(int axis, float sign, float mag) {
+        float dY = 0, dP = 0, dR = 0;
+        switch (axis) {
+            case 0 : dP = sign * mag; break;
+            case 1 : dY = sign * mag; break;
+            case 2 : dR = sign * mag; break;
+        }
+        this.applyDelta(dY, dP, dR);
+        this.setRotationText();
         this.sendPacketToServer();
     }
 
-    private void onResetXSlide(Button btn) {
-        this.pitchHandle.setValue(0);
-        updateRotationFromSliders();
+    private void setRotationText() {
+        EulerAngle e = RotMatrix.from(this.rotation).toEulerAngle();
+        float p = e.pitch(), y = e.yaw(), r = e.roll();
+
+        TextFieldWidget fp = axisFieldMap.get(0);
+        TextFieldWidget fy = axisFieldMap.get(1);
+        TextFieldWidget fr = axisFieldMap.get(2);
+
+        if (fp != null) fp.setText(String.format("%s %.1f", QX.getString(),p));
+        if (fy != null) fy.setText(String.format("%s %.1f", QY.getString(),y));
+        if (fr != null) fr.setText(String.format("%s %.1f", QZ.getString(),r));
     }
 
-    private void onResetYSlide(Button btn) {
-        this.yawHandle.setValue(0);
-        updateRotationFromSliders();
-    }
-
-    private void onResetZSlide(Button btn) {
-        this.rollHandle.setValue(0);
-        updateRotationFromSliders();
-    }
-
-    private void onApplyButton(Button btn) {
-        sendPacketToServer();
-    }
-
-    private void onPreviewButton(Button btn) {
-        // 发送预览包到客户端，临时应用旋转但不保存
-        // GSKONetworking.CHANNEL.sendToServer(new CPreviewRailPacket(this.targetPos, this.rotation, this.startEntityId));
+    private void sendPacketToServer() {
+        GSKONetworking.CHANNEL.sendToServer(new CAdjustRailPacket(targetPos, rotation, startEntityId));
     }
 
     @Override
     protected void init() {
         super.init();
-        double x = this.initHandleValue.x;
-        double y = this.initHandleValue.y;
-        double z = this.initHandleValue.z;
+        int baseY = 20;
+        int btnW = 30;
+        int gap = 2;
+        int labelW = 100;
+        int rowH = 22;
 
-        // 创建滑块，确保范围正确
-        this.pitchHandle = new Slider(50, 20, 180, 20, QX, withText("°"),
-                -180, 180, x,
-                true, true, iPressable -> {}, this::onPitchSlide);
+        int y = baseY;
+        int x = 50;
+        this.addStepButtons(x, y, 0, QX, btnW, gap, labelW);
+        y += rowH;
+        this.addStepButtons(x, y, 1, QY, btnW, gap, labelW);
+        y += rowH;
+        this.addStepButtons(x, y, 2, QZ, btnW, gap, labelW);
 
-        this.yawHandle = new Slider(50, 45, 180, 20, QY, withText("°"),
-                -180, 180, y,
-                true, true, iPressable -> {}, this::onYawSlide);
+        y += rowH + 6;
+        this.addButton(new Button(125, y, 70, 20, RESET, b -> {
+            this.rotation = Quaternion.ONE;
+            this.setRotationText();
+            sendPacketToServer();
+        }));
+    }
 
-        this.rollHandle = new Slider(50, 70, 180, 20, QZ, withText("°"),
-                -180, 180, z,
-                true, true, iPressable -> {}, this::onRollSlide);
+    /**
+     * 生成一行：[-90] [-10] [-1]  [Label]  [+1] [+10] [+90]
+     * axis: 0=Pitch,1=Yaw,2=Roll
+     */
+    private void addStepButtons(int startX, int y, int axis,
+                                ITextComponent label, int bw, int gap, int lw) {
+        int x = startX;
+        for (float mag : STEPS) {
+            this.addButton(new Button(x, y, bw, 20, GSKOUtil.stringText("-" + (int) mag),
+                    b -> step(axis, -1, mag)));
+            x += bw + gap;
+        }
 
-        this.resetX0 = new Button(250, 20, 60, 20, RX, this::onResetXSlide);
-        this.resetY0 = new Button(250, 45, 60, 20, RY, this::onResetYSlide);
-        this.resetZ0 = new Button(250, 70, 60, 20, RZ, this::onResetZSlide);
+        TextFieldWidget field = new TextFieldWidget(font, x, y, lw, 20, label);
+        field.setMaxStringLength(100);
+        field.setTextColor(0xFFFFFF);
+        field.setDisabledTextColour(0x888888);
 
-        // 添加应用和预览按钮
-        // this.applyButton = new Button(50, 100, 80, 20, APPLY, this::onApplyButton);
-        // this.previewButton = new Button(140, 100, 80, 20, PREVIEW, this::onPreviewButton);
+        // 初始值：从当前四元数反算
+        EulerAngle e = RotMatrix.from(rotation).toEulerAngle();
+        float initVal;
+        switch (axis) {
+            case 0 : initVal = e.pitch(); break;
+            case 1 : initVal = e.yaw(); break;
+            case 2 : initVal = e.roll(); break;
+            default : initVal = 0; break;
+        }
+        field.setText(String.format("%s %.1f", label.getString(), initVal));
+        axisFieldMap.put(axis, field);
+        this.addButton(field);
+        x += lw + gap;
 
-        this.addButton(this.pitchHandle);
-        this.addButton(this.yawHandle);
-        this.addButton(this.rollHandle);
 
-        this.addButton(this.resetX0);
-        this.addButton(this.resetY0);
-        this.addButton(this.resetZ0);
-
-        // this.addButton(this.applyButton);
+        for (float mag : STEPS) {
+            this.addButton(new Button(x, y, bw, 20, GSKOUtil.stringText("+" + (int) mag),
+                    b -> step(axis, +1, mag)));
+            x += bw + gap;
+        }
     }
 
     @Override
-    public void render(@NotNull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderBackground(matrixStack);
-
-        this.pitchHandle.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.yawHandle.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.rollHandle.render(matrixStack, mouseX, mouseY, partialTicks);
-
-        this.resetX0.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.resetY0.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.resetZ0.render(matrixStack, mouseX, mouseY, partialTicks);
-
-        // this.applyButton.render(matrixStack, mouseX, mouseY, partialTicks);
-        // this.previewButton.render(matrixStack, mouseX, mouseY, partialTicks);
-
-        // 显示当前旋转值
-        String rotationText = String.format("Rotation: Yaw=%.1f°, Pitch=%.1f°, Roll=%.1f°",
-                this.eulerAngle.yaw(), this.eulerAngle.pitch(), this.eulerAngle.roll());
-        drawString(matrixStack, this.font, rotationText, 50, 130, 0xFFFFFF);
-    }
-
-    @Override
-    public void renderBackground(@NotNull MatrixStack matrixStack) {
-        // 绘制背景
-        fill(matrixStack, 0, 0, this.width, this.height, 0x80000000);
-        fill(matrixStack, 30, 10, this.width - 30, 160, 0x40000000);
-    }
-
-    private float to3Digits(float value) {
-        BigDecimal b = new BigDecimal(value);
-        return b.setScale(2, RoundingMode.HALF_UP).floatValue();
+    public void render(@NotNull MatrixStack ms, int mx, int my, float pt) {
+        super.render(ms, mx, my, pt);
+        for (Map.Entry<Integer, TextFieldWidget> entry : axisFieldMap.entrySet()) {
+            TextFieldWidget f = entry.getValue();
+            if (f.getText().isEmpty() && !f.isFocused()) {
+                String[] names = {QX.getString(), QY.getString(), QZ.getString()};
+                drawString(ms, font, names[entry.getKey()] + " °", f.x + 4, f.y + 6, 0x666666);
+            }
+        }
     }
 
     @Override
@@ -204,30 +172,60 @@ public class RailDashboardScreen extends LineralLayoutScreen {
         return false;
     }
 
-    private void sendPacketToServer() {
-        GSKONetworking.CHANNEL.sendToServer(new CAdjustRailPacket(this.targetPos, this.rotation, this.startEntityId));
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        // 回车 commit 当前聚焦的文本框
+        for (Map.Entry<Integer, TextFieldWidget> entry : axisFieldMap.entrySet()) {
+            TextFieldWidget f = entry.getValue();
+            if (f.isFocused()) {
+                if (keyCode == 257 || keyCode == 335 /* ENTER */) {
+                    commitAxisField(entry.getKey());
+                    f.changeFocus(false); // 失焦
+                }
+                return super.keyPressed(keyCode, scanCode, modifiers);
+            }
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
-    private float value(Slider slider) {
-        if (slider == null) return 0;
-        slider.setValue(this.to3Digits((float) slider.getValue()));
-        return GSKOMathUtil.normalize(this.to3Digits((float) slider.getValue()), -180, 180);
+    @Override
+    public void onClose() {
+        // 关界面时把所有文本框刷进去，避免玩家输完直接 Esc 丢数据
+        for (int axis : axisFieldMap.keySet()) {
+            commitAxisField(axis);
+        }
+        super.onClose();
     }
 
-    private void setSliderValue() {
-        if (this.yawHandle == null) return;
-        if (this.rollHandle == null) return;
-        if (this.pitchHandle == null) return;
+    /** 把某个轴的文本框值按绝对值写回四元数（ZXY 顺规） */
+    private void commitAxisField(int axis) {
+        TextFieldWidget f = axisFieldMap.get(axis);
+        if (f == null) return;
 
-        this.pitchHandle.setValue(MathHelper.wrapDegrees(this.eulerAngle.pitch()));
-        this.yawHandle.setValue(MathHelper.wrapDegrees(this.eulerAngle.yaw()));
-        this.rollHandle.setValue(MathHelper.wrapDegrees(this.eulerAngle.roll()));
-    }
+        String raw = f.getText();
 
-    private EulerAngle getEulerAngleFrom(Slider xHandle, Slider yHandle, Slider zHandle) {
-        return EulerAngle.of(
-                xHandle == null ? 0F : (float) xHandle.getValue(),
-                yHandle == null ? 0F : (float) yHandle.getValue(),
-                zHandle == null ? 0F : (float) zHandle.getValue());
+        // 把 "Yaw 90.0" / "Pitch -10.0" 里的非数字、非负号、非 '.' 全剥掉
+        String num = raw.replaceAll("[^\\-\\d.]", "");
+        if (num.isEmpty()) {
+            this.setRotationText();
+            return;
+        }
+
+        float val;
+        try {
+            val = Float.parseFloat(num);
+        } catch (NumberFormatException ex) {
+            this.setRotationText();
+            return;
+        }
+
+        EulerAngle cur = RotMatrix.from(rotation).toEulerAngle();
+        EulerAngle next;
+        if (axis == 0)      next = EulerAngle.of(cur.yaw(),   val, cur.roll());
+        else if (axis == 1) next = EulerAngle.of(val,         cur.pitch(), cur.roll());
+        else                next = EulerAngle.of(cur.yaw(),   cur.pitch(), val);
+
+        this.rotation = next.toQuaternion();
+        sendPacketToServer();
     }
 }

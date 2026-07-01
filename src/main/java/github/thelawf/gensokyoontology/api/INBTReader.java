@@ -1,10 +1,15 @@
 package github.thelawf.gensokyoontology.api;
 
+import github.thelawf.gensokyoontology.common.nbt.GSKONBTUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.util.INBTSerializable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public interface INBTReader {
 
@@ -54,6 +59,22 @@ public interface INBTReader {
         if (stack.getTag() == null) return list;
         CompoundNBT nbt = stack.getTag();
         return nbt.getList(key, type.id);
+    }
+
+    default <T extends INBT, S extends INBTSynchornizable<T, S>> List<S> readList(String key, CompoundNBT nbt, S instance, Function<INBT, T> function){
+        if (!nbt.contains(key)) return new ArrayList<>();
+        if (!(nbt.get(key) instanceof ListNBT)) return new ArrayList<>();
+        ListNBT listNBT = (ListNBT) nbt.get(key);
+        List<S> list = new ArrayList<>();
+        if (listNBT == null) {
+            return new ArrayList<>();
+        }
+
+        for (INBT inbt : listNBT) {
+            instance.deserializeNBT(function.apply(inbt));
+            list.add(instance.copy());
+        }
+        return list;
     }
 
     default <T extends INBT> T cast(INBT nbt, Type type) {

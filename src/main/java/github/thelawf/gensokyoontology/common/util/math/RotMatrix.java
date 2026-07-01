@@ -288,23 +288,43 @@ public class RotMatrix {
     }
 
     public EulerAngle toEulerAngle() {
-        float pitch, yaw, roll;
+        // 从 m21 = sin(pitch) 解 pitch
+        double sp = MathHelper.clamp(this.m21, -1.0f, 1.0f);
+        double cp = Math.sqrt(1.0 - sp * sp);
+        double pitch = Math.asin(sp); // [-π/2, π/2]
 
-        // 从旋转矩阵中提取欧拉角（使用Y-X-Z顺序）
-        pitch = (float) Math.asin(-this.m12);
-        yaw = (float) Math.atan2(this.m02, this.m22);
-        roll = (float) Math.atan2(this.m10, this.m11);
+        double yaw, roll;
 
-        // 转换为角度
-        pitch = (float) Math.toDegrees(pitch);
-        yaw = (float) Math.toDegrees(yaw);
-        roll = (float) Math.toDegrees(roll);
+        if (Math.abs(cp) > 1e-6) {
+            // ---- 非死锁：cp ≠ 0 ----
+            // m01 = -sr*cp, m11 = cr*cp → roll
+            roll  = Math.atan2(-this.m01, this.m11);
 
-        // 确保角度在合适范围内
-        yaw = MathHelper.wrapDegrees(yaw);
-        roll = MathHelper.wrapDegrees(roll);
+            double cr = Math.cos(roll), sr = Math.sin(roll);
+            if (Math.abs(sp) > 1e-6) {
+                double cy = m00 * cr + m10 * sr;
+                double sy = -(m10 * cr - m00 * sr) / sp;
+                yaw = Math.atan2(sy, cy);
+            } else {
 
-        return EulerAngle.of(yaw, pitch, roll);
+                double cy = m00 / cr;
+                double sy = m02 / (-cr);
+                yaw = Math.atan2(sy, cy);
+            }
+        } else {
+            roll = 0;
+            if (sp > 0) {
+                yaw = Math.atan2(this.m02, this.m00);
+            } else {
+                yaw = Math.atan2(-this.m02, this.m00);
+            }
+        }
+
+        return EulerAngle.of(
+                (float) Math.toDegrees(yaw),
+                (float) Math.toDegrees(pitch),
+                (float) Math.toDegrees(roll)
+        );
     }
 
     public Vector3d toHandleValue() {

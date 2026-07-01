@@ -1,12 +1,25 @@
 package github.thelawf.gensokyoontology.api;
 
+import github.thelawf.gensokyoontology.common.nbt.GSKONBTUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface INBTWriter extends INBTReader {
+    default <T extends INBT, S extends INBTSynchornizable<T, S>> void writeList(CompoundNBT nbtToWirteIn, String key, List<S> list, GSKONBTUtil.NBTType nbtType){
+        ListNBT listNBT = new ListNBT();
+        list.forEach(s -> listNBT.add(nbtType.typeByte, s.serializeNBT()));
+        nbtToWirteIn.put(key, listNBT);
+    }
+
+
     default void writeBoolean(ItemStack stack, String key, Boolean value) {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putBoolean(key, value);

@@ -13,9 +13,12 @@ import github.thelawf.gensokyoontology.core.init.ItemRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
@@ -44,7 +47,9 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         return TEXTURE;
     }
 
-    // avg: 1/seg, 1 / lenOfEach
+    // avg: 1/seg, l: lenOfEach, L: totalLen
+    // percent: l/L
+    // abs(avg / percent)
     @Override
     public void render(@NotNull RailEntity startRail, float entityYaw, float partialTicks, @NotNull MatrixStack matrixStack, IRenderTypeBuffer bufferIn, int light) {
         super.render(startRail, entityYaw, partialTicks, matrixStack, bufferIn, light);
@@ -53,7 +58,7 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         ClientPlayerEntity player = minecraft.player;
 
         IVertexBuilder builder = bufferIn.getBuffer(RenderType.getEntityCutoutNoCull(TEXTURE));
-        IVertexBuilder buffer = bufferIn.getBuffer(GSKORenderTypes.MULTI_FACE_SOLID);
+        IVertexBuilder buffer  = bufferIn.getBuffer(GSKORenderTypes.MULTI_FACE_SOLID);
 
         Maybe<Entity> maybe = startRail.getNextRailClient(Maybe.empty());
         if (!maybe.isPresent()) {
@@ -61,19 +66,35 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             return;
         }
         if (!(maybe.get() instanceof RailEntity)) return;
-        Predicate<PlayerEntity> isHoldingThese = p ->
-                p.getHeldItemMainhand().getItem() == ItemRegistry.RAIL_WRENCH.get() ||
-                p.getHeldItemMainhand().getItem() == ItemRegistry.RAIL_CONNECTOR.get() ||
+        Predicate<PlayerEntity> holdWrench = p ->
+                p.getHeldItemMainhand().getItem() == ItemRegistry.RAIL_WRENCH.get();
+        Predicate<PlayerEntity> holdConnector = p ->
+                p.getHeldItemMainhand().getItem() == ItemRegistry.RAIL_CONNECTOR.get();
+
+        Predicate<PlayerEntity> holdTracks = p ->
                 p.getHeldItemMainhand().getItem() == ItemRegistry.TRACK_PLACER.get() ||
                 p.getHeldItemMainhand().getItem() == ItemRegistry.TRACK_REMOVER.get();
 
-        if (player != null && isHoldingThese.test(player)){
+        if (player != null && holdTracks.or(holdWrench).or(holdConnector).test(player)){
             this.renderUnconnectedTrack(buffer, matrixStack, startRail);
         }
 
         maybe.ifPresent(nextRail -> this.renderHermite3(startRail, (RailEntity) nextRail, builder, matrixStack));
+        if (player != null && holdWrench.test(player)){
+            this.renderRotateFrame(startRail, bufferIn, matrixStack, light);
+        }
 //        RailEntity targetRail = (RailEntity) maybe.get();
 //        this.renderHermite3(startRail, targetRail, builder, matrixStack);
+    }
+
+    private void renderRotateFrame(RailEntity rail, IRenderTypeBuffer buffer, @NotNull MatrixStack matrixStack, int light) {
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        matrixStack.push();
+        matrixStack.rotate(rail.getRotation());
+        itemRenderer.renderItem(ItemRegistry.ROTATE_FRAME.get().getDefaultInstance(),
+                ItemCameraTransforms.TransformType.GUI,
+                light, OverlayTexture.NO_OVERLAY, matrixStack, buffer);
+        matrixStack.pop();
     }
 
     public void renderHermite3(RailEntity startRail, RailEntity targetRail, IVertexBuilder builder, MatrixStack matrixStack) {
@@ -92,8 +113,8 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
 
         // 预计算全局桶滚角度变化范围
         float maxRollChange = 180.0f;
-        float startRoll = GSKOMathUtil.getEulerAngle(startRot).roll();
-        float endRoll = GSKOMathUtil.getEulerAngle(endRot).roll();
+        float startRoll = RotMatrix.from(startRot).toEulerAngle().roll();
+        float endRoll = RotMatrix.from(endRot).toEulerAngle().roll();
         float rollDelta = MathHelper.wrapDegrees(endRoll - startRoll);
         if (Math.abs(rollDelta) > maxRollChange) {
             rollDelta = Math.signum(rollDelta) * maxRollChange;
@@ -112,69 +133,10 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
 
         // 保存初始矩阵状态，以便在渲染完这一整条轨道后恢复
         matrixStack.push();
+
         this.renderSegments(segments, startOffset, endOffset, startDirection, endDirection, startRot, endRot, builder, matrixStack,
                 startRoll, rollDelta);
 
-//        for (int i = 0; i < segments; i++) {
-//            float t0 = (float) i / segments;
-//            float t1 = (float) (i + 1) / segments;
-//
-//            // 使用相对偏移量计算曲线点
-//            Vector3d prev = CurveUtil.hermite3(startOffset, endOffset, startDirection, endDirection, t0);
-//            Vector3d next = CurveUtil.hermite3(startOffset, endOffset, startDirection, endDirection, t1);
-//
-//            // 计算切向量（用于旋转）
-//            // 注意：这里使用局部坐标计算切线，因为矩阵已经平移了
-//            Vector3d tangentVec = tangent(startOffset, endOffset, startDirection, endDirection, t0).normalize();
-//
-//            // 应用桶滚 (Roll)
-//            float currentRoll = startRoll + t0 * rollDelta;
-//
-//            // 使用球面线性插值(SLERP)平滑旋转
-//            Quaternion currentRotation = GSKOMathUtil.slerp(startRot, endRot, t0);
-//
-//            // 构建旋转矩阵 - 使用轨道实体的旋转
-//            RotMatrix rotMatrix = new RotMatrix(currentRotation);
-//
-//            // 应用桶滚旋转到法线方向
-//            Vector3f normal = rotMatrix.normal(); // 获取法线（X轴）
-//            Vector3f binormal = rotMatrix.binormal(); // 获取副法线（Y轴）
-//            Vector3f tangentAxis = rotMatrix.tangent(); // 获取切线（Z轴）
-//
-//            // 创建桶滚四元数并应用到法线
-//            Quaternion rollQuat = new Quaternion(tangentAxis, currentRoll, true);
-//            Vector3f rolledNormal = GSKOMathUtil.rotateVector(rollQuat, normal);
-//
-//            // 重新构建旋转矩阵
-//            RotMatrix matrix = new RotMatrix();
-//            matrix.setColumn(0, new Vector3d(rolledNormal));     // X轴 = 滚动后的法线
-//            matrix.setColumn(1, new Vector3d(binormal));         // Y轴 = 副法线
-//            matrix.setColumn(2, new Vector3d(tangentAxis));      // Z轴 = 切线
-//
-//            Vector3d localLeftOffset  = new Vector3d(-RAIL_WIDTH,0, 0);
-//            Vector3d localRightOffset = new Vector3d(RAIL_WIDTH, 0, 0);
-//
-//            // 转换到世界坐标（因为外层 matrixStack 已经 translate 过了，这里只需乘 rotMatrix）
-//            Vector3d leftStart = matrix.multiply(localLeftOffset).add(prev);
-//            Vector3d rightStart = matrix.multiply(localRightOffset).add(prev);
-//            Vector3d leftEnd = matrix.multiply(localLeftOffset).add(next);
-//            Vector3d rightEnd = matrix.multiply(localRightOffset).add(next);
-//
-//            Color4f color = new Color4i(255, 0, 0, 255).toColor4f();
-//
-//            // 渲染左轨道
-//            GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
-//                    leftStart, leftEnd,
-//                    RAIL_RADIUS, 8,
-//                    color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-//
-//            // 渲染右轨道
-//            GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
-//                    rightStart, rightEnd,
-//                    RAIL_RADIUS, 8,
-//                    color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-//        }
-//        // 恢复矩阵状态
         matrixStack.pop();
     }
 
@@ -226,6 +188,15 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             Vector3d leftEnd = matrix.multiply(localLeftOffset).add(next);
             Vector3d rightEnd = matrix.multiply(localRightOffset).add(next);
 
+            float scaleLeft = (float) (1F / segments / (leftStart.distanceTo(leftEnd)));
+            float scaleRight = (float) (1F / segments / (rightStart.distanceTo(rightEnd)));
+
+            // leftStart 等需要加下面这些：（四个位置都要加）
+            next.subtract(next).scale(scaleLeft).add(prev);
+            next.subtract(next).scale(scaleRight).add(next);
+//            leftEnd = leftEnd.scale(scaleLeft);
+//            rightEnd = rightEnd.scale(scaleRight);
+
             Color4f color = new Color4i(255, 0, 0, 255).toColor4f();
 
             // 渲染左轨道
@@ -255,6 +226,9 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
 
         Quaternion rotation = rail.getRotation();
         matrixStackIn.push();
+//        if (player != null && holdWrench.test(player)){
+//            this.renderRotateFrame(bufferIn, matrixStack, light);
+//        }
         matrixStackIn.rotate(rotation);
         matrixStackIn.translate(0, 0.5F, 0);
 

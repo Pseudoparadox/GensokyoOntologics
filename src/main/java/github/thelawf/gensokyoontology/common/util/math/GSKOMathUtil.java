@@ -563,8 +563,8 @@ public class GSKOMathUtil {
         Quaternion qz = new Quaternion(Vector3f.ZP, eulerAngle.roll(), true);    // 先绕Z轴（Yaw）
         Quaternion qy = new Quaternion(Vector3f.YP, eulerAngle.yaw(), true);   // 再绕Y轴（Pitch）
         Quaternion qx = new Quaternion(Vector3f.XP, eulerAngle.pitch(), true);    // 后绕X轴（Roll）
-        qz.multiply(qy);
-        qz.multiply(qx); // 顺序: Z → Y → X
+        qz.multiply(qx);
+        qz.multiply(qy); // 顺序: Z → X → Y
         return qz;
     }
 

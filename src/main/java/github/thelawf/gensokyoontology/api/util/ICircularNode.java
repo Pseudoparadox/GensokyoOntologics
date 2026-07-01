@@ -1,13 +1,16 @@
 package github.thelawf.gensokyoontology.api.util;
 
-public interface ICircularNode<T> {
-    ICircularNode<T> prev();
-    ICircularNode<T> next();
+public interface ICircularNode<T, N extends ICircularNode<T, N>> {
+    N prev();
+    N next();
     T value();
-    default boolean HasNext() {
+
+    void setPrev(N node);
+    void setNext(N node);
+    default boolean hasNext() {
         return next() == null;
     }
-    default boolean HasPrev() {
+    default boolean hasPrev() {
         return prev() == null;
     }
 }
