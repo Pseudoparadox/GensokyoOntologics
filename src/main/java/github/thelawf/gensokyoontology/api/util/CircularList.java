@@ -13,9 +13,8 @@ public class CircularList<T> {
     private List<CircularNode<T>> nodes;
 
     // 初始化一个空链表
-    public CircularList(int capacity)
+    public CircularList()
     {
-        this.depth = capacity;
         this.head = null;
         this.tail = null;
         nodes = new ArrayList<>();
@@ -31,10 +30,10 @@ public class CircularList<T> {
         return this.tail;
     }
 
-    public static <T> CircularList<T> from(Iterator<T> list)
+    public static <T> CircularList<T> from(Iterable<T> list)
     {
-        CircularList<T> circular = new CircularList<>(0);
-        list.forEachRemaining(circular::add);
+        CircularList<T> circular = new CircularList<>();
+        list.forEach(circular::add);
         return circular;
     }
 

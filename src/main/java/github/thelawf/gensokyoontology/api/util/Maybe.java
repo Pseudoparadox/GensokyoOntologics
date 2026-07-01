@@ -10,7 +10,7 @@ public class Maybe<T> {
     private Maybe(){
 
     }
-    private Maybe(T value){
+    private Maybe(@org.jetbrains.annotations.Nullable T value){
         this.value = value;
     }
     public static <T> Maybe<T> empty(){

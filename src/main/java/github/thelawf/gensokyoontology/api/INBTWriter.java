@@ -5,20 +5,32 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.LongNBT;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public interface INBTWriter extends INBTReader {
-    default <T extends INBT, S extends INBTSynchornizable<T, S>> void writeList(CompoundNBT nbtToWirteIn, String key, List<S> list, GSKONBTUtil.NBTType nbtType){
+    default void writeLongList(CompoundNBT nbtToWirteIn, String key, Iterable<Long> list){
+        ListNBT listNBT = new ListNBT();
+        list.forEach(l -> listNBT.add(GSKONBTUtil.NBTType.LONG.typeByte, LongNBT.valueOf(l)));
+        nbtToWirteIn.put(key, listNBT);
+    }
+
+    default void writeCompoundList(CompoundNBT nbtToWriteIn, String key, Stream<CompoundNBT> compoundNBTS){
+        ListNBT listNBT = new ListNBT();
+        compoundNBTS.forEach(listNBT::add);
+        nbtToWriteIn.put(key,listNBT);
+    }
+    default <T extends INBT, S extends INBTSynchornizable<T, S>> void writeList(CompoundNBT nbtToWirteIn, String key, Iterable<S> list, GSKONBTUtil.NBTType nbtType){
         ListNBT listNBT = new ListNBT();
         list.forEach(s -> listNBT.add(nbtType.typeByte, s.serializeNBT()));
         nbtToWirteIn.put(key, listNBT);
     }
-
 
     default void writeBoolean(ItemStack stack, String key, Boolean value) {
         CompoundNBT nbt = new CompoundNBT();

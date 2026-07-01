@@ -61,6 +61,21 @@ public interface INBTReader {
         return nbt.getList(key, type.id);
     }
 
+    default <T> List<CompoundNBT> readCompoundList(String key, CompoundNBT nbt, Function<INBT, T> function){
+        if (!nbt.contains(key)) return new ArrayList<>();
+        if (!(nbt.get(key) instanceof ListNBT)) return new ArrayList<>();
+        ListNBT listNBT = (ListNBT) nbt.get(key);
+        List<CompoundNBT> list = new ArrayList<>();
+        if (listNBT == null) {
+            return new ArrayList<>();
+        }
+
+        for (INBT inbt : listNBT) {
+        }
+        return list;
+    }
+
+
     default <T extends INBT, S extends INBTSynchornizable<T, S>> List<S> readList(String key, CompoundNBT nbt, S instance, Function<INBT, T> function){
         if (!nbt.contains(key)) return new ArrayList<>();
         if (!(nbt.get(key) instanceof ListNBT)) return new ArrayList<>();
