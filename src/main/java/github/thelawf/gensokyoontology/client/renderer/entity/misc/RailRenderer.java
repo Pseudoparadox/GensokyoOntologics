@@ -10,6 +10,7 @@ import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.common.util.math.*;
 import github.thelawf.gensokyoontology.core.init.ItemRegistry;
+import github.thelawf.gensokyoontology.data.HermiteSpineInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -121,20 +122,18 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         }
 
         // 获取方向向量
-        Vector3f startDirection = startRail.getOrientation().copy();
-        Vector3f endDirection = targetRail.getOrientation().copy();
-        startDirection.mul(SCALE);
-        endDirection.mul(SCALE);
+        Vector3f currentOrientation = startRail.getOrientation().copy();
+        Vector3f nextOrientation = targetRail.getOrientation().copy();
+        currentOrientation.mul(rescaleTangent(startWorldPos, endWorldPos));
+        nextOrientation.mul(rescaleTangent(startWorldPos, endWorldPos));
 
         final int segments = 32;
         // 临时变量存储上一段的端点，用于连线
-        Vector3d prevLeft = null;
-        Vector3d prevRight = null;
 
         // 保存初始矩阵状态，以便在渲染完这一整条轨道后恢复
         matrixStack.push();
 
-        this.renderSegments(segments, startOffset, endOffset, startDirection, endDirection, startRot, endRot, builder, matrixStack,
+        this.renderSegments(segments, startOffset, endOffset, currentOrientation, nextOrientation, startRot, endRot, builder, matrixStack,
                 startRoll, rollDelta);
 
         matrixStack.pop();
@@ -143,6 +142,8 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
     public void renderSegments(int segments, Vector3d startOffset, Vector3d endOffset, Vector3f startDirection, Vector3f endDirection,
                                Quaternion startRot, Quaternion endRot, IVertexBuilder builder, MatrixStack matrixStack,
                                float startRoll, float rollDelta){
+        Vector3d prevLeft = null;
+        Vector3d prevRight = null;
         for (int i = 0; i < segments; i++) {
             float t0 = (float) i / segments;
             float t1 = (float) (i + 1) / segments;
@@ -183,19 +184,13 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             Vector3d localRightOffset = new Vector3d(RAIL_WIDTH, 0, 0);
 
             // 转换到世界坐标（因为外层 matrixStack 已经 translate 过了，这里只需乘 rotMatrix）
-            Vector3d leftStart = matrix.multiply(localLeftOffset).add(prev);
-            Vector3d rightStart = matrix.multiply(localRightOffset).add(prev);
+            Vector3d leftStart = prevLeft == null ? matrix.multiply(localLeftOffset).add(prev) : prevLeft;
+            Vector3d rightStart = prevRight == null ? matrix.multiply(localRightOffset).add(prev) : prevRight;
             Vector3d leftEnd = matrix.multiply(localLeftOffset).add(next);
             Vector3d rightEnd = matrix.multiply(localRightOffset).add(next);
 
             float scaleLeft = (float) (1F / segments / (leftStart.distanceTo(leftEnd)));
             float scaleRight = (float) (1F / segments / (rightStart.distanceTo(rightEnd)));
-
-            // leftStart 等需要加下面这些：（四个位置都要加）
-            next.subtract(next).scale(scaleLeft).add(prev);
-            next.subtract(next).scale(scaleRight).add(next);
-//            leftEnd = leftEnd.scale(scaleLeft);
-//            rightEnd = rightEnd.scale(scaleRight);
 
             Color4f color = new Color4i(255, 0, 0, 255).toColor4f();
 
@@ -211,6 +206,9 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
                     rightStart, rightEnd, new Vector3d(rolledNormal), RAIL_RADIUS, 8,
                     color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+
+            prevLeft = leftEnd;
+            prevRight = rightEnd;
 
             // 渲染右轨道
 //            GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
@@ -233,7 +231,7 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         matrixStackIn.translate(0, 0.5F, 0);
 
         matrixStackIn.push();
-        matrixStackIn.translate(-0.5, 0.1, -0.5);
+        matrixStackIn.translate(-0.5, 0, -0.5);
         GeometryUtil.renderCyl(builder, matrixStackIn.getLast().getMatrix(),
                 new Vector3d(0,0,0),
                 new Vector3d(0, 0, 1),
@@ -262,7 +260,7 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         matrixStackIn.pop();
 
         matrixStackIn.push();
-        matrixStackIn.translate(-0.2, -0.2, -0.5);
+        matrixStackIn.translate(-0.2, -0.1, -0.5);
         matrixStackIn.translate(0, -0.15, 0);
         GeometryUtil.renderCube(builder, matrixStackIn.getLast().getMatrix(),
                 new Vector3f(0.4F, 0.15F, 1F),
@@ -276,5 +274,20 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         Vector3d prev = CurveUtil.hermite3(start, end, startDirection, endDirection, Math.max(0, t));
         Vector3d next = CurveUtil.hermite3(start, end, startDirection, endDirection, Math.min(1, t + 0.001F));
         return next.subtract(prev).normalize();
+    }
+
+    private float rescaleTangent(Vector3d start, Vector3d end) {
+        double distance = start.distanceTo(end);
+        float scale;
+        if (distance < 20.0) {
+            scale = (float) distance * 0.8f;
+        } else if (distance < 50.0) {
+            scale = (float) distance * 0.5f;
+        } else {
+            scale = (float) distance * 0.2f;
+        }
+
+        scale = Math.max(1.0f, Math.min(50.0f, scale));
+        return scale;
     }
 }

@@ -2,13 +2,17 @@ package github.thelawf.gensokyoontology.client.gui.screen;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import github.thelawf.gensokyoontology.client.gui.screen.script.LineralLayoutScreen;
+import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.network.GSKONetworking;
 import github.thelawf.gensokyoontology.common.network.packet.CAdjustRailPacket;
+import github.thelawf.gensokyoontology.common.util.EnumUtil;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.common.util.math.EulerAngle;
 import github.thelawf.gensokyoontology.common.util.math.RotMatrix;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3f;
@@ -16,6 +20,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class RailDashboardScreen extends LineralLayoutScreen {
@@ -25,29 +30,49 @@ public class RailDashboardScreen extends LineralLayoutScreen {
     private Quaternion rotation;
 
     private final java.util.Map<Integer, TextFieldWidget> axisFieldMap = new java.util.HashMap<>();
+    private TextFieldWidget startScale;
+    private TextFieldWidget endScale;
+    private Button railType;
+
+
+
     private static final TranslationTextComponent
             QY = GSKOUtil.fromLocaleKey("gui.", ".axis.yaw"),
             QX = GSKOUtil.fromLocaleKey("gui.", ".axis.pitch"),
             QZ = GSKOUtil.fromLocaleKey("gui.", ".axis.roll"),
-            APPLY   = GSKOUtil.fromLocaleKey("gui.", ".button.apply"),
-            PREVIEW = GSKOUtil.fromLocaleKey("gui.", ".button.preview"),
+            SCALE_START   = GSKOUtil.fromLocaleKey("gui.", ".label.scale_start"),
+            SCALE_END     = GSKOUtil.fromLocaleKey("gui.", ".label.scale_end"),
+            INFO_UNIFORM  = GSKOUtil.fromLocaleKey("gui.", ".label.rail_info.uniform"),
+            INFO_INERTIAL = GSKOUtil.fromLocaleKey("gui.", ".label.rail_info.inertial"),
+            INFO_ACC      = GSKOUtil.fromLocaleKey("gui.", ".label.rail_info.acceleration"),
+            INFO_DEC      = GSKOUtil.fromLocaleKey("gui.", ".label.rail_info.deceleration"),
             RESET   = GSKOUtil.fromLocaleKey("gui.", ".button.reset");
+
+    private static final Map<RailEntity.Info, TranslationTextComponent> MAP = Util.make(() -> {
+        Map<RailEntity.Info, TranslationTextComponent> map = new HashMap<>();
+        map.put(RailEntity.Info.ACCELERATION, INFO_ACC);
+        map.put(RailEntity.Info.DECELERATION, INFO_DEC);
+        map.put(RailEntity.Info.UNIFORM, INFO_UNIFORM);
+        map.put(RailEntity.Info.INERTIAL, INFO_INERTIAL);
+        return map;
+    });
 
     public static final ITextComponent TITLE = GSKOUtil.translateText("gui.", ".rail_dashboard.title");
     private static final float[] STEPS = {90f, 10f, 1f};
     private final Quaternion initRotation;
+    private RailEntity.Info railInfo;
+    private int exit;
+    private int enter;
 
-
-    public RailDashboardScreen(BlockPos pos, Quaternion rotation, int startEntityId) {
+    public RailDashboardScreen(BlockPos pos, Quaternion rotation, RailEntity.Info railInfo, int startEntityId, int exit, int enter) {
         super(TITLE);
         this.targetPos = pos;
         this.rotation = rotation.copy();
         this.initRotation = rotation.copy();
         this.startEntityId = startEntityId;
-    }
-
-    public RailDashboardScreen(BlockPos pos, RotMatrix matrix, int startEntityId) {
-        this(pos, matrix.toQuaternion(), startEntityId);
+        this.railInfo = railInfo;
+        this.exit = exit;
+        this.enter = enter;
     }
 
     private void applyDelta(float dYaw, float dPitch, float dRoll) {
@@ -93,32 +118,34 @@ public class RailDashboardScreen extends LineralLayoutScreen {
     @Override
     protected void init() {
         super.init();
-        int baseY = 20;
-        int btnW = 30;
-        int gap = 2;
-        int labelW = 100;
-        int rowH = 22;
+        int x = 50, y = 20, buttonWidth = 30, gap = 2, labelWidth = 100, row = 22;
+        this.addStepButtons(x, y, 0, QX, buttonWidth, gap, labelWidth);
+        y += row;
+        this.addStepButtons(x, y, 1, QY, buttonWidth, gap, labelWidth);
+        y += row;
+        this.addStepButtons(x, y, 2, QZ, buttonWidth, gap, labelWidth);
 
-        int y = baseY;
-        int x = 50;
-        this.addStepButtons(x, y, 0, QX, btnW, gap, labelW);
-        y += rowH;
-        this.addStepButtons(x, y, 1, QY, btnW, gap, labelW);
-        y += rowH;
-        this.addStepButtons(x, y, 2, QZ, btnW, gap, labelW);
+        y += row;
+        this.startScale = new TextFieldWidget(this.font, x, y, buttonWidth, 20, withText(""));
+        this.endScale = new TextFieldWidget(this.font, x + buttonWidth + gap + 100, y, buttonWidth, 20, withText(""));
 
-        y += rowH + 6;
+        y += row;
+        this.railType = new Button(x, y, buttonWidth, 20, INFO_UNIFORM, this::switchRailType);
+        y += row + 6;
         this.addButton(new Button(125, y, 70, 20, RESET, b -> {
             this.rotation = Quaternion.ONE;
             this.setRotationText();
-            sendPacketToServer();
+            this.sendPacketToServer();
         }));
     }
 
-    /**
-     * 生成一行：[-90] [-10] [-1]  [Label]  [+1] [+10] [+90]
-     * axis: 0=Pitch,1=Yaw,2=Roll
-     */
+    private void switchRailType(Button button){
+        RailEntity.Info newInfo = EnumUtil.switchEnum(RailEntity.Info.class, this.railInfo);
+        this.railInfo = newInfo;
+        button.setMessage(MAP.get(newInfo));
+        this.sendPacketToServer();
+    }
+
     private void addStepButtons(int startX, int y, int axis,
                                 ITextComponent label, int bw, int gap, int lw) {
         int x = startX;
@@ -131,7 +158,6 @@ public class RailDashboardScreen extends LineralLayoutScreen {
         TextFieldWidget field = new TextFieldWidget(font, x, y, lw, 20, label);
         field.setMaxStringLength(100);
         field.setTextColor(0xFFFFFF);
-        field.setDisabledTextColour(0x888888);
 
         // 初始值：从当前四元数反算
         EulerAngle e = RotMatrix.from(rotation).toEulerAngle();
@@ -156,13 +182,20 @@ public class RailDashboardScreen extends LineralLayoutScreen {
     }
 
     @Override
-    public void render(@NotNull MatrixStack ms, int mx, int my, float pt) {
-        super.render(ms, mx, my, pt);
+    public void render(@NotNull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.startScale.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.endScale.render(matrixStack, mouseX, mouseY, partialTicks);
+
+        int endX = this.startScale.x + this.startScale.getWidth() + 2;
+        drawString(matrixStack, this.font, SCALE_START.getString(), 0, this.startScale.y, 0x666666);
+        drawString(matrixStack, this.font, SCALE_END.getString(), endX, this.startScale.y, 0x666666);
+
         for (Map.Entry<Integer, TextFieldWidget> entry : axisFieldMap.entrySet()) {
             TextFieldWidget f = entry.getValue();
             if (f.getText().isEmpty() && !f.isFocused()) {
                 String[] names = {QX.getString(), QY.getString(), QZ.getString()};
-                drawString(ms, font, names[entry.getKey()] + " °", f.x + 4, f.y + 6, 0x666666);
+                drawString(matrixStack, this.font, names[entry.getKey()] + " °", f.x + 4, f.y + 6, 0x666666);
             }
         }
     }

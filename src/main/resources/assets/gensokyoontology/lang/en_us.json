@@ -493,6 +493,8 @@
   "gui.gensokyoontology.button.reset_z": "Reset Z: ",
   "gui.gensokyoontology.label.qw": "Rotation W: ",
 
+  "gui.gensokyoontology.label.scale_start": "Scale: ",
+
   "gui.gensokyoontology.label.cx1": "Control X1 Offset: ",
   "gui.gensokyoontology.label.cy1": "Control Y1 Offset: ",
   "gui.gensokyoontology.label.cz1": "Control Z1 Offset: ",

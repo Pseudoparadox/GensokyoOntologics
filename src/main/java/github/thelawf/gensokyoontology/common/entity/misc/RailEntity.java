@@ -2,14 +2,11 @@ package github.thelawf.gensokyoontology.common.entity.misc;
 
 import github.thelawf.gensokyoontology.api.Color4i;
 import github.thelawf.gensokyoontology.api.util.Maybe;
-import github.thelawf.gensokyoontology.common.network.GSKONetworking;
-import github.thelawf.gensokyoontology.common.network.packet.S2CRenderRailPacket;
 import github.thelawf.gensokyoontology.common.util.math.CurveUtil;
 import github.thelawf.gensokyoontology.common.util.math.RotMatrix;
 import github.thelawf.gensokyoontology.core.init.EntityRegistry;
 import github.thelawf.gensokyoontology.common.util.math.DerivativeInfo;
 import github.thelawf.gensokyoontology.data.GSKOSerializers;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -27,7 +24,6 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
-import net.minecraftforge.fml.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -43,9 +39,13 @@ public class RailEntity extends Entity {
 
     public static final DataParameter<Quaternion> DATA_ROT = EntityDataManager.createKey(
             RailEntity.class, GSKOSerializers.QUATERNION);
-    public static final DataParameter<BlockPos> DATA_TARGET = EntityDataManager.createKey(
+    public static final DataParameter<BlockPos> DATA_NEXT_POS = EntityDataManager.createKey(
             RailEntity.class, DataSerializers.BLOCK_POS);
     public static final DataParameter<Integer> DATA_INFO = EntityDataManager.createKey(
+            RailEntity.class, DataSerializers.VARINT);
+    public static final DataParameter<Integer> DATA_EXIT = EntityDataManager.createKey(
+            RailEntity.class, DataSerializers.VARINT);
+    public static final DataParameter<Integer> DATA_ENTER = EntityDataManager.createKey(
             RailEntity.class, DataSerializers.VARINT);
 
     public int prevId;
@@ -73,8 +73,10 @@ public class RailEntity extends Entity {
         this.dataManager.register(DATA_PREV_UUID, Optional.empty());
         this.dataManager.register(DATA_TARGET_UUID, Optional.empty());
         this.dataManager.register(DATA_ROT, new Quaternion(0f, 0f, 0f, 1f));
-        this.dataManager.register(DATA_TARGET, new BlockPos(0,0,0));
+        this.dataManager.register(DATA_NEXT_POS, new BlockPos(0,0,0));
         this.dataManager.register(DATA_INFO, Info.UNIFORM.ordinal());
+        this.dataManager.register(DATA_EXIT, 10);
+        this.dataManager.register(DATA_ENTER, 10);
     }
 
     @Override
@@ -90,6 +92,8 @@ public class RailEntity extends Entity {
         float qw = nbt.getFloat("qw");
 
         this.setInfo(nbt.getInt("info"));
+        this.setExit(nbt.getInt("exit"));
+        this.setEnter(nbt.getInt("enter"));
         this.setRotation(new Quaternion(qx, qy, qz, qw));
 
         if (nbt.contains("prevID")) this.setPrevId(nbt.getUniqueId("prevID"));
@@ -109,7 +113,10 @@ public class RailEntity extends Entity {
 
         this.getPrevId().ifPresent(id -> compound.putUniqueId("prevID", id));
         this.getNextId().ifPresent(id -> compound.putUniqueId("nextID", id));
-        compound.putInt("railInfo", this.getInfo().ordinal());
+
+        compound.putInt("exit", this.getExit());
+        compound.putInt("enter", this.getEnter());
+        compound.putInt("info", this.getInfo().ordinal());
 
         compound.putInt("targetX", this.getNextPos().getX());
         compound.putInt("targetY", this.getNextPos().getY());
@@ -179,6 +186,19 @@ public class RailEntity extends Entity {
         this.dataManager.set(DATA_ROT, new Quaternion(qx, qy, qz, qw));
     }
 
+    public int getExit(){
+        return this.dataManager.get(DATA_EXIT);
+    }public int getEnter(){
+        return this.dataManager.get(DATA_ENTER);
+    }
+
+    public void setExit(int exitScale){
+        this.dataManager.set(DATA_EXIT, exitScale);
+    }
+    public void setEnter(int enterScale){
+        this.dataManager.set(DATA_ENTER, enterScale);
+    }
+
     public void setRotation(Quaternion rotation) {
         this.dataManager.set(DATA_ROT, rotation);
     }
@@ -188,11 +208,11 @@ public class RailEntity extends Entity {
     }
 
     public BlockPos getNextPos() {
-        return this.dataManager.get(DATA_TARGET);
+        return this.dataManager.get(DATA_NEXT_POS);
     }
 
     public void setNextPos(BlockPos targetRailPos) {
-        this.dataManager.set(DATA_TARGET, targetRailPos);
+        this.dataManager.set(DATA_NEXT_POS, targetRailPos);
     }
 
     public Vector3f getOrientation() {

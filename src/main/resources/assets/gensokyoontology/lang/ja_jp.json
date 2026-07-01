@@ -232,6 +232,7 @@
   "item.gensokyoontology.v3d_invoker": "Vector3d Function Invoker",
   "item.gensokyoontology.static_invoker": "Static Function Invoker",
   "item.gensokyoontology.binary_operation_builder": "Binary Operation Builder",
+  "item.gensokyoontology.rot_roll_clockwise": "Test Rotation Roll Clockwise",
   "advancement.gensokyoontology.root.title": "これは異変だった, 霊夢！",
   "advancement.gensokyoontology.root.description": "Get Story Pages Chapter 1.1",
   "advancement.gensokyoontology.login_gensokyo.title": "幻想郷からの愛ですよ♥～",
@@ -396,9 +397,9 @@
   "gui.gensokyoontology.power_consumed": "Power Consumed: ",
   "gui.gensokyoontology.danmaku_shot_consumed": "Danmaku Shot Consumed: ",
   "gui.gensokyoontology.rail_adjust.title": "Rail Adjustment",
-  "gui.gensokyoontology.button.increase_roll": "+",
-  "gui.gensokyoontology.button.increase_yaw": "+",
-  "gui.gensokyoontology.button.increase_pitch": "+",
+  "gui.gensokyoontology.axis.roll": "Z Rotation: ",
+  "gui.gensokyoontology.axis.yaw": "Y Rotation: ",
+  "gui.gensokyoontology.axis.pitch": "X Rotation: ",
   "gui.gensokyoontology.button.decrease_roll": "-",
   "gui.gensokyoontology.button.decrease_yaw": "-",
   "gui.gensokyoontology.button.decrease_pitch": "-",
@@ -406,6 +407,7 @@
   "gui.gensokyoontology.silder_prefix.qy": "Y Axis Angle: ",
   "gui.gensokyoontology.silder_prefix.qz": "Z Axis Angle: ",
   "gui.gensokyoontology.silder_prefix.qw": "W: ",
+  "gui.gensokyoontology.button.reset": "Reset",
   "gui.gensokyoontology.button.reset_x": "Reset X: ",
   "gui.gensokyoontology.button.reset_y": "Reset Y: ",
   "gui.gensokyoontology.button.reset_z": "Reset Z: ",
@@ -650,5 +652,7 @@
   "patchouli.gensokyoontology.ideology.dia.tutorial_p1": "Yes! Programming in Minecraft. Remember what I wrote on the first page? Stay sane! or you will become Cyber Spirits. To check whether you could read this digital gibberish to test if you are becoming cyber ghost or not.",
   "patchouli.gensokyoontology.ideology.dia.tutorial_p2": "In inner IDE, your code should be highlighted like this:$(br2)$(l)SAMPLE 1: $(br)$(1)public abstract class$() $(l)ThrowableEntity $(1)extends$() $(l)ProjectileEntity(){$(br)  $(1)protected$() $(l)$(#ffa500)ThrowableEntity$()$(l)(EntityType<? $(1)extends$() $(l)ThrowableEntity> type, World worldIn) {$(br)$(1)    super$() $(l)worldIn;$(br)  }$(br)})",
   "patchouli.gensokyoontology.ideology.dia.tutorial_p3": "$(l)SAMPLE 2: $(br)$(1)public static final$() $(l)RegistryObject<Item> $(#800080)SPIRIT_DIALECTIC$() $(l)= $(#800080)ITEMS$()$(l).register($(#32cd32)\"spirit_dialectic\"$()$(l), () -> $(1)new$() $(l)Items.Properties().group(GensokyoOntologics.$(#800080)GSKO_ITEM_TAB$()));",
-  "item.gensokyoontology.rot_roll_clockwise": "Test Rotation Roll Clockwise"
+  "gui.gensokyoontology.button.increase_pitch": "+",
+  "gui.gensokyoontology.button.increase_roll": "+",
+  "gui.gensokyoontology.button.increase_yaw": "+"
 }
