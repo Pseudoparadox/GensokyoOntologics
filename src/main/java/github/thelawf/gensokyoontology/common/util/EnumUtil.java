@@ -29,6 +29,10 @@ public class EnumUtil {
         return values[targetIndex];
     }
 
+    public static <T extends Enum<T>> T readEnum(Class<T> enumClass, int ordinalValue){
+        return enumClass.getEnumConstants()[ordinalValue];
+    }
+
     public static <T extends Enum<T>> void forEachAct(Class<T> enumClass, Consumer<T> action){
         for (T enumConst : enumClass.getEnumConstants()) {
             action.accept(enumConst);

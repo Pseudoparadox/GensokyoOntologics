@@ -124,8 +124,8 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         // 获取方向向量
         Vector3f currentOrientation = startRail.getOrientation().copy();
         Vector3f nextOrientation = targetRail.getOrientation().copy();
-        currentOrientation.mul(rescaleTangent(startWorldPos, endWorldPos));
-        nextOrientation.mul(rescaleTangent(startWorldPos, endWorldPos));
+        currentOrientation.mul(startRail.isAutoScale() ? rescaleTangent(startWorldPos, endWorldPos) : startRail.getExit());
+        nextOrientation.mul(startRail.isAutoScale() ? rescaleTangent(startWorldPos, endWorldPos) : targetRail.getEnter());
 
         final int segments = 32;
         // 临时变量存储上一段的端点，用于连线

@@ -25,6 +25,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.system.CallbackI;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -47,6 +48,9 @@ public class RailEntity extends Entity {
             RailEntity.class, DataSerializers.VARINT);
     public static final DataParameter<Integer> DATA_ENTER = EntityDataManager.createKey(
             RailEntity.class, DataSerializers.VARINT);
+    public static final DataParameter<Boolean> DATA_AUTO = EntityDataManager.createKey(
+            RailEntity.class, DataSerializers.BOOLEAN);
+
 
     public int prevId;
     public int nextId;
@@ -77,6 +81,7 @@ public class RailEntity extends Entity {
         this.dataManager.register(DATA_INFO, Info.UNIFORM.ordinal());
         this.dataManager.register(DATA_EXIT, 10);
         this.dataManager.register(DATA_ENTER, 10);
+        this.dataManager.register(DATA_AUTO, true);
     }
 
     @Override
@@ -94,6 +99,7 @@ public class RailEntity extends Entity {
         this.setInfo(nbt.getInt("info"));
         this.setExit(nbt.getInt("exit"));
         this.setEnter(nbt.getInt("enter"));
+        this.setAutoScale(nbt.getBoolean("auto"));
         this.setRotation(new Quaternion(qx, qy, qz, qw));
 
         if (nbt.contains("prevID")) this.setPrevId(nbt.getUniqueId("prevID"));
@@ -116,6 +122,7 @@ public class RailEntity extends Entity {
 
         compound.putInt("exit", this.getExit());
         compound.putInt("enter", this.getEnter());
+        compound.putBoolean("auto", this.isAutoScale());
         compound.putInt("info", this.getInfo().ordinal());
 
         compound.putInt("targetX", this.getNextPos().getX());
@@ -230,6 +237,12 @@ public class RailEntity extends Entity {
         return nextRail.get();
     }
 
+    public void setAutoScale(boolean autoScale){
+        this.dataManager.set(DATA_AUTO, autoScale);
+    }
+    public boolean isAutoScale(){
+        return this.dataManager.get(DATA_AUTO);
+    }
     public void setInfo(Info info) {
         this.dataManager.set(DATA_INFO, info.ordinal());
     }

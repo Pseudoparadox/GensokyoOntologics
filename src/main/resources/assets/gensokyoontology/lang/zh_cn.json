@@ -192,11 +192,18 @@
   "gui.gensokyoontology.binary_operation.left.text": "左值：",
   "gui.gensokyoontology.binary_operation.right.text": "右值：",
 
-
   "gui.gensokyoontology.axis.roll": "Z轴旋转: ",
   "gui.gensokyoontology.axis.yaw": "Y轴旋转: ",
   "gui.gensokyoontology.axis.pitch": "X轴旋转: ",
-  "gui.gensokyoontology.button.reset": "重置",
+  "gui.gensokyoontology.button.reset_rotation": "重置所有旋转",
+  "gui.gensokyoontology.button.reset_scale": "重置所有缩放",
+
+  "gui.gensokyoontology.label.scale_start": "出射向量缩放: ",
+  "gui.gensokyoontology.label.scale_end": "入射向量缩放: ",
+  "gui.gensokyoontology.label.rail_info.uniform": "轨道类型: 匀速",
+  "gui.gensokyoontology.label.rail_info.inertial": "轨道类型: 惯性",
+  "gui.gensokyoontology.label.rail_info.acceleration": "轨道类型: 加速",
+  "gui.gensokyoontology.label.rail_info.deceleration": "轨道类型: 减速",
 
   "gui.gensokyoontology.button.decrease_pitch": "-",
   "gui.gensokyoontology.button.decrease_pitch.msg": "Pitch",

@@ -1,9 +1,19 @@
 package github.thelawf.gensokyoontology.api.client;
 
+import github.thelawf.gensokyoontology.api.INBTReader;
+import github.thelawf.gensokyoontology.api.util.Maybe;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public interface IInputParser {
+    default Maybe<Integer> tryParseInt(String input){
+        String pattern = "-?\\d+";
+        Matcher matcher = Pattern.compile(pattern).matcher(input);
+        StringBuilder sb = new StringBuilder();
+        while (matcher.find()) sb.append(matcher.group());
+        return sb.toString().isEmpty() ? Maybe.empty() : maybeInt(sb.toString());
+    }
     default int parseInt(String input) {
         String pattern = "-?\\d+";
         Matcher matcher = Pattern.compile(pattern).matcher(input);
@@ -56,6 +66,16 @@ public interface IInputParser {
             return Integer.parseInt(matcher.group());
         }
         return 0;
+    }
+
+    default Maybe<Integer> maybeInt(String input) {
+        String pattern = "-?\\d+";
+        String substring = input.substring(0, Math.min(input.length(), 9));
+        Matcher matcher = Pattern.compile(pattern).matcher(substring);
+        if (matcher.matches()) {
+            return Maybe.ofNullable(Integer.parseInt(matcher.group()));
+        }
+        return Maybe.empty();
     }
 
     default int hasPosOrNegSymbol(String parsedStr) {

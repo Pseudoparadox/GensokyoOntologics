@@ -407,11 +407,18 @@
   "gui.gensokyoontology.silder_prefix.qy": "Y Axis Angle: ",
   "gui.gensokyoontology.silder_prefix.qz": "Z Axis Angle: ",
   "gui.gensokyoontology.silder_prefix.qw": "W: ",
-  "gui.gensokyoontology.button.reset": "Reset",
+  "gui.gensokyoontology.button.reset_rotation": "Reset All Rotations",
+  "gui.gensokyoontology.button.reset_scale": "Reset All Scales",
   "gui.gensokyoontology.button.reset_x": "Reset X: ",
   "gui.gensokyoontology.button.reset_y": "Reset Y: ",
   "gui.gensokyoontology.button.reset_z": "Reset Z: ",
   "gui.gensokyoontology.label.qw": "Rotation W: ",
+  "gui.gensokyoontology.label.scale_start": "Reflection Scale: ",
+  "gui.gensokyoontology.label.scale_end": "Incidence Scale: ",
+  "gui.gensokyoontology.label.rail_info.uniform": "Rail: Uniform",
+  "gui.gensokyoontology.label.rail_info.inertial": "Rail: Inertial",
+  "gui.gensokyoontology.label.rail_info.acceleration": "Rail: Acceleration",
+  "gui.gensokyoontology.label.rail_info.deceleration": "Rail: Deceleration",
   "gui.gensokyoontology.label.cx1": "Control X1 Offset: ",
   "gui.gensokyoontology.label.cy1": "Control Y1 Offset: ",
   "gui.gensokyoontology.label.cz1": "Control Z1 Offset: ",
@@ -654,5 +661,6 @@
   "patchouli.gensokyoontology.ideology.dia.tutorial_p3": "$(l)SAMPLE 2: $(br)$(1)public static final$() $(l)RegistryObject<Item> $(#800080)SPIRIT_DIALECTIC$() $(l)= $(#800080)ITEMS$()$(l).register($(#32cd32)\"spirit_dialectic\"$()$(l), () -> $(1)new$() $(l)Items.Properties().group(GensokyoOntologics.$(#800080)GSKO_ITEM_TAB$()));",
   "gui.gensokyoontology.button.increase_pitch": "+",
   "gui.gensokyoontology.button.increase_roll": "+",
-  "gui.gensokyoontology.button.increase_yaw": "+"
+  "gui.gensokyoontology.button.increase_yaw": "+",
+  "gui.gensokyoontology.button.reset": "Reset"
 }

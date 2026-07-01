@@ -487,13 +487,19 @@
   "gui.gensokyoontology.silder_prefix.qz": "Z Axis Roatation: ",
   "gui.gensokyoontology.silder_prefix.qw": "W: ",
 
-  "gui.gensokyoontology.button.reset": "Reset",
+  "gui.gensokyoontology.button.reset_rotation": "Reset All Rotations",
+  "gui.gensokyoontology.button.reset_scale": "Reset All Scales",
   "gui.gensokyoontology.button.reset_x": "Reset X: ",
   "gui.gensokyoontology.button.reset_y": "Reset Y: ",
   "gui.gensokyoontology.button.reset_z": "Reset Z: ",
   "gui.gensokyoontology.label.qw": "Rotation W: ",
 
-  "gui.gensokyoontology.label.scale_start": "Scale: ",
+  "gui.gensokyoontology.label.scale_start": "Reflection Scale: ",
+  "gui.gensokyoontology.label.scale_end": "Incidence Scale: ",
+  "gui.gensokyoontology.label.rail_info.uniform": "Rail: Uniform",
+  "gui.gensokyoontology.label.rail_info.inertial": "Rail: Inertial",
+  "gui.gensokyoontology.label.rail_info.acceleration": "Rail: Acceleration",
+  "gui.gensokyoontology.label.rail_info.deceleration": "Rail: Deceleration",
 
   "gui.gensokyoontology.label.cx1": "Control X1 Offset: ",
   "gui.gensokyoontology.label.cy1": "Control Y1 Offset: ",
