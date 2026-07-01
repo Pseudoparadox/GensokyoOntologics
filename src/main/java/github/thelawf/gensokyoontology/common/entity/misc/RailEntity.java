@@ -15,6 +15,7 @@ import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
@@ -50,7 +51,6 @@ public class RailEntity extends Entity {
             RailEntity.class, DataSerializers.VARINT);
     public static final DataParameter<Boolean> DATA_AUTO = EntityDataManager.createKey(
             RailEntity.class, DataSerializers.BOOLEAN);
-
 
     public int prevId;
     public int nextId;
@@ -242,9 +242,6 @@ public class RailEntity extends Entity {
     }
     public boolean isAutoScale(){
         return this.dataManager.get(DATA_AUTO);
-    }
-    public void setInfo(Info info) {
-        this.dataManager.set(DATA_INFO, info.ordinal());
     }
 
     public void setInfo(int infoOrdinal) {

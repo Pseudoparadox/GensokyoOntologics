@@ -36,6 +36,8 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
     public static final float SEGMENTS = 32;
     public static final float SCALE = 20F;
 
+    public static final Minecraft MINECRAFT = Minecraft.getInstance();
+
     public static final ResourceLocation TEXTURE = GSKOUtil.withRL("textures/entity/entity_blank.png");
 
     public RailRenderer(EntityRendererManager manager) {
@@ -62,6 +64,7 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         IVertexBuilder buffer  = bufferIn.getBuffer(GSKORenderTypes.MULTI_FACE_SOLID);
 
         Maybe<Entity> maybe = startRail.getNextRailClient(Maybe.empty());
+        Color4f railColor = startRail.getInfo().color.toColor4f();
         if (!maybe.isPresent()) {
             this.renderUnconnectedTrack(buffer, matrixStack, startRail);
             return;
@@ -80,7 +83,10 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             this.renderUnconnectedTrack(buffer, matrixStack, startRail);
         }
 
-        maybe.ifPresent(nextRail -> this.renderHermite3(startRail, (RailEntity) nextRail, builder, matrixStack));
+        if (player == null) railColor = Color4i.MAGENTA.toColor4f();
+        if (player != null && holdTracks.or(holdWrench).or(holdConnector).negate().test(player)) railColor = Color4i.RED.toColor4f();
+        Color4f color = railColor;
+        maybe.ifPresent(nextRail -> this.renderHermite3(startRail, (RailEntity) nextRail, color, builder, matrixStack));
         if (player != null && holdWrench.test(player)){
             this.renderRotateFrame(startRail, bufferIn, matrixStack, light);
         }
@@ -98,7 +104,7 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         matrixStack.pop();
     }
 
-    public void renderHermite3(RailEntity startRail, RailEntity targetRail, IVertexBuilder builder, MatrixStack matrixStack) {
+    public void renderHermite3(RailEntity startRail, RailEntity targetRail, Color4f railColor, IVertexBuilder builder, MatrixStack matrixStack) {
         // 1. 获取世界坐标下的起点和终点
         Vector3d startWorldPos = startRail.getPositionVec();
         Vector3d endWorldPos = targetRail.getPositionVec();
@@ -133,13 +139,13 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         // 保存初始矩阵状态，以便在渲染完这一整条轨道后恢复
         matrixStack.push();
 
-        this.renderSegments(segments, startOffset, endOffset, currentOrientation, nextOrientation, startRot, endRot, builder, matrixStack,
-                startRoll, rollDelta);
+        this.renderSegments(segments, railColor, startOffset, endOffset, currentOrientation, nextOrientation, startRot, endRot,
+                builder, matrixStack, startRoll, rollDelta);
 
         matrixStack.pop();
     }
 
-    public void renderSegments(int segments, Vector3d startOffset, Vector3d endOffset, Vector3f startDirection, Vector3f endDirection,
+    public void renderSegments(int segments, Color4f railColor, Vector3d startOffset, Vector3d endOffset, Vector3f startDirection, Vector3f endDirection,
                                Quaternion startRot, Quaternion endRot, IVertexBuilder builder, MatrixStack matrixStack,
                                float startRoll, float rollDelta){
         Vector3d prevLeft = null;
@@ -192,20 +198,11 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             float scaleLeft = (float) (1F / segments / (leftStart.distanceTo(leftEnd)));
             float scaleRight = (float) (1F / segments / (rightStart.distanceTo(rightEnd)));
 
-            Color4f color = new Color4i(255, 0, 0, 255).toColor4f();
-
-            // 渲染左轨道
-//            GeometryUtil.renderCyl(builder, matrixStack.getLast().getMatrix(),
-//                    leftStart, leftEnd,
-//                    RAIL_RADIUS, 8,
-//                    color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
             GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
-                    leftStart, leftEnd, new Vector3d(rolledNormal),  RAIL_RADIUS, 8,
-                    color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+                    leftStart, leftEnd, new Vector3d(rolledNormal),  RAIL_RADIUS, 8, railColor);
 
             GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
-                    rightStart, rightEnd, new Vector3d(rolledNormal), RAIL_RADIUS, 8,
-                    color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+                    rightStart, rightEnd, new Vector3d(rolledNormal), RAIL_RADIUS, 8, railColor);
 
             prevLeft = leftEnd;
             prevRight = rightEnd;

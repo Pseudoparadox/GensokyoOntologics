@@ -2,6 +2,7 @@ package github.thelawf.gensokyoontology.common.util.math;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import github.thelawf.gensokyoontology.api.Color4f;
 import github.thelawf.gensokyoontology.api.Color4i;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.math.vector.*;
@@ -530,15 +531,12 @@ public class GeometryUtil {
      * @param normal 法线方向（轨道的"上"方向）
      * @param radius 半径
      * @param segments 分段数
-     * @param red 红色分量
-     * @param green 绿色分量
-     * @param blue 蓝色分量
-     * @param alpha 透明度
+     * @param color 颜色
      */
     public static void renderClippedCylinder(IVertexBuilder builder, Matrix4f matrix,
-                                           Vector3d start, Vector3d end,
-                                           Vector3d normal, float radius, int segments,
-                                           float red, float green, float blue, float alpha) {
+                                             Vector3d start, Vector3d end,
+                                             Vector3d normal, float radius, int segments,
+                                             Color4f color) {
         Vector3d direction = end.subtract(start);
         Vector3d binormal = direction.crossProduct(normal).normalize();
 
@@ -553,8 +551,8 @@ public class GeometryUtil {
             Vector3d p3 = cylPos(end, normal, binormal, radius, theta0);
 
             // 渲染四边形
-            renderQuad(builder, matrix, p0, p1, p2, p3, red, green, blue, alpha);
-            renderQuad(builder, matrix, p3, p2, p1, p0, red, green, blue, alpha);
+            renderQuad(builder, matrix, p0, p1, p2, p3, color.r, color.g, color.b, color.a);
+            renderQuad(builder, matrix, p3, p2, p1, p0, color.r, color.g, color.b, color.a);
         }
     }
 

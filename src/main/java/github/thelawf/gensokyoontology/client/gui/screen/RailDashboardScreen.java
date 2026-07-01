@@ -32,14 +32,14 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
     private final java.util.Map<Integer, TextFieldWidget> axisFieldMap = new java.util.HashMap<>();
     private TextFieldWidget startScale;
     private TextFieldWidget endScale;
-    private Button railType;
+    private Button railTypeSetter;
 
     private static final TranslationTextComponent
             QY = GSKOUtil.fromLocaleKey("gui.", ".axis.yaw"),
             QX = GSKOUtil.fromLocaleKey("gui.", ".axis.pitch"),
             QZ = GSKOUtil.fromLocaleKey("gui.", ".axis.roll"),
-            SCALE_START   = GSKOUtil.fromLocaleKey("gui.", ".label.scale_start"),
-            SCALE_END     = GSKOUtil.fromLocaleKey("gui.", ".label.scale_end"),
+            SCALE_EXIT    = GSKOUtil.fromLocaleKey("gui.", ".label.scale_start"),
+            SCALE_ENTER   = GSKOUtil.fromLocaleKey("gui.", ".label.scale_end"),
             INFO_UNIFORM  = GSKOUtil.fromLocaleKey("gui.", ".label.rail_info.uniform"),
             INFO_INERTIAL = GSKOUtil.fromLocaleKey("gui.", ".label.rail_info.inertial"),
             INFO_ACC      = GSKOUtil.fromLocaleKey("gui.", ".label.rail_info.acceleration"),
@@ -146,13 +146,14 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
         this.addButton(this.startScale);
         this.addButton(this.endScale);
         y += row;
-        this.railType = new Button(125, y, labelWidth, 20, INFO_UNIFORM, this::switchRailType);
+        this.railTypeSetter = new Button(125, y, labelWidth, 20, INFO_UNIFORM, this::switchRailType);
+        this.addButton(this.railTypeSetter);
         y += row;
-        this.addButton(new Button(x, y, labelWidth, 20, RESET_SCALE, b -> {
+        this.addButton(new Button(x, y, labelWidth + 50, 20, RESET_SCALE, b -> {
             this.autoScale = true;
             this.sendPacketToServer();
         }));
-        this.addButton(new Button(x + labelWidth + 5, y, 100, 20, RESET_ROT, b -> {
+        this.addButton(new Button(x + labelWidth + 55, y, labelWidth + 50, 20, RESET_ROT, b -> {
             this.rotation = Quaternion.ONE;
             this.setRotationText();
             this.sendPacketToServer();
@@ -205,11 +206,11 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         this.startScale.render(matrixStack, mouseX, mouseY, partialTicks);
         this.endScale.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.railType.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.railTypeSetter.render(matrixStack, mouseX, mouseY, partialTicks);
 
         int endX = this.startScale.x + this.startScale.getWidth() + 20;
-        drawString(matrixStack, this.font, SCALE_START.getString(), 10, this.startScale.y + 5, WHITE);
-        drawString(matrixStack, this.font, SCALE_END.getString(), endX, this.startScale.y + 5, WHITE);
+        drawString(matrixStack, this.font, SCALE_EXIT.getString(), 10, this.startScale.y + 5, WHITE);
+        drawString(matrixStack, this.font, SCALE_ENTER.getString(), endX, this.startScale.y + 5, WHITE);
 
         for (Map.Entry<Integer, TextFieldWidget> entry : axisFieldMap.entrySet()) {
             TextFieldWidget f = entry.getValue();
