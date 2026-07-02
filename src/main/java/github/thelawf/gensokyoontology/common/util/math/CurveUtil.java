@@ -1,6 +1,7 @@
 package github.thelawf.gensokyoontology.common.util.math;
 
 import com.mojang.datafixers.util.Pair;
+import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
@@ -325,6 +326,45 @@ public class CurveUtil {
                 .add(endTangent.scale(h4_deriv2));
     }
 
+    public static float hermiteLength(HermiteNodeInfo nodeInfo, float t0, float t1, int resolution){
+        float totalLength = 0.0F;
+        Vector3d prevPoint = hermite3(Vector3d.ZERO, nodeInfo.getEndOffset(), nodeInfo.prevOrientation(), nodeInfo.nextOrientation(),0);
+
+        for (int i = 1; i <= resolution; i++) {
+            float t = t0 + (t1 - t0) * i / resolution;
+            Vector3d point = hermite3(Vector3d.ZERO, nodeInfo.getEndOffset(), nodeInfo.prevOrientation(), nodeInfo.nextOrientation(),t);
+            totalLength += (float) point.subtract(prevPoint).length();
+            prevPoint = point;
+        }
+        return totalLength;
+    }
+
+    /**
+     * 根据弧长找到对应的t值（二分查找）
+     */
+    public static float hermiteProgress(HermiteNodeInfo nodeInfo, float arcLength, int samples) {
+        float low = 0.0F;
+        float high = 1.0F;
+        float mid = 0.5F;
+
+        for (int iteration = 0; iteration < 20; iteration++) {
+            mid = (low + high) / 2.0F;
+            float length = hermiteLength(nodeInfo, 0.0F, mid, samples);
+
+            if (Math.abs(length - arcLength) < 0.001) {
+                break;
+            }
+
+            if (length < arcLength) {
+                low = mid;
+            } else {
+                high = mid;
+            }
+        }
+
+        return mid;
+    }
+
     /**
      * 计算埃尔米特曲线在参数t处的二阶导数（加速度）
      * @param start 起点位置
@@ -402,4 +442,5 @@ public class CurveUtil {
 
         return curvatureNormal;
     }
+
 }

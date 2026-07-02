@@ -69,8 +69,8 @@ public class CAdjustRailPacket {
         if (rail == null) return;
         rail.setRotation(packet.selfFacing);
         rail.setInfo(packet.info.ordinal());
-        rail.setExit(packet.exit);
-        rail.setEnter(packet.enter);
+        rail.setScale0(packet.exit);
+        rail.setScale1(packet.enter);
         rail.setAutoScale(packet.autoScale);
         serverWorld.updateEntity(rail);
         rail.getNextRail().ifPresent(serverWorld::updateEntity);

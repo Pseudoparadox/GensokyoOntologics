@@ -413,6 +413,7 @@
   "gui.gensokyoontology.button.reset_y": "Reset Y: ",
   "gui.gensokyoontology.button.reset_z": "Reset Z: ",
   "gui.gensokyoontology.label.qw": "Rotation W: ",
+  "gui.gensokyoontology.label.flip": "Flip Normal",
   "gui.gensokyoontology.label.scale_start": "Reflection Scale: ",
   "gui.gensokyoontology.label.scale_end": "Incidence Scale: ",
   "gui.gensokyoontology.label.rail_info.uniform": "Rail: Uniform",

@@ -7,6 +7,7 @@ import github.thelawf.gensokyoontology.common.util.math.RotMatrix;
 import github.thelawf.gensokyoontology.core.init.EntityRegistry;
 import github.thelawf.gensokyoontology.common.util.math.DerivativeInfo;
 import github.thelawf.gensokyoontology.data.GSKOSerializers;
+import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -15,7 +16,6 @@ import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
@@ -26,7 +26,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.system.CallbackI;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -41,19 +40,19 @@ public class RailEntity extends Entity {
 
     public static final DataParameter<Quaternion> DATA_ROT = EntityDataManager.createKey(
             RailEntity.class, GSKOSerializers.QUATERNION);
+
     public static final DataParameter<BlockPos> DATA_NEXT_POS = EntityDataManager.createKey(
             RailEntity.class, DataSerializers.BLOCK_POS);
     public static final DataParameter<Integer> DATA_INFO = EntityDataManager.createKey(
             RailEntity.class, DataSerializers.VARINT);
-    public static final DataParameter<Integer> DATA_EXIT = EntityDataManager.createKey(
+    public static final DataParameter<Integer> DATA_SCALE0 = EntityDataManager.createKey(
             RailEntity.class, DataSerializers.VARINT);
-    public static final DataParameter<Integer> DATA_ENTER = EntityDataManager.createKey(
+    public static final DataParameter<Integer> DATA_SCALE1 = EntityDataManager.createKey(
             RailEntity.class, DataSerializers.VARINT);
     public static final DataParameter<Boolean> DATA_AUTO = EntityDataManager.createKey(
             RailEntity.class, DataSerializers.BOOLEAN);
-
-    public static final DataParameter<CompoundNBT> DATA_SPLINE = EntityDataManager.createKey(
-            RailEntity.class, DataSerializers.COMPOUND_NBT);
+    public static final DataParameter<Boolean> DATA_FLIP = EntityDataManager.createKey(
+            RailEntity.class, DataSerializers.BOOLEAN);
 
     public int prevId;
     public int nextId;
@@ -82,9 +81,10 @@ public class RailEntity extends Entity {
         this.dataManager.register(DATA_ROT, new Quaternion(0f, 0f, 0f, 1f));
         this.dataManager.register(DATA_NEXT_POS, new BlockPos(0,0,0));
         this.dataManager.register(DATA_INFO, Info.UNIFORM.ordinal());
-        this.dataManager.register(DATA_EXIT, 10);
-        this.dataManager.register(DATA_ENTER, 10);
+        this.dataManager.register(DATA_SCALE0, 10);
+        this.dataManager.register(DATA_SCALE1, 10);
         this.dataManager.register(DATA_AUTO, true);
+        this.dataManager.register(DATA_FLIP, false);
     }
 
     @Override
@@ -100,9 +100,10 @@ public class RailEntity extends Entity {
         float qw = nbt.getFloat("qw");
 
         this.setInfo(nbt.getInt("info"));
-        this.setExit(nbt.getInt("exit"));
-        this.setEnter(nbt.getInt("enter"));
+        this.setScale0(nbt.getInt("scale0"));
+        this.setScale1(nbt.getInt("scale1"));
         this.setAutoScale(nbt.getBoolean("auto"));
+        this.setFlipNormal(nbt.getBoolean("flip"));
         this.setRotation(new Quaternion(qx, qy, qz, qw));
 
         if (nbt.contains("prevID")) this.setPrevId(nbt.getUniqueId("prevID"));
@@ -111,6 +112,10 @@ public class RailEntity extends Entity {
         if (nbt.contains("targetX") && nbt.contains("targetY") && nbt.contains("targetZ")){
             this.setNextPos(new BlockPos(nbt.getInt("targetX"), nbt.getInt("targetY"), nbt.getInt("targetZ")));
         }
+    }
+
+    private void setFlipNormal(boolean flip) {
+        this.dataManager.set(DATA_FLIP, flip);
     }
 
     @Override
@@ -123,15 +128,20 @@ public class RailEntity extends Entity {
         this.getPrevId().ifPresent(id -> compound.putUniqueId("prevID", id));
         this.getNextId().ifPresent(id -> compound.putUniqueId("nextID", id));
 
-        compound.putInt("exit", this.getExit());
-        compound.putInt("enter", this.getEnter());
+        compound.putInt("scale0", this.getScale0());
+        compound.putInt("scale1", this.getScale1());
         compound.putBoolean("auto", this.isAutoScale());
+        compound.putBoolean("flip", this.isFlipNormal());
         compound.putInt("info", this.getInfo().ordinal());
 
         compound.putInt("targetX", this.getNextPos().getX());
         compound.putInt("targetY", this.getNextPos().getY());
         compound.putInt("targetZ", this.getNextPos().getZ());
 
+    }
+
+    public boolean isFlipNormal() {
+        return this.dataManager.get(DATA_FLIP);
     }
 
     public Maybe<Entity> tryGetPrevRail(Maybe<Entity> ref) {
@@ -196,17 +206,17 @@ public class RailEntity extends Entity {
         this.dataManager.set(DATA_ROT, new Quaternion(qx, qy, qz, qw));
     }
 
-    public int getExit(){
-        return this.dataManager.get(DATA_EXIT);
-    }public int getEnter(){
-        return this.dataManager.get(DATA_ENTER);
+    public int getScale0(){
+        return this.dataManager.get(DATA_SCALE0);
+    }public int getScale1(){
+        return this.dataManager.get(DATA_SCALE1);
     }
 
-    public void setExit(int exitScale){
-        this.dataManager.set(DATA_EXIT, exitScale);
+    public void setScale0(int exitScale){
+        this.dataManager.set(DATA_SCALE0, exitScale);
     }
-    public void setEnter(int enterScale){
-        this.dataManager.set(DATA_ENTER, enterScale);
+    public void setScale1(int enterScale){
+        this.dataManager.set(DATA_SCALE1, enterScale);
     }
 
     public void setRotation(Quaternion rotation) {

@@ -7,20 +7,16 @@ import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.util.EnumUtil;
 import github.thelawf.gensokyoontology.common.util.math.CurveUtil;
 import github.thelawf.gensokyoontology.common.util.math.RotMatrix;
-import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.world.server.ServerWorld;
-
-import java.util.UUID;
 
 public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT, HermiteNodeInfo>{
-    private long startPos;
-    private long endPosOffset;
+    private long startPos = 0;
+    private long endPosOffset = 0;
     private boolean flipNormal = false;
     private boolean autoSmooth = true;
     private int scale0 = 10;
@@ -32,6 +28,12 @@ public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT,
     public static final HermiteNodeInfo EMPTY = new HermiteNodeInfo(RailEntity.Info.DECELERATION,
             0, 0, Quaternion.ONE, Quaternion.ONE);
 
+    public static HermiteNodeInfo of(RailEntity.Info info, BlockPos start, BlockPos end, Quaternion startRot, Quaternion endRot){
+        return new HermiteNodeInfo(info, start.toLong(), end.toLong(), startRot, endRot);
+    }
+    public HermiteNodeInfo(){
+
+    }
     private HermiteNodeInfo(RailEntity.Info info, long startPos, long endPosOffset, Quaternion prevRot, Quaternion nextRot) {
         this.info = info;
         this.startPos = startPos;
@@ -112,10 +114,11 @@ public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT,
         buf.writeCompoundTag(value.serializeNBT());
     }
 
-    // TODO: Read from bytes
     @Override
     public HermiteNodeInfo read(PacketBuffer buf) {
-        return null;
+        Maybe<CompoundNBT> maybe = Maybe.ofNullable(buf.readCompoundTag());
+        maybe.ifPresent(this::deserializeNBT);
+        return this;
     }
 
     @Override
@@ -126,23 +129,70 @@ public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT,
     public BlockPos getStartPos(){
         return BlockPos.fromLong(this.startPos);
     }
-    public BlockPos getEndBlockPos(){
+    public Vector3d getStartVec(Vector3d offset){
+        return Vector3d.copy(this.getStartPos()).add(offset);
+    }
+    public BlockPos getEndPos(){
         return BlockPos.fromLong(this.endPosOffset).add(this.getStartPos());
     }
 
-    public Vector3d getEndPosVec(Vector3d offset){
-        return Vector3d.copy(this.getEndBlockPos()).add(offset);
+    public Vector3d getEndOffset(){
+        return Vector3d.copy(BlockPos.fromLong(this.endPosOffset));
+    }
+    public Vector3d getEndVec(Vector3d offset){
+        return Vector3d.copy(this.getEndPos()).add(offset);
     }
 
     public Vector3d getEndPosVec(){
-        return Vector3d.copy(this.getEndBlockPos());
+        return Vector3d.copy(this.getEndPos());
+    }
+    public RailEntity.Info getRailType(){
+        return this.info;
+    }
+
+    public Quaternion rotation0(){
+        return this.prevRotation;
+    }
+    public Quaternion rotation1(){
+        return this.nextRotation;
+    }
+    public boolean shouldAutoSmooth(){
+        return this.autoSmooth;
+    }
+    public boolean shouldFlipNormal(){
+        return this.flipNormal;
+    }
+    public int scale0(){
+        return this.scale0;
+    }
+    public int scale1(){
+        return this.scale1;
+    }
+
+    public HermiteNodeInfo setEndOffset(long endPosOffset) {
+        this.endPosOffset = endPosOffset;
+        return this;
     }
 
     public Vector3f prevOrientation(){
-        return RotMatrix.from(this.prevRotation).tangent();
+        Vector3f v = RotMatrix.from(this.prevRotation).tangent();
+        v.mul(this.scale0);
+        return v;
+    }
+    public Vector3d orientation0(){
+        Vector3f v = RotMatrix.from(this.prevRotation).tangent();
+        v.mul(this.scale0);
+        return new Vector3d(v);
     }
     public Vector3f nextOrientation(){
-        return RotMatrix.from(this.nextRotation).tangent();
+        Vector3f v = RotMatrix.from(this.nextRotation).tangent();
+        v.mul(this.scale1);
+        return v;
+    }
+    public Vector3d orientation1(){
+        Vector3f v = RotMatrix.from(this.nextRotation).tangent();
+        v.mul(this.scale1);
+        return new Vector3d(v);
     }
 
     public HermiteNodeInfo setFlipNormal(boolean flipNormal) {

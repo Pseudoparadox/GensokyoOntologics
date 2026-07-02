@@ -41,7 +41,7 @@ public class FireRenderer extends EntityRenderer<FireEntity> {
         float b = GSKOMathUtil.lerpTicks(partialTicks, 45, entityIn.ticksExisted, whiteLight.getBlue() / 255F, warmLight.getBlue() / 255F);
 
         IVertexBuilder builder = bufferIn.getBuffer(RenderType.getLightning());
-        GeometryUtil.renderCircle(builder, matrixStackIn.getLast().getMatrix(), new Vector3f(0,0,0), radius, 6,
+        GeometryUtil.renderCircle(builder, matrixStackIn.getLast().getMatrix(), 6, new Vector3f(0,0,0), radius,
                 r, g, b, 0.9F, false);
     }
 }

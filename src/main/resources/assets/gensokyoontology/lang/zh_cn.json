@@ -198,6 +198,7 @@
   "gui.gensokyoontology.button.reset_rotation": "重置所有旋转",
   "gui.gensokyoontology.button.reset_scale": "重置所有缩放",
 
+  "gui.gensokyoontology.label.flip": "反转法线",
   "gui.gensokyoontology.label.scale_start": "出射向量缩放: ",
   "gui.gensokyoontology.label.scale_end": "入射向量缩放: ",
   "gui.gensokyoontology.label.rail_info.uniform": "轨道类型: 匀速",

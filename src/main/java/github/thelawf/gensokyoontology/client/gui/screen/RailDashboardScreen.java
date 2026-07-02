@@ -3,7 +3,6 @@ package github.thelawf.gensokyoontology.client.gui.screen;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import github.thelawf.gensokyoontology.api.client.IInputParser;
 import github.thelawf.gensokyoontology.client.gui.screen.script.LineralLayoutScreen;
-import github.thelawf.gensokyoontology.common.command.StringListArgumentType;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.network.GSKONetworking;
 import github.thelawf.gensokyoontology.common.network.packet.CAdjustRailPacket;
@@ -11,6 +10,7 @@ import github.thelawf.gensokyoontology.common.util.EnumUtil;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.common.util.math.EulerAngle;
 import github.thelawf.gensokyoontology.common.util.math.RotMatrix;
+import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.CheckboxButton;
@@ -64,19 +64,20 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
     private static final float[] STEPS = {90f, 10f, 1f};
     private final Quaternion initRotation;
     private RailEntity.Info railInfo;
-    private int exit;
-    private int enter;
+    private int scale0;
+    private int scale1;
     private boolean autoScale = true;
+    private boolean flipChirality = false;
 
-    public RailDashboardScreen(BlockPos pos, Quaternion rotation, RailEntity.Info railInfo, int startEntityId, int exit, int enter) {
+    public RailDashboardScreen(BlockPos pos, HermiteNodeInfo node, int entityId) {
         super(TITLE);
         this.targetPos = pos;
-        this.rotation = rotation.copy();
-        this.initRotation = rotation.copy();
-        this.startEntityId = startEntityId;
-        this.railInfo = railInfo;
-        this.exit = exit;
-        this.enter = enter;
+        this.rotation = node.rotation0().copy();
+        this.initRotation = node.rotation0().copy();
+        this.startEntityId = entityId;
+        this.railInfo = node.getRailType();
+        this.scale0 = node.scale0();
+        this.scale1 = node.scale1();
     }
 
     private void applyDelta(float dYaw, float dPitch, float dRoll) {
@@ -117,7 +118,7 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
 
     private void sendPacketToServer() {
         GSKONetworking.CHANNEL.sendToServer(new CAdjustRailPacket(targetPos, rotation, startEntityId,
-                this.exit, this.enter, this.railInfo, this.autoScale));
+                this.scale0, this.scale1, this.railInfo, this.autoScale));
     }
 
     @Override
@@ -131,24 +132,24 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
         this.addStepButtons(x, y, 2, QZ, buttonWidth, gap, labelWidth);
 
         y += row;
-        this.startScale = new TextFieldWidget(this.font, x + 20, y, buttonWidth, 20, withText(""));
-        this.endScale = new TextFieldWidget(this.font, x + buttonWidth + 100, y, buttonWidth, 20, withText(""));
+        this.startScale = new TextFieldWidget(this.font, x + 70, y, buttonWidth, 20, withText(""));
+        this.endScale = new TextFieldWidget(this.font, x + buttonWidth + 150, y, buttonWidth, 20, withText(""));
 
-        this.startScale.setText(String.valueOf(this.exit));
+        this.startScale.setText(String.valueOf(this.scale0));
         this.startScale.setResponder(s -> this.tryParseInt(s).ifPresent(scale -> {
-            this.exit = scale;
+            this.scale0 = scale;
             this.autoScale = false;
             this.sendPacketToServer();
         }));
-        this.endScale.setText(String.valueOf(this.enter));
+        this.endScale.setText(String.valueOf(this.scale1));
         this.endScale.setResponder(s -> this.tryParseInt(s).ifPresent(scale -> {
-            this.enter = scale;
+            this.scale1 = scale;
             this.autoScale = false;
             this.sendPacketToServer();
         }));
 
-        // this.flipSetter = new Button(175, y, 20, 20, FLIP, this::switchRailType);
-        // this.addButton(this.flipSetter);
+        this.flipSetter = new CheckboxButton(275, y, 20, 20, FLIP, false);
+        this.addButton(this.flipSetter);
         this.addButton(this.startScale);
         this.addButton(this.endScale);
         y += row;
@@ -217,7 +218,7 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
         int endX = this.startScale.x + this.startScale.getWidth() + 70;
         drawString(matrixStack, this.font, SCALE_EXIT.getString(), 50, this.startScale.y + 5, WHITE);
         drawString(matrixStack, this.font, SCALE_ENTER.getString(), endX, this.startScale.y + 5, WHITE);
-        endX += 30;
+        endX += 50;
         drawString(matrixStack, this.font, FLIP.getString(), endX, this.startScale.y + 5, WHITE);
 
         for (Map.Entry<Integer, TextFieldWidget> entry : axisFieldMap.entrySet()) {
@@ -235,8 +236,16 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        this.flipChirality = this.flipSetter.isChecked();
+        this.sendPacketToServer();
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        // 回车 commit 当前聚焦的文本框
+        this.flipChirality = this.flipSetter.isChecked();
+        this.sendPacketToServer();
         for (Map.Entry<Integer, TextFieldWidget> entry : axisFieldMap.entrySet()) {
             TextFieldWidget f = entry.getValue();
             if (f.isFocused()) {

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class GSKOSerializers {
     public static final CatmullRomSpline.Deserializer CATMULL_ROM = new CatmullRomSpline.Deserializer();
+    public static final HermiteNodeInfo HERMITE_SPLINE = new HermiteNodeInfo();
     public static final IDataSerializer<Vector3f> VECTOR3F = new IDataSerializer<Vector3f>() {
         @Override
         public Vector3f read(PacketBuffer buf) {

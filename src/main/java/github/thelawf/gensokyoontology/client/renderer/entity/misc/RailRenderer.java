@@ -32,8 +32,10 @@ import java.util.function.Predicate;
 public class RailRenderer extends EntityRenderer<RailEntity> {
     public static final double RAIL_WIDTH = 0.5;
     public static final float RAIL_RADIUS = 0.07F;
-    public static final float SEGMENTS = 32;
+    public static final int SEGMENTS = 32;
     public static final float SCALE = 20F;
+    // 枕木间距（方块）
+    public final float SLEEPER_SPACING = 1.5F;
 
     public static final Minecraft MINECRAFT = Minecraft.getInstance();
 
@@ -82,10 +84,10 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         if (player == null) railColor = Color4i.MAGENTA.toColor4f();
         if (player != null && holdTracks.or(holdWrench).or(holdConnector).negate().test(player)) railColor = Color4i.RED.toColor4f();
         Color4f color = railColor;
+
         maybe.ifPresent(nextRail -> this.renderHermite3(startRail, (RailEntity) nextRail, color, builder, matrixStack));
-        if (player != null && holdWrench.test(player)){
-            this.renderRotateFrame(startRail, bufferIn, matrixStack, light);
-        }
+        if (player != null && holdWrench.test(player)) this.renderRotateFrame(startRail, bufferIn, matrixStack, light);
+        if (player != null && holdTracks.or(holdConnector).test(player)) this.renderFacingArrow(startRail, builder, matrixStack);
 //        RailEntity targetRail = (RailEntity) maybe.get();
 //        this.renderHermite3(startRail, targetRail, builder, matrixStack);
     }
@@ -102,13 +104,11 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
 
     public void renderHermite3(RailEntity startRail, RailEntity targetRail, Color4f railColor, IVertexBuilder builder, MatrixStack matrixStack) {
         // 1. 获取世界坐标下的起点和终点
-        Vector3d startWorldPos = startRail.getPositionVec();
-        Vector3d endWorldPos = targetRail.getPositionVec();
+        Vector3d startPos = startRail.getPositionVec();
+        Vector3d endPos = targetRail.getPositionVec();
 
-        // 2. 计算相对偏移量（局部坐标），这是修复断开的关键！
-        // 无论前面连了多少段，当前这段总是从 (0,0,0) 画到 endWorldPos.subtract(startWorldPos)
         Vector3d startOffset = Vector3d.ZERO;
-        Vector3d endOffset = endWorldPos.subtract(startWorldPos);
+        Vector3d endOffset = endPos.subtract(startPos);
 
         // 3. 获取旋转信息
         Quaternion startRot = startRail.getRotation();
@@ -123,54 +123,43 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             rollDelta = Math.signum(rollDelta) * maxRollChange;
         }
 
-        // 获取方向向量
-        Vector3f currentOrientation = startRail.getOrientation().copy();
-        Vector3f nextOrientation = targetRail.getOrientation().copy();
-        currentOrientation.mul(startRail.isAutoScale() ? rescaleTangent(startWorldPos, endWorldPos) : startRail.getExit());
-        nextOrientation.mul(startRail.isAutoScale() ? rescaleTangent(startWorldPos, endWorldPos) : targetRail.getEnter());
-
         final int segments = 32;
         // 保存初始矩阵状态，以便在渲染完这一整条轨道后恢复
         matrixStack.push();
-        matrixStack.translate(0, 0.3, 0);
-        this.renderSegments(segments, railColor, startOffset, endOffset, currentOrientation, nextOrientation, startRot, endRot,
-                builder, matrixStack, startRoll, rollDelta);
+        HermiteNodeInfo nodeInfo = HermiteNodeInfo.of(RailEntity.Info.DECELERATION,
+                        startRail.getPosition(), targetRail.getPosition().subtract(startRail.getPosition()),
+                        startRail.getRotation(), targetRail.getRotation())
+                .setPrevScale(startRail.isAutoScale() ? (int) rescaleTangent(startPos, endPos) : startRail.getScale0())
+                .setNextScale(startRail.isAutoScale() ? (int) rescaleTangent(startPos, endPos) : targetRail.getScale1());
+        this.renderSegments(segments, railColor, builder, matrixStack, startRoll, rollDelta, nodeInfo);
+        this.renderSleepers(builder, matrixStack, railColor, nodeInfo);
         matrixStack.pop();
     }
 
-    public void renderGirder(IVertexBuilder builder, MatrixStack matrixStack, HermiteNodeInfo info, Color4f railColor,
-                             float roll0, float deltaRoll){
-
-    }
-
-    // TODO: Flip Normal
-    public void renderSegments(int segments, Color4f railColor, Vector3d startOffset, Vector3d endOffset, Vector3f startDirection, Vector3f endDirection,
-                               Quaternion startRot, Quaternion endRot, IVertexBuilder builder, MatrixStack matrixStack,
-                               float startRoll, float rollDelta){
+    public void renderSegments(int segments, Color4f railColor,  IVertexBuilder builder, MatrixStack matrixStack,
+                               float startRoll, float rollDelta, HermiteNodeInfo node){
         Vector3d prevLeft = null;
         Vector3d prevRight = null;
         Vector3d prevGirder = null;
+
+        Vector3d startOffset    = Vector3d.ZERO;
+        Vector3d endOffset      = node.getEndOffset();
+        Vector3f startDirection = node.prevOrientation();
+        Vector3f endDirection   = node.nextOrientation();
+        Quaternion startRot     = node.rotation0();
+        Quaternion endRot       = node.rotation1();
+
         for (int i = 0; i < segments; i++) {
             float t0 = (float) i / segments;
             float t1 = (float) (i + 1) / segments;
+            float currentRoll = startRoll + t0 * rollDelta;
 
             // 使用相对偏移量计算曲线点
             Vector3d prev = CurveUtil.hermite3(startOffset, endOffset, startDirection, endDirection, t0);
             Vector3d next = CurveUtil.hermite3(startOffset, endOffset, startDirection, endDirection, t1);
 
-            // 计算切向量（用于旋转）
-            // 注意：这里使用局部坐标计算切线，因为矩阵已经平移了
-            Vector3d tangentVec = CurveUtil.hermiteTangent(startOffset, endOffset,
-                    new Vector3d(startDirection), new Vector3d(endDirection), t0).normalize();
-
-            // 应用桶滚 (Roll)
-            float currentRoll = startRoll + t0 * rollDelta;
-
-            // 使用球面线性插值(SLERP)平滑旋转
-            Quaternion currentRotation = GSKOMathUtil.slerp(startRot, endRot, t0);
-
-            // 构建旋转矩阵 - 使用轨道实体的旋转
-            RotMatrix rotMatrix = new RotMatrix(currentRotation);
+            Quaternion rotation = GSKOMathUtil.slerp(startRot, endRot, t0);
+            RotMatrix rotMatrix = new RotMatrix(rotation);
 
             // 应用桶滚旋转到法线方向
             Vector3f normal = rotMatrix.normal(); // 获取法线（X轴）
@@ -178,8 +167,9 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             Vector3f tangentAxis = rotMatrix.tangent(); // 获取切线（Z轴）
 
             // 创建桶滚四元数并应用到法线
-            Quaternion rollQuat = new Quaternion(tangentAxis, currentRoll, true);
-            Vector3f rolledNormal = GSKOMathUtil.rotateVector(rollQuat, normal);
+            Quaternion roll = new Quaternion(tangentAxis, currentRoll, true);
+            Vector3f rolledNormal = GSKOMathUtil.rotateVector(roll, normal);
+            rolledNormal.mul(node.shouldFlipNormal() ? -1 : 1);
 
             // 重新构建旋转矩阵
             RotMatrix matrix = new RotMatrix();
@@ -187,15 +177,16 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             matrix.setColumn(1, new Vector3d(binormal));         // Y轴 = 副法线
             matrix.setColumn(2, new Vector3d(tangentAxis));      // Z轴 = 切线
 
-            Vector3d leftOffset   = new Vector3d(-RAIL_WIDTH,0, 0);
-            Vector3d rightOffset  = new Vector3d(RAIL_WIDTH, 0, 0);
-            Vector3d girderOffset = new Vector3d(0, -0.3, 0);
+            Vector3d offset      = new Vector3d(0, 0.2, 0);
+            Vector3d leftPivot   = new Vector3d(-RAIL_WIDTH,0, 0);
+            Vector3d rightPivot  = new Vector3d(RAIL_WIDTH, 0, 0);
+            Vector3d girderOffset = new Vector3d(0, 0, 0);
 
             // 转换到世界坐标（因为外层 matrixStack 已经 translate 过了，这里只需乘 rotMatrix）
-            Vector3d leftStart = prevLeft == null ? matrix.multiply(leftOffset).add(prev) : prevLeft;
-            Vector3d rightStart = prevRight == null ? matrix.multiply(rightOffset).add(prev) : prevRight;
-            Vector3d leftEnd = matrix.multiply(leftOffset).add(next);
-            Vector3d rightEnd = matrix.multiply(rightOffset).add(next);
+            Vector3d leftStart = prevLeft == null ? matrix.multiply(leftPivot).add(prev).add(offset) : prevLeft;
+            Vector3d rightStart = prevRight == null ? matrix.multiply(rightPivot).add(prev).add(offset) : prevRight;
+            Vector3d leftEnd = matrix.multiply(leftPivot).add(next).add(offset);
+            Vector3d rightEnd = matrix.multiply(rightPivot).add(next).add(offset);
 
             Vector3d girderStart = prevGirder == null ? rotMatrix.multiply(girderOffset).add(prev) : prevGirder;
             Vector3d girderNext = rotMatrix.multiply(girderOffset).add(next);
@@ -219,15 +210,55 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         }
     }
 
+
+    public void renderSleepers(IVertexBuilder builder, MatrixStack matrixStackIn, Color4f color, HermiteNodeInfo node){
+        // 计算样条曲线总长度
+        float totalLength = CurveUtil.hermiteLength(node, 0.0F, 1.0F, SEGMENTS);
+        int count = (int) Math.ceil(totalLength / SLEEPER_SPACING);
+        for (int i = 0; i < count; i++) {
+            matrixStackIn.push();
+            float arcLength = i / (count - 1F) * totalLength;
+            float t = CurveUtil.hermiteProgress(node, arcLength, SEGMENTS);
+            Vector3d sleeperPos = CurveUtil.hermite3(Vector3d.ZERO, node.getEndOffset(),
+                    node.prevOrientation(), node.nextOrientation(), t);
+            Vector3d tangent = CurveUtil.hermiteTangent(Vector3d.ZERO, node.getEndOffset(),
+                    node.orientation0(), node.orientation1(), t).normalize();
+
+            Vector3d sleeperPivot = new Vector3d(0, 0, 0);
+            Quaternion rotation = GSKOMathUtil.slerp(node.rotation0(), node.rotation1(), t);
+            RotMatrix rotMatrix = RotMatrix.from(rotation);
+            rotMatrix.multiply(sleeperPivot);
+            matrixStackIn.translate(sleeperPos.x + 0.5, sleeperPos.y + 0.1, sleeperPos.z - 0.5);
+            matrixStackIn.rotate(rotation);
+
+            GeometryUtil.quadFace(builder, matrixStackIn.getLast().getMatrix(),
+                    new Vector3f(0F,0,0F),
+                    new Vector3f(1F,0,0F),
+                    new Vector3f(0.8F,-0.25F,0F),
+                    new Vector3f(0.2F,-0.25F,0F),
+                    new Vector4f(color.r, color.g, color.b, color.a));
+            matrixStackIn.pop();
+        }
+
+    }
+
+    public void renderFacingArrow(RailEntity rail, IVertexBuilder builder, MatrixStack matrixStack){
+        matrixStack.push();
+        matrixStack.rotate(rail.getRotation());
+        GeometryUtil.renderCylinderSides(builder, matrixStack.getLast().getMatrix(), 0.03F, 1F, 10,
+                0, 1, 1, 1);
+        matrixStack.translate(0,1,0);
+        GeometryUtil.renderCone(builder, matrixStack.getLast().getMatrix(), 10, 0.1F,
+                0.07F, 1, 1, 1, 1);
+        matrixStack.pop();
+    }
+
     public void renderUnconnectedTrack(IVertexBuilder builder, MatrixStack matrixStackIn, RailEntity rail) {
         float r1 = 195, g1 = 35, b1 = 35, r2 = 155, g2 = 23, b2 = 23;
         float rf1 = r1 / 255, gf1 = g1 / 255, bf1 = b1 / 255, rf2 = r2 / 255, gf2 =  g2 / 255, bf2 = b2 / 255;
 
         Quaternion rotation = rail.getRotation();
         matrixStackIn.push();
-//        if (player != null && holdWrench.test(player)){
-//            this.renderRotateFrame(bufferIn, matrixStack, light);
-//        }
         matrixStackIn.rotate(rotation);
         matrixStackIn.translate(0, 0.5F, 0);
 
@@ -268,13 +299,6 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
                 new Vector3i(r1, g1, b1));
         matrixStackIn.pop();
         matrixStackIn.pop();
-    }
-
-    private Vector3d tangent(Vector3d start, Vector3d end, Vector3f startDirection, Vector3f endDirection, float t) {
-        // 使用中心差分法（提高平滑性）
-        Vector3d prev = CurveUtil.hermite3(start, end, startDirection, endDirection, Math.max(0, t));
-        Vector3d next = CurveUtil.hermite3(start, end, startDirection, endDirection, Math.min(1, t + 0.001F));
-        return next.subtract(prev).normalize();
     }
 
     private float rescaleTangent(Vector3d start, Vector3d end) {

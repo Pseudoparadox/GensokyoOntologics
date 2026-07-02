@@ -36,10 +36,8 @@ public class GeometryUtil {
 
     public static void renderCylinder(IVertexBuilder builder, Matrix4f matrix4f, int segments, float radius, float height,
                                       float red, float green, float blue, float alpha){
-        renderCircle(builder, matrix4f, new Vector3f(0,0,0),
-                radius, segments, red, green, blue, alpha, true);
-        renderCircle(builder, matrix4f, new Vector3f(0, height, 0),
-                radius, segments, red, green, blue, alpha, false);
+        renderCircle(builder, matrix4f, segments, new Vector3f(0,0,0), radius, red, green, blue, alpha, true);
+        renderCircle(builder, matrix4f, segments, new Vector3f(0, height, 0), radius, red, green, blue, alpha, false);
         renderCylinderSides(builder, matrix4f, radius, height, segments, red, green, blue, alpha);
     }
 
@@ -81,7 +79,46 @@ public class GeometryUtil {
         }
     }
 
-    public static void renderCircle(IVertexBuilder builder, Matrix4f matrix, Vector3f center, float radius, int segments, float red, float green, float blue, float alpha, boolean isBottom) {
+    public static void renderCone(IVertexBuilder builder, Matrix4f matrix, int segments, float height, float radius,
+                                  float red, float green, float blue, float alpha){
+        Vector3f top = new Vector3f(0, height, 0);
+        float normalY = 1.F;
+        for (int i = 0; i < segments; i++) {
+            double angle1 = 2 * Math.PI * i / segments;
+            double angle2 = 2 * Math.PI * (i + 1) / segments;
+            double angle3 = 2 * Math.PI * (i + 2) / segments;
+            double angle4 = 2 * Math.PI * (i + 3) / segments;
+
+            float x1 = (float) Math.cos(angle1) * radius;
+            float z1 = (float) Math.sin(angle1) * radius;
+            float x2 = (float) Math.cos(angle2) * radius;
+            float z2 = (float) Math.sin(angle2) * radius;
+
+            float x3 = (float) Math.cos(angle3) * radius;
+            float z3 = (float) Math.sin(angle3) * radius;
+            float x4 = (float) Math.cos(angle4) * radius;
+            float z4 = (float) Math.sin(angle4) * radius;
+
+            // 三角形顶点：中心点，边缘点1，边缘点2
+            builder.pos(matrix, top.getX(), top.getY(), top.getZ()).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+            builder.pos(matrix, x1, top.getY(), z1).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+            builder.pos(matrix, x2, top.getY(), z2).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+
+            builder.pos(matrix, top.getX(), top.getY(), top.getZ()).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+            builder.pos(matrix, x2, top.getY(), z2).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+            builder.pos(matrix, x3, top.getY(), z3).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+
+            builder.pos(matrix, top.getX(), top.getY(), top.getZ()).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+            builder.pos(matrix, x3, top.getY(), z3).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+            builder.pos(matrix, x4, top.getY(), z4).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+
+            builder.pos(matrix, top.getX(), top.getY(), top.getZ()).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+            builder.pos(matrix, x4, top.getY(), z4).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+            builder.pos(matrix, x1, top.getY(), z1).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+        }
+    }
+
+    public static void renderCircle(IVertexBuilder builder, Matrix4f matrix, int segments, Vector3f center, float radius, float red, float green, float blue, float alpha, boolean isBottom) {
         // 计算法线方向
         float normalY = isBottom ? -1.0f : 1.0f;
 
@@ -120,7 +157,7 @@ public class GeometryUtil {
         }
     }
 
-    private static void renderCylinderSides(IVertexBuilder vertexBuilder, Matrix4f matrix, float radius, float height,
+    public static void renderCylinderSides(IVertexBuilder vertexBuilder, Matrix4f matrix, float radius, float height,
                                             int segments, float red, float green, float blue, float alpha) {
         for (int i = 0; i < segments; i++) {
             double angle1 = 2 * Math.PI * i / segments;
