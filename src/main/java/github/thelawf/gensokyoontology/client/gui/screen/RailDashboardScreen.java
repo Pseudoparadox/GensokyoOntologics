@@ -3,6 +3,7 @@ package github.thelawf.gensokyoontology.client.gui.screen;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import github.thelawf.gensokyoontology.api.client.IInputParser;
 import github.thelawf.gensokyoontology.client.gui.screen.script.LineralLayoutScreen;
+import github.thelawf.gensokyoontology.common.command.StringListArgumentType;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.network.GSKONetworking;
 import github.thelawf.gensokyoontology.common.network.packet.CAdjustRailPacket;
@@ -12,6 +13,7 @@ import github.thelawf.gensokyoontology.common.util.math.EulerAngle;
 import github.thelawf.gensokyoontology.common.util.math.RotMatrix;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Quaternion;
@@ -32,12 +34,14 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
     private final java.util.Map<Integer, TextFieldWidget> axisFieldMap = new java.util.HashMap<>();
     private TextFieldWidget startScale;
     private TextFieldWidget endScale;
+    private CheckboxButton flipSetter;
     private Button railTypeSetter;
 
     private static final TranslationTextComponent
             QY = GSKOUtil.fromLocaleKey("gui.", ".axis.yaw"),
             QX = GSKOUtil.fromLocaleKey("gui.", ".axis.pitch"),
             QZ = GSKOUtil.fromLocaleKey("gui.", ".axis.roll"),
+            FLIP = GSKOUtil.fromLocaleKey("gui.", ".label.flip"),
             SCALE_EXIT    = GSKOUtil.fromLocaleKey("gui.", ".label.scale_start"),
             SCALE_ENTER   = GSKOUtil.fromLocaleKey("gui.", ".label.scale_end"),
             INFO_UNIFORM  = GSKOUtil.fromLocaleKey("gui.", ".label.rail_info.uniform"),
@@ -143,17 +147,19 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
             this.sendPacketToServer();
         }));
 
+        // this.flipSetter = new Button(175, y, 20, 20, FLIP, this::switchRailType);
+        // this.addButton(this.flipSetter);
         this.addButton(this.startScale);
         this.addButton(this.endScale);
         y += row;
         this.railTypeSetter = new Button(125, y, labelWidth, 20, INFO_UNIFORM, this::switchRailType);
         this.addButton(this.railTypeSetter);
         y += row;
-        this.addButton(new Button(x, y, labelWidth + 50, 20, RESET_SCALE, b -> {
+        this.addButton(new Button(x, y, labelWidth + 40, 20, RESET_SCALE, b -> {
             this.autoScale = true;
             this.sendPacketToServer();
         }));
-        this.addButton(new Button(x + labelWidth + 55, y, labelWidth + 50, 20, RESET_ROT, b -> {
+        this.addButton(new Button(x + labelWidth + 55, y, labelWidth + 40, 20, RESET_ROT, b -> {
             this.rotation = Quaternion.ONE;
             this.setRotationText();
             this.sendPacketToServer();
@@ -208,9 +214,11 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
         this.endScale.render(matrixStack, mouseX, mouseY, partialTicks);
         this.railTypeSetter.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        int endX = this.startScale.x + this.startScale.getWidth() + 20;
-        drawString(matrixStack, this.font, SCALE_EXIT.getString(), 10, this.startScale.y + 5, WHITE);
+        int endX = this.startScale.x + this.startScale.getWidth() + 70;
+        drawString(matrixStack, this.font, SCALE_EXIT.getString(), 50, this.startScale.y + 5, WHITE);
         drawString(matrixStack, this.font, SCALE_ENTER.getString(), endX, this.startScale.y + 5, WHITE);
+        endX += 30;
+        drawString(matrixStack, this.font, FLIP.getString(), endX, this.startScale.y + 5, WHITE);
 
         for (Map.Entry<Integer, TextFieldWidget> entry : axisFieldMap.entrySet()) {
             TextFieldWidget f = entry.getValue();

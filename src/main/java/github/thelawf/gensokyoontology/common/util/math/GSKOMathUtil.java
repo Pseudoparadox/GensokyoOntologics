@@ -550,7 +550,7 @@ public class GSKOMathUtil {
         return new Rot2f(yawDegrees, pitchDegrees);
     }
 
-    public static EulerAngle getEulerAngle(Quaternion quaternion) {
+    public static EulerAngle getEulerAngleZYX(Quaternion quaternion) {
         float w = quaternion.getW(), x = quaternion.getX(), y = quaternion.getY(), z = quaternion.getZ();
         float yaw = (float) Math.atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z));    // 绕Z轴
         float pitch = (float) Math.asin(2 * (w * y - z * x));                            // 绕Y轴

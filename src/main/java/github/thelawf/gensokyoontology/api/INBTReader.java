@@ -1,10 +1,8 @@
 package github.thelawf.gensokyoontology.api;
 
-import github.thelawf.gensokyoontology.common.nbt.GSKONBTUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,22 +59,25 @@ public interface INBTReader {
         return nbt.getList(key, type.id);
     }
 
-    default <T> List<CompoundNBT> readCompoundList(String key, CompoundNBT nbt, Function<INBT, T> function){
+    default <T> List<T> readCompoundList(String key, CompoundNBT nbt, Function<CompoundNBT, T> function){
         if (!nbt.contains(key)) return new ArrayList<>();
         if (!(nbt.get(key) instanceof ListNBT)) return new ArrayList<>();
         ListNBT listNBT = (ListNBT) nbt.get(key);
-        List<CompoundNBT> list = new ArrayList<>();
+        List<T> list = new ArrayList<>();
         if (listNBT == null) {
             return new ArrayList<>();
         }
 
         for (INBT inbt : listNBT) {
+            if (inbt instanceof CompoundNBT){
+                CompoundNBT compound = (CompoundNBT) inbt;
+                list.add(function.apply(compound));
+            }
         }
         return list;
     }
 
-
-    default <T extends INBT, S extends INBTSynchornizable<T, S>> List<S> readList(String key, CompoundNBT nbt, S instance, Function<INBT, T> function){
+    default <T extends INBT, S extends ISynchornizable<T, S>> List<S> readList(String key, CompoundNBT nbt, S instance, Function<INBT, T> function){
         if (!nbt.contains(key)) return new ArrayList<>();
         if (!(nbt.get(key) instanceof ListNBT)) return new ArrayList<>();
         ListNBT listNBT = (ListNBT) nbt.get(key);

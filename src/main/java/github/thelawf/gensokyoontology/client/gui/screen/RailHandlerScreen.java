@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+@Deprecated
 public class RailHandlerScreen extends LineralLayoutScreen {
     private final int startEntityId;
     private Quaternion rotation;

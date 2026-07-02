@@ -20,8 +20,13 @@ public class EulerAngle {
         return new EulerAngle((float) yaw, (float) pitch,  (float) roll);
     }
 
+    /**
+     * @deprecated 原因：从四元数转欧拉角会出现奇点
+     * @see RotMatrix#from(Quaternion)
+     */
+    @Deprecated
     public static EulerAngle from(Quaternion quaternion) {
-        return GSKOMathUtil.getEulerAngle(quaternion);
+        return GSKOMathUtil.getEulerAngleZYX(quaternion);
     }
 
     public Quaternion toRotation() {

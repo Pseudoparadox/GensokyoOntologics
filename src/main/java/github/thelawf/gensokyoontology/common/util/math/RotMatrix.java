@@ -4,6 +4,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
+import org.jetbrains.annotations.ApiStatus;
 
 public class RotMatrix {
     private float m00, m01, m02,
@@ -200,50 +201,9 @@ public class RotMatrix {
                 this.m20, this.m21, this.m22);
     }
 
-    public static RotMatrix fromXHandle(float rotationX) {
-        // 将角度转换为弧度
-        float angleRad = (float) Math.toRadians(rotationX);
-
-        // 根据旋转轴创建旋转矩阵
-        RotMatrix matrix = RotMatrix.IDENTITY;
-        float cos = (float) Math.cos(angleRad);
-        float sin = (float) Math.sin(angleRad);
-
-        matrix.set(1, 0, 0,
-                   0,      cos,    -sin,
-                   0,      sin,    cos);
-
-        return matrix;
+    public Vector3d rotateVec(Vector3d prev){
+        return this.multiply(prev);
     }
-
-    public static RotMatrix fromYHandle(float rotationY) {
-        // 将角度转换为弧度
-        float angleRad = (float) Math.toRadians(rotationY);
-
-        // 根据旋转轴创建旋转矩阵
-        RotMatrix matrix = RotMatrix.IDENTITY;
-        float cos = (float) Math.cos(angleRad);
-        float sin = (float) Math.sin(angleRad);
-
-        matrix.set(cos, 0, sin,
-                0, 1, 0,
-                  -sin, 0, cos);
-
-        return matrix;
-    }
-
-    public static RotMatrix fromZHandle(float rotationZ) {
-        float angleRad = (float) Math.toRadians(rotationZ);
-        RotMatrix matrix = RotMatrix.IDENTITY;
-        float cos = (float) Math.cos(angleRad);
-        float sin = (float) Math.sin(angleRad);
-
-        matrix.set(cos, -sin, 0,
-                sin, cos, 0,
-                0, 0, 1);
-        return matrix;
-    }
-
 
     public Vector3d multiply(Vector3d vector) {
         double x = this.m00 * vector.x + this.m01 * vector.y + this.m02 * vector.z;
@@ -287,6 +247,10 @@ public class RotMatrix {
         return new Quaternion(x, y, z, w);
     }
 
+    /**
+     * @apiNote 旋转顺规：ZXY，和 {@linkplain GSKOMathUtil#toQuaternion(EulerAngle)} 的顺规保持一致
+     */
+    @ApiStatus.Experimental
     public EulerAngle toEulerAngle() {
         // 从 m21 = sin(pitch) 解 pitch
         double sp = MathHelper.clamp(this.m21, -1.0f, 1.0f);

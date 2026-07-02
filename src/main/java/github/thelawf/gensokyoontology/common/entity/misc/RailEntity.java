@@ -52,6 +52,9 @@ public class RailEntity extends Entity {
     public static final DataParameter<Boolean> DATA_AUTO = EntityDataManager.createKey(
             RailEntity.class, DataSerializers.BOOLEAN);
 
+    public static final DataParameter<CompoundNBT> DATA_SPLINE = EntityDataManager.createKey(
+            RailEntity.class, DataSerializers.COMPOUND_NBT);
+
     public int prevId;
     public int nextId;
 

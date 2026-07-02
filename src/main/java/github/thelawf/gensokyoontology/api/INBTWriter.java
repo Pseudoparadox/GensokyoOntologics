@@ -8,9 +8,6 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.LongNBT;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -26,7 +23,7 @@ public interface INBTWriter extends INBTReader {
         compoundNBTS.forEach(listNBT::add);
         nbtToWriteIn.put(key,listNBT);
     }
-    default <T extends INBT, S extends INBTSynchornizable<T, S>> void writeList(CompoundNBT nbtToWirteIn, String key, Iterable<S> list, GSKONBTUtil.NBTType nbtType){
+    default <T extends INBT, S extends ISynchornizable<T, S>> void writeList(CompoundNBT nbtToWirteIn, String key, Iterable<S> list, GSKONBTUtil.NBTType nbtType){
         ListNBT listNBT = new ListNBT();
         list.forEach(s -> listNBT.add(nbtType.typeByte, s.serializeNBT()));
         nbtToWirteIn.put(key, listNBT);

@@ -1,5 +1,6 @@
 package github.thelawf.gensokyoontology.data;
 
+import com.mojang.datafixers.util.Pair;
 import github.thelawf.gensokyoontology.api.INBTWriter;
 import github.thelawf.gensokyoontology.api.util.CircularList;
 import github.thelawf.gensokyoontology.api.util.Maybe;
@@ -11,15 +12,14 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.DimensionSavedDataManager;
 import net.minecraft.world.storage.WorldSavedData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class TrackInfo extends WorldSavedData implements INBTWriter {
-    private Map<Long, CircularList<HermiteSpineInfo>> tracks = new HashMap<>();
+    private Map<Long, CircularList<HermiteNodeInfo>> tracks = new HashMap<>();
     private boolean isLooped;
     public static final String NAME = "TrackInfo";
 
@@ -27,12 +27,12 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
         super(NAME);
     }
 
-    public Map<Long, CircularList<HermiteSpineInfo>> tracks() {
+    public Map<Long, CircularList<HermiteNodeInfo>> tracks() {
         return this.tracks;
     }
 
-    public CircularList<HermiteSpineInfo> addTrack(BlockPos blockPos) {
-        CircularList<HermiteSpineInfo> splines = new CircularList<>();
+    public CircularList<HermiteNodeInfo> addTrack(BlockPos blockPos) {
+        CircularList<HermiteNodeInfo> splines = new CircularList<>();
         this.tracks.put(blockPos.toLong(), splines);
         return splines;
     }
@@ -60,8 +60,14 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
     @Override
     public void read(CompoundNBT nbt) {
         this.isLooped = nbt.getBoolean("isLooped");
-        List<HermiteSpineInfo> list = this.readList("splines", nbt, HermiteSpineInfo.IDENTITY, inbt -> (CompoundNBT) inbt);
-
+        List<Pair<Long, List<HermiteNodeInfo>>> entries = this.readCompoundList("tracks", nbt, compound -> {
+            HermiteNodeInfo info = HermiteNodeInfo.EMPTY;
+            info.deserializeNBT(compound);
+            return Pair.of(compound.getLong("startPos"), this.readList("splines", compound, info, inbt -> (CompoundNBT) inbt));
+        });
+        if (entries.isEmpty()) return;
+        this.tracks.clear();
+        entries.forEach(entry -> this.tracks.put(entry.getFirst(), CircularList.from(entry.getSecond())));
     }
 
     @Override
