@@ -2,6 +2,8 @@ package github.thelawf.gensokyoontology.common.network.packet;
 
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.util.EnumUtil;
+import github.thelawf.gensokyoontology.common.util.GSKOUtil;
+import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
@@ -12,43 +14,20 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import java.util.function.Supplier;
 
 public class CAdjustRailPacket {
-    private final Quaternion selfFacing;
-    private final BlockPos targetPos;
-    private final int startEntityId;
-    private final int exit;
-    private final int enter;
-    private final RailEntity.Info info;
-    private final boolean autoScale;
+    private final HermiteNodeInfo node;
+    private final int entityId;
 
-    public CAdjustRailPacket(BlockPos targetPos, Quaternion selfFacing, int startEntityId, int exit, int enter,
-                             RailEntity.Info info, boolean autoScale) {
-        this.targetPos = targetPos;
-        this.selfFacing = selfFacing;
-        this.startEntityId = startEntityId;
-        this.exit = exit;
-        this.enter = enter;
-        this.info = info;
-        this.autoScale = autoScale;
+    public CAdjustRailPacket(HermiteNodeInfo node, int entityId) {
+        this.node = node;
+        this.entityId = entityId;
     }
 
     public static CAdjustRailPacket fromBytes(PacketBuffer buf) {
-        return new CAdjustRailPacket(buf.readBlockPos(),
-                new Quaternion(buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat()),
-                buf.readInt(), buf.readInt(), buf.readInt(), EnumUtil.readEnum(RailEntity.Info.class, buf.readInt()), buf.readBoolean());
+        return new CAdjustRailPacket(HermiteNodeInfo.EMPTY.read(buf), buf.readInt());
     }
     public void toBytes(PacketBuffer buf) {
-        buf.writeBlockPos(targetPos);
-
-        buf.writeFloat(this.selfFacing.getX());
-        buf.writeFloat(this.selfFacing.getY());
-        buf.writeFloat(this.selfFacing.getZ());
-        buf.writeFloat(this.selfFacing.getW());
-
-        buf.writeInt(this.startEntityId);
-        buf.writeInt(this.exit);
-        buf.writeInt(this.enter);
-        buf.writeInt(this.info.ordinal());
-        buf.writeBoolean(this.autoScale);
+        buf.writeCompoundTag(this.node.serializeNBT());
+        buf.writeInt(this.entityId);
     }
 
     public static void handle(CAdjustRailPacket packet, Supplier<NetworkEvent.Context> ctx) {
@@ -63,16 +42,18 @@ public class CAdjustRailPacket {
     }
 
     private static void changeAndSaveTileData(CAdjustRailPacket packet, ServerWorld serverWorld){
-        serverWorld.getBlockState(packet.targetPos);
-        RailEntity rail = (RailEntity) serverWorld.getEntityByID(packet.startEntityId);
+        serverWorld.getBlockState(packet.node.getStartPos());
+        RailEntity rail = (RailEntity) serverWorld.getEntityByID(packet.entityId);
 
         if (rail == null) return;
-        rail.setRotation(packet.selfFacing);
-        rail.setInfo(packet.info.ordinal());
-        rail.setScale0(packet.exit);
-        rail.setScale1(packet.enter);
-        rail.setAutoScale(packet.autoScale);
+        rail.setRotation(packet.node.rotation0());
+        rail.setInfo(packet.node.getRailType().ordinal());
+        rail.setScale0(packet.node.scale0());
+        rail.setScale1(packet.node.scale1());
+        rail.setAutoScale(packet.node.shouldAutoSmooth());
+        rail.setFlipNormal(packet.node.shouldFlipNormal());
         serverWorld.updateEntity(rail);
         rail.getNextRail().ifPresent(serverWorld::updateEntity);
+        GSKOUtil.log(rail.isFlipNormal());
     }
 }

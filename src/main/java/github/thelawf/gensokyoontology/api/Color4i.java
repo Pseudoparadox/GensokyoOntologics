@@ -12,7 +12,7 @@ public class Color4i {
     public static final Color4i BLUE = new Color4i(0, 0, 255, 255);
     public static final Color4i YELLOW = new Color4i(255, 255, 0, 255);
     public static final Color4i MAGENTA = new Color4i(0, 255, 255, 255);
-    public static final Color4i CYAN = new Color4i(0, 0, 255, 255);
+    public static final Color4i CYAN = new Color4i(0, 255, 255, 255);
     public static final Color4i WHITE = new Color4i(255, 255, 255, 255);
     public static final Color4i BLACK = new Color4i(0, 0, 0, 255);
 

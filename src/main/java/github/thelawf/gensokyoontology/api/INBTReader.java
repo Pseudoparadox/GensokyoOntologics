@@ -67,7 +67,6 @@ public interface INBTReader {
         if (listNBT == null) {
             return new ArrayList<>();
         }
-
         for (INBT inbt : listNBT) {
             if (inbt instanceof CompoundNBT){
                 CompoundNBT compound = (CompoundNBT) inbt;

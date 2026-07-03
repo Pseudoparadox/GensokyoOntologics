@@ -63,11 +63,6 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
 
         Maybe<Entity> maybe = startRail.getNextRailClient(Maybe.empty());
         Color4f railColor = startRail.getInfo().color.toColor4f();
-        if (!maybe.isPresent()) {
-            this.renderUnconnectedTrack(buffer, matrixStack, startRail);
-            return;
-        }
-        if (!(maybe.get() instanceof RailEntity)) return;
         Predicate<PlayerEntity> holdWrench = p ->
                 p.getHeldItemMainhand().getItem() == ItemRegistry.RAIL_WRENCH.get();
         Predicate<PlayerEntity> holdConnector = p ->
@@ -75,7 +70,14 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
 
         Predicate<PlayerEntity> holdTracks = p ->
                 p.getHeldItemMainhand().getItem() == ItemRegistry.TRACK_PLACER.get() ||
-                p.getHeldItemMainhand().getItem() == ItemRegistry.TRACK_REMOVER.get();
+                        p.getHeldItemMainhand().getItem() == ItemRegistry.TRACK_REMOVER.get();
+        if (player != null && holdTracks.or(holdConnector).test(player)) this.renderFacingArrow(startRail, builder, matrixStack);
+        if (!maybe.isPresent()) {
+            this.renderUnconnectedTrack(buffer, matrixStack, startRail);
+            return;
+        }
+        if (!(maybe.get() instanceof RailEntity)) return;
+
 
         if (player != null && holdTracks.or(holdWrench).or(holdConnector).test(player)){
             this.renderUnconnectedTrack(buffer, matrixStack, startRail);
@@ -87,7 +89,6 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
 
         maybe.ifPresent(nextRail -> this.renderHermite3(startRail, (RailEntity) nextRail, color, builder, matrixStack));
         if (player != null && holdWrench.test(player)) this.renderRotateFrame(startRail, bufferIn, matrixStack, light);
-        if (player != null && holdTracks.or(holdConnector).test(player)) this.renderFacingArrow(startRail, builder, matrixStack);
 //        RailEntity targetRail = (RailEntity) maybe.get();
 //        this.renderHermite3(startRail, targetRail, builder, matrixStack);
     }
@@ -132,7 +133,7 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
                 .setPrevScale(startRail.isAutoScale() ? (int) rescaleTangent(startPos, endPos) : startRail.getScale0())
                 .setNextScale(startRail.isAutoScale() ? (int) rescaleTangent(startPos, endPos) : targetRail.getScale1());
         this.renderSegments(segments, railColor, builder, matrixStack, startRoll, rollDelta, nodeInfo);
-        this.renderSleepers(builder, matrixStack, railColor, nodeInfo);
+        this.renderSleepers(builder, matrixStack, new Color4f(0.62F, 0,0,1), nodeInfo);
         matrixStack.pop();
     }
 
@@ -169,7 +170,6 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             // 创建桶滚四元数并应用到法线
             Quaternion roll = new Quaternion(tangentAxis, currentRoll, true);
             Vector3f rolledNormal = GSKOMathUtil.rotateVector(roll, normal);
-            rolledNormal.mul(node.shouldFlipNormal() ? -1 : 1);
 
             // 重新构建旋转矩阵
             RotMatrix matrix = new RotMatrix();
@@ -196,13 +196,16 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
 
             // 左轨右轨
             GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
-                    leftStart, leftEnd, new Vector3d(rolledNormal),  RAIL_RADIUS, 8, railColor);
+                    leftStart.scale(node.shouldFlipNormal() ? -1 : 1), leftEnd.scale(node.shouldFlipNormal() ? -1 : 1),
+                    new Vector3d(rolledNormal),  RAIL_RADIUS, 8, railColor);
             GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
-                    rightStart, rightEnd, new Vector3d(rolledNormal), RAIL_RADIUS, 8, railColor);
+                    rightStart.scale(node.shouldFlipNormal() ? -1 : 1), rightEnd.scale(node.shouldFlipNormal() ? -1 : 1),
+                    new Vector3d(rolledNormal), RAIL_RADIUS, 8, railColor);
 
             // 承重轨
             GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
-                    girderStart, girderNext, new Vector3d(rolledNormal), RAIL_RADIUS, 4, railColor);
+                    girderStart, girderNext, new Vector3d(rolledNormal), RAIL_RADIUS, 4,
+                    new Color4f(0.82F, 0, 0, 1));
 
             prevLeft = leftEnd;
             prevRight = rightEnd;
@@ -210,46 +213,52 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         }
     }
 
-
     public void renderSleepers(IVertexBuilder builder, MatrixStack matrixStackIn, Color4f color, HermiteNodeInfo node){
         // 计算样条曲线总长度
         float totalLength = CurveUtil.hermiteLength(node, 0.0F, 1.0F, SEGMENTS);
         int count = (int) Math.ceil(totalLength / SLEEPER_SPACING);
+        matrixStackIn.push();
         for (int i = 0; i < count; i++) {
-            matrixStackIn.push();
-            float arcLength = i / (count - 1F) * totalLength;
-            float t = CurveUtil.hermiteProgress(node, arcLength, SEGMENTS);
-            Vector3d sleeperPos = CurveUtil.hermite3(Vector3d.ZERO, node.getEndOffset(),
-                    node.prevOrientation(), node.nextOrientation(), t);
-            Vector3d tangent = CurveUtil.hermiteTangent(Vector3d.ZERO, node.getEndOffset(),
-                    node.orientation0(), node.orientation1(), t).normalize();
+            float arc0 = i / (count - 1F) * totalLength;
+            float arc1 = (i + 1) / (count - 1F) * totalLength;
+            float t0 = CurveUtil.hermiteProgress(node, arc0, SEGMENTS);
+            float t1 = CurveUtil.hermiteProgress(node, arc1, SEGMENTS);
 
-            Vector3d sleeperPivot = new Vector3d(0, 0, 0);
-            Quaternion rotation = GSKOMathUtil.slerp(node.rotation0(), node.rotation1(), t);
+            Vector3d prev = CurveUtil.hermite3(Vector3d.ZERO, node.getEndOffset(), node.prevOrientation(), node.nextOrientation(), t0);
+            Vector3d next = CurveUtil.hermite3(Vector3d.ZERO, node.getEndOffset(), node.prevOrientation(), node.nextOrientation(), t1);
+
+            Vector3d tangent = CurveUtil.hermiteTangent(Vector3d.ZERO, node.getEndOffset(),
+                    node.orientation0(), node.orientation1(), t0).normalize();
+
+            Vector3d leftUp    = new Vector3d(-RAIL_WIDTH, 0, 0);
+            Vector3d rightUp   = new Vector3d(RAIL_WIDTH, 0, 0);
+            Vector3d rightDown = new Vector3d(RAIL_WIDTH - 0.1F, -0.25F, 0);
+            Vector3d leftDown  = new Vector3d(-RAIL_WIDTH + 0.1F, -0.25F, 0);
+
+            Quaternion rotation = GSKOMathUtil.slerp(node.rotation0(), node.rotation1(), t0);
             RotMatrix rotMatrix = RotMatrix.from(rotation);
-            rotMatrix.multiply(sleeperPivot);
-            matrixStackIn.translate(sleeperPos.x + 0.5, sleeperPos.y + 0.1, sleeperPos.z - 0.5);
-            matrixStackIn.rotate(rotation);
+            Vector3d offset = rotMatrix.multiply(new Vector3d(0, 0.1, 0));
 
             GeometryUtil.quadFace(builder, matrixStackIn.getLast().getMatrix(),
-                    new Vector3f(0F,0,0F),
-                    new Vector3f(1F,0,0F),
-                    new Vector3f(0.8F,-0.25F,0F),
-                    new Vector3f(0.2F,-0.25F,0F),
+                    new Vector3f(rotMatrix.multiply(leftUp).add(prev).add(offset)),
+                    new Vector3f(rotMatrix.multiply(rightUp).add(prev).add(offset)),
+                    new Vector3f(rotMatrix.multiply(rightDown).add(prev).add(offset)),
+                    new Vector3f(rotMatrix.multiply(leftDown).add(prev).add(offset)),
                     new Vector4f(color.r, color.g, color.b, color.a));
-            matrixStackIn.pop();
         }
 
+        matrixStackIn.pop();
     }
 
     public void renderFacingArrow(RailEntity rail, IVertexBuilder builder, MatrixStack matrixStack){
         matrixStack.push();
+        matrixStack.rotate(Vector3f.XP.rotationDegrees(-90));
         matrixStack.rotate(rail.getRotation());
-        GeometryUtil.renderCylinderSides(builder, matrixStack.getLast().getMatrix(), 0.03F, 1F, 10,
+        GeometryUtil.renderCylinderSides(builder, matrixStack.getLast().getMatrix(), 0.02F, 1F, 10,
                 0, 1, 1, 1);
         matrixStack.translate(0,1,0);
-        GeometryUtil.renderCone(builder, matrixStack.getLast().getMatrix(), 10, 0.1F,
-                0.07F, 1, 1, 1, 1);
+        GeometryUtil.renderCone(builder, matrixStack.getLast().getMatrix(), 10, new Vector3f(0, 0.1F, 0),
+                new Vector3f(), 0.05F, Color4i.CYAN.toColor4f());
         matrixStack.pop();
     }
 

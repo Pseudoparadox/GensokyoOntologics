@@ -677,14 +677,14 @@ public class GSKOMathUtil {
     }
 
     public static double pow2(double base) {
-        return square(base);
+        return base * base;
     }
 
     public static double pow3(double base) {
-        return cube(base);
+        return base * base * base;
     }
 
-    public static double square(double base) {
+    public static float square(float base) {
         return base * base;
     }
 
@@ -972,6 +972,9 @@ public class GSKOMathUtil {
         return newMatrix;
     }
 
+    public static float length(Vector3f vector3f){
+        return MathHelper.sqrt(square(vector3f.getX()) + square(vector3f.getY()) + square(vector3f.getZ()));
+    }
 
     public static Vector3d getMidPointOf(Vector3d prev, Vector3d next) {
         return new Vector3d((prev.x + next.x) / 2, (prev.y + next.y) / 2, (prev.z + next.z) / 2);

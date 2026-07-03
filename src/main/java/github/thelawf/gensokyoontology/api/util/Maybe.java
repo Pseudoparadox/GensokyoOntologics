@@ -7,9 +7,7 @@ import java.util.function.Function;
 
 public class Maybe<T> {
     @Nullable private T value;
-    private Maybe(){
-
-    }
+    private Maybe(){}
     private Maybe(@org.jetbrains.annotations.Nullable T value){
         this.value = value;
     }
@@ -38,6 +36,15 @@ public class Maybe<T> {
 
     public boolean isPresent(){
         return this.value != null;
+    }
+
+    /**
+     * @param <A> Any Type
+     */
+    public <A> Maybe<T> ifTypeMatches(Consumer<A> action, Function<T, A> type2Any){
+        if (this.value == null) return this;
+        action.accept(type2Any.apply(this.value));
+        return this;
     }
 
     public Maybe<T> ifPresent(Consumer<T> action){

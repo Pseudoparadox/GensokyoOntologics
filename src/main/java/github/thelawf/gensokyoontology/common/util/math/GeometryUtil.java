@@ -4,7 +4,9 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import github.thelawf.gensokyoontology.api.Color4f;
 import github.thelawf.gensokyoontology.api.Color4i;
+import github.thelawf.gensokyoontology.client.GSKORenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.*;
 
 public class GeometryUtil {
@@ -79,42 +81,89 @@ public class GeometryUtil {
         }
     }
 
-    public static void renderCone(IVertexBuilder builder, Matrix4f matrix, int segments, float height, float radius,
-                                  float red, float green, float blue, float alpha){
-        Vector3f top = new Vector3f(0, height, 0);
-        float normalY = 1.F;
+    public static void renderCone(IVertexBuilder builder, Matrix4f matrix, int segments,
+                                  Vector3f apex, Vector3f baseCenter, float radius,
+                                  Color4f color4f) {
+
+        // --- 高度方向 ---
+        Vector3f axis = new Vector3f(
+                baseCenter.getX() - apex.getX(),
+                baseCenter.getY() - apex.getY(),
+                baseCenter.getZ() - apex.getZ()
+        );
+        float axisLenSq = axis.getX() * axis.getX() + axis.getY() * axis.getY() + axis.getZ() * axis.getZ();
+        if (axisLenSq < 1e-6f) return;
+
+        // 手动 normalize（Vector3f 没 length()）
+        float invLen = 1.0f / (float) Math.sqrt(axisLenSq);
+        axis = new Vector3f(axis.getX() * invLen, axis.getY() * invLen, axis.getZ() * invLen);
+
+        // --- 找一个与 axis 垂直的向量（内联，不单独抽方法）---
+        Vector3f perp;
+        if (Math.abs(axis.getX()) < 0.9f) {
+            perp = new Vector3f(1, 0, 0);
+        } else {
+            perp = new Vector3f(0, 1, 0);
+        }
+        // perp = perp - (perp·axis) * axis，再 normalize
+        float dot = perp.getX() * axis.getX() + perp.getY() * axis.getY() + perp.getZ() * axis.getZ();
+        perp = new Vector3f(
+                perp.getX() - dot * axis.getX(),
+                perp.getY() - dot * axis.getY(),
+                perp.getZ() - dot * axis.getZ()
+        );
+        float perpLenSq = perp.getX() * perp.getX() + perp.getY() * perp.getY() + perp.getZ() * perp.getZ();
+        float invPerpLen = 1.0f / (float) Math.sqrt(perpLenSq);
+        perp = new Vector3f(perp.getX() * invPerpLen, perp.getY() * invPerpLen, perp.getZ() * invPerpLen);
+
+        Vector3f perp2 = new Vector3f(
+                axis.getY() * perp.getZ() - axis.getZ() * perp.getY(),
+                axis.getZ() * perp.getX() - axis.getX() * perp.getZ(),
+                axis.getX() * perp.getY() - axis.getY() * perp.getX()
+        ); // perp2 = axis × perp
+
+        // --- 底面圆周点 ---
+        Vector3f[] ring = new Vector3f[segments];
         for (int i = 0; i < segments; i++) {
-            double angle1 = 2 * Math.PI * i / segments;
-            double angle2 = 2 * Math.PI * (i + 1) / segments;
-            double angle3 = 2 * Math.PI * (i + 2) / segments;
-            double angle4 = 2 * Math.PI * (i + 3) / segments;
+            float angle = 2.0f * (float) Math.PI * i / segments;
+            float c = (float) Math.cos(angle);
+            float s = (float) Math.sin(angle);
 
-            float x1 = (float) Math.cos(angle1) * radius;
-            float z1 = (float) Math.sin(angle1) * radius;
-            float x2 = (float) Math.cos(angle2) * radius;
-            float z2 = (float) Math.sin(angle2) * radius;
+            Vector3f radial = new Vector3f(
+                    perp.getX() * c + perp2.getX() * s,
+                    perp.getY() * c + perp2.getY() * s,
+                    perp.getZ() * c + perp2.getZ() * s
+            );
+            ring[i] = new Vector3f(
+                    baseCenter.getX() + radial.getX() * radius,
+                    baseCenter.getY() + radial.getY() * radius,
+                    baseCenter.getZ() + radial.getZ() * radius
+            );
+        }
 
-            float x3 = (float) Math.cos(angle3) * radius;
-            float z3 = (float) Math.sin(angle3) * radius;
-            float x4 = (float) Math.cos(angle4) * radius;
-            float z4 = (float) Math.sin(angle4) * radius;
+        // --- 侧面：统一 CCW（apex -> ring[i] -> ring[i+1]） ---
+        for (int i = 0; i < segments; i++) {
+            int j = (i + 1) % segments;
+            addVertex(matrix, builder, apex,    color4f);
+            addVertex(matrix, builder, ring[i], color4f);
+            addVertex(matrix, builder, ring[j], color4f);
 
-            // 三角形顶点：中心点，边缘点1，边缘点2
-            builder.pos(matrix, top.getX(), top.getY(), top.getZ()).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
-            builder.pos(matrix, x1, top.getY(), z1).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
-            builder.pos(matrix, x2, top.getY(), z2).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+            addVertex(matrix, builder, ring[j], color4f);
+            addVertex(matrix, builder, ring[i], color4f);
+            addVertex(matrix, builder, apex,    color4f);
+        }
 
-            builder.pos(matrix, top.getX(), top.getY(), top.getZ()).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
-            builder.pos(matrix, x2, top.getY(), z2).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
-            builder.pos(matrix, x3, top.getY(), z3).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+        // --- 底面：统一 CCW（baseCenter -> ring[j] -> ring[i]） ---
+        // 底面法线朝 -axis，从外面看也是 CCW，所以先 j 后 i
+        for (int i = 0; i < segments; i++) {
+            int j = (i + 1) % segments;
+            addVertex(matrix, builder, baseCenter, color4f);
+            addVertex(matrix, builder, ring[i], color4f);
+            addVertex(matrix, builder, ring[j], color4f);
 
-            builder.pos(matrix, top.getX(), top.getY(), top.getZ()).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
-            builder.pos(matrix, x3, top.getY(), z3).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
-            builder.pos(matrix, x4, top.getY(), z4).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
-
-            builder.pos(matrix, top.getX(), top.getY(), top.getZ()).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
-            builder.pos(matrix, x4, top.getY(), z4).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
-            builder.pos(matrix, x1, top.getY(), z1).color(red, green, blue, alpha).normal(0.0f, normalY, 0.0f).endVertex();
+            addVertex(matrix, builder, ring[j], color4f);
+            addVertex(matrix, builder, ring[i], color4f);
+            addVertex(matrix, builder, baseCenter, color4f);
         }
     }
 
@@ -409,6 +458,11 @@ public class GeometryUtil {
     private static void addVertex(Matrix4f matrix, IVertexBuilder vertexBuilder, float[] pos, float red, float green, float blue, float alpha) {
         vertexBuilder.pos(matrix, pos[0], pos[1], pos[2])
                 .color(red, green, blue, alpha)
+                .endVertex();
+    }
+    private static void addVertex(Matrix4f matrix, IVertexBuilder vertexBuilder, Vector3f pos, Color4f color4f) {
+        vertexBuilder.pos(matrix, pos.getX(), pos.getY(), pos.getZ())
+                .color(color4f.getRed(), color4f.getGreen(), color4f.getBlue(), color4f.getAlpha())
                 .endVertex();
     }
 

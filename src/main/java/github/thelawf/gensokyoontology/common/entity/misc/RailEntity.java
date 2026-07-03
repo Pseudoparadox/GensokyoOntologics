@@ -114,7 +114,7 @@ public class RailEntity extends Entity {
         }
     }
 
-    private void setFlipNormal(boolean flip) {
+    public void setFlipNormal(boolean flip) {
         this.dataManager.set(DATA_FLIP, flip);
     }
 
@@ -229,6 +229,9 @@ public class RailEntity extends Entity {
 
     public BlockPos getNextPos() {
         return this.dataManager.get(DATA_NEXT_POS);
+    }
+    public Vector3d getNextPosVec(){
+        return Vector3d.copyCentered(this.getNextPos());
     }
 
     public void setNextPos(BlockPos targetRailPos) {
@@ -354,7 +357,7 @@ public class RailEntity extends Entity {
     public enum Info{
         ACCELERATION(Color4i.GREEN),
         DECELERATION(Color4i.RED),
-        UNIFORM(Color4i.CYAN),
+        UNIFORM(Color4i.BLUE),
         INERTIAL(Color4i.YELLOW);
 
         public final Color4i color;

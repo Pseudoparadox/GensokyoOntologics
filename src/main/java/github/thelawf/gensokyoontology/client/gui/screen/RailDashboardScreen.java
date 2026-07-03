@@ -28,7 +28,7 @@ import java.util.Map;
 public class RailDashboardScreen extends LineralLayoutScreen implements IInputParser {
 
     private final int startEntityId;
-    private final BlockPos targetPos;
+    private final BlockPos position;
     private Quaternion rotation;
 
     private final java.util.Map<Integer, TextFieldWidget> axisFieldMap = new java.util.HashMap<>();
@@ -62,7 +62,7 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
 
     public static final ITextComponent TITLE = GSKOUtil.translateText("gui.", ".rail_dashboard.title");
     private static final float[] STEPS = {90f, 10f, 1f};
-    private final Quaternion initRotation;
+    // private final Quaternion initRotation;
     private RailEntity.Info railInfo;
     private int scale0;
     private int scale1;
@@ -71,13 +71,14 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
 
     public RailDashboardScreen(BlockPos pos, HermiteNodeInfo node, int entityId) {
         super(TITLE);
-        this.targetPos = pos;
+        this.position = pos;
         this.rotation = node.rotation0().copy();
-        this.initRotation = node.rotation0().copy();
         this.startEntityId = entityId;
         this.railInfo = node.getRailType();
         this.scale0 = node.scale0();
         this.scale1 = node.scale1();
+        this.flipChirality = node.shouldFlipNormal();
+        this.autoScale = node.shouldAutoSmooth();
     }
 
     private void applyDelta(float dYaw, float dPitch, float dRoll) {
@@ -117,8 +118,13 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
     }
 
     private void sendPacketToServer() {
-        GSKONetworking.CHANNEL.sendToServer(new CAdjustRailPacket(targetPos, rotation, startEntityId,
-                this.scale0, this.scale1, this.railInfo, this.autoScale));
+        GSKONetworking.CHANNEL.sendToServer(new CAdjustRailPacket(
+                HermiteNodeInfo.of(this.railInfo, this.position, BlockPos.ZERO, this.rotation, Quaternion.ONE)
+                        .setPrevScale(this.scale0)
+                        .setNextScale(this.scale1)
+                        .setAutoSmooth(this.autoScale)
+                        .setFlipNormal(this.flipChirality),
+                this.startEntityId));
     }
 
     @Override
@@ -215,11 +221,9 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
         this.endScale.render(matrixStack, mouseX, mouseY, partialTicks);
         this.railTypeSetter.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        int endX = this.startScale.x + this.startScale.getWidth() + 70;
+        int endX = this.startScale.x + this.startScale.getWidth() + 20;
         drawString(matrixStack, this.font, SCALE_EXIT.getString(), 50, this.startScale.y + 5, WHITE);
         drawString(matrixStack, this.font, SCALE_ENTER.getString(), endX, this.startScale.y + 5, WHITE);
-        endX += 50;
-        drawString(matrixStack, this.font, FLIP.getString(), endX, this.startScale.y + 5, WHITE);
 
         for (Map.Entry<Integer, TextFieldWidget> entry : axisFieldMap.entrySet()) {
             TextFieldWidget f = entry.getValue();
@@ -244,8 +248,6 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        this.flipChirality = this.flipSetter.isChecked();
-        this.sendPacketToServer();
         for (Map.Entry<Integer, TextFieldWidget> entry : axisFieldMap.entrySet()) {
             TextFieldWidget f = entry.getValue();
             if (f.isFocused()) {
