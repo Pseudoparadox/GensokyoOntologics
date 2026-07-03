@@ -133,7 +133,7 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
                 .setPrevScale(startRail.isAutoScale() ? (int) rescaleTangent(startPos, endPos) : startRail.getScale0())
                 .setNextScale(startRail.isAutoScale() ? (int) rescaleTangent(startPos, endPos) : targetRail.getScale1());
         this.renderSegments(segments, railColor, builder, matrixStack, startRoll, rollDelta, nodeInfo);
-        this.renderSleepers(builder, matrixStack, new Color4f(0.62F, 0,0,1), nodeInfo);
+        this.renderSleepers(builder, matrixStack, new Color4f(0.67F, 0,0,1), nodeInfo);
         matrixStack.pop();
     }
 
@@ -168,25 +168,25 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             Vector3f tangentAxis = rotMatrix.tangent(); // 获取切线（Z轴）
 
             // 创建桶滚四元数并应用到法线
-            Quaternion roll = new Quaternion(tangentAxis, currentRoll, true);
-            Vector3f rolledNormal = GSKOMathUtil.rotateVector(roll, normal);
+//            Quaternion roll = new Quaternion(tangentAxis, currentRoll, true);
+//            Vector3f rolledNormal = GSKOMathUtil.rotateVector(roll, normal);
 
             // 重新构建旋转矩阵
             RotMatrix matrix = new RotMatrix();
-            matrix.setColumn(0, new Vector3d(rolledNormal));     // X轴 = 滚动后的法线
+            matrix.setColumn(0, new Vector3d(normal));     // X轴 = 滚动后的法线
             matrix.setColumn(1, new Vector3d(binormal));         // Y轴 = 副法线
             matrix.setColumn(2, new Vector3d(tangentAxis));      // Z轴 = 切线
 
-            Vector3d offset      = new Vector3d(0, 0.2, 0);
-            Vector3d leftPivot   = new Vector3d(-RAIL_WIDTH,0, 0);
-            Vector3d rightPivot  = new Vector3d(RAIL_WIDTH, 0, 0);
-            Vector3d girderOffset = new Vector3d(0, 0, 0);
+            Vector3d offset       = new Vector3d(0, 0, 0);
+            Vector3d leftPivot    = new Vector3d(-RAIL_WIDTH,0, 0);
+            Vector3d rightPivot   = new Vector3d(RAIL_WIDTH, 0, 0);
+            Vector3d girderOffset = new Vector3d(0, -0.1, 0);
 
             // 转换到世界坐标（因为外层 matrixStack 已经 translate 过了，这里只需乘 rotMatrix）
-            Vector3d leftStart = prevLeft == null ? matrix.multiply(leftPivot).add(prev).add(offset) : prevLeft;
-            Vector3d rightStart = prevRight == null ? matrix.multiply(rightPivot).add(prev).add(offset) : prevRight;
-            Vector3d leftEnd = matrix.multiply(leftPivot).add(next).add(offset);
-            Vector3d rightEnd = matrix.multiply(rightPivot).add(next).add(offset);
+            Vector3d leftStart = prevLeft == null ? matrix.multiply(leftPivot).add(prev): prevLeft;
+            Vector3d rightStart = prevRight == null ? matrix.multiply(rightPivot).add(prev) : prevRight;
+            Vector3d leftEnd = matrix.multiply(leftPivot).add(next);
+            Vector3d rightEnd = matrix.multiply(rightPivot).add(next);
 
             Vector3d girderStart = prevGirder == null ? rotMatrix.multiply(girderOffset).add(prev) : prevGirder;
             Vector3d girderNext = rotMatrix.multiply(girderOffset).add(next);
@@ -194,18 +194,30 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             float scaleLeft = (float) (1F / segments / (leftStart.distanceTo(leftEnd)));
             float scaleRight = (float) (1F / segments / (rightStart.distanceTo(rightEnd)));
 
-            // 左轨右轨
             GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
                     leftStart.scale(node.shouldFlipNormal() ? -1 : 1), leftEnd.scale(node.shouldFlipNormal() ? -1 : 1),
-                    new Vector3d(rolledNormal),  RAIL_RADIUS, 8, railColor);
+                    new Vector3d(normal),  RAIL_RADIUS, 8, railColor);
             GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
                     rightStart.scale(node.shouldFlipNormal() ? -1 : 1), rightEnd.scale(node.shouldFlipNormal() ? -1 : 1),
-                    new Vector3d(rolledNormal), RAIL_RADIUS, 8, railColor);
+                    new Vector3d(normal), RAIL_RADIUS, 8, railColor);
 
             // 承重轨
             GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
-                    girderStart, girderNext, new Vector3d(rolledNormal), RAIL_RADIUS, 4,
+                    girderStart, girderNext, new Vector3d(normal), RAIL_RADIUS, 4,
                     new Color4f(0.82F, 0, 0, 1));
+
+            // 左轨右轨
+//            GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
+//                    leftStart.scale(node.shouldFlipNormal() ? -1 : 1), leftEnd.scale(node.shouldFlipNormal() ? -1 : 1),
+//                    new Vector3d(rolledNormal),  RAIL_RADIUS, 8, railColor);
+//            GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
+//                    rightStart.scale(node.shouldFlipNormal() ? -1 : 1), rightEnd.scale(node.shouldFlipNormal() ? -1 : 1),
+//                    new Vector3d(rolledNormal), RAIL_RADIUS, 8, railColor);
+
+            // 承重轨
+//            GeometryUtil.renderClippedCylinder(builder, matrixStack.getLast().getMatrix(),
+//                    girderStart, girderNext, new Vector3d(rolledNormal), RAIL_RADIUS, 4,
+//                    new Color4f(0.82F, 0, 0, 1));
 
             prevLeft = leftEnd;
             prevRight = rightEnd;
@@ -240,10 +252,10 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
             Vector3d offset = rotMatrix.multiply(new Vector3d(0, 0.1, 0));
 
             GeometryUtil.quadFace(builder, matrixStackIn.getLast().getMatrix(),
-                    new Vector3f(rotMatrix.multiply(leftUp).add(prev).add(offset)),
-                    new Vector3f(rotMatrix.multiply(rightUp).add(prev).add(offset)),
-                    new Vector3f(rotMatrix.multiply(rightDown).add(prev).add(offset)),
-                    new Vector3f(rotMatrix.multiply(leftDown).add(prev).add(offset)),
+                    new Vector3f(rotMatrix.multiply(leftUp).add(prev)),
+                    new Vector3f(rotMatrix.multiply(rightUp).add(prev)),
+                    new Vector3f(rotMatrix.multiply(rightDown).add(prev)),
+                    new Vector3f(rotMatrix.multiply(leftDown).add(prev)),
                     new Vector4f(color.r, color.g, color.b, color.a));
         }
 

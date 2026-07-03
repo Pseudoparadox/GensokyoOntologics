@@ -663,7 +663,10 @@
   "story.gensokyoontology.chapter_1_2.page_1": "That was a cold spring which I was starved to die. Snows fall until May 1st. I have wandered around on this icy land for many years ever since then. I was unreconciled, why me? why only my vitality was been taken altogether with the spring?",
   "story.gensokyoontology.chapter_1_3.page_1": "Quite a lengthy night!\nThis is the only thing that I can remember.",
 
-  "tooltip.gensokyoontology.coaster_rail.start_pos": "§dFirst Coaster Track Node at: §r",
+  "tooltip.gensokyoontology.coaster_rail.start_pos": "First Coaster Track Node at: ",
+  "tooltip.gensokyoontology.coaster_rail.place": "§bRight CLICK§r Block to place new Rail",
+  "tooltip.gensokyoontology.coaster_rail.place_connect": "§bRight CLICK§r Block to place new Rail and connect",
+  "tooltip.gensokyoontology.coaster_rail.connect": "§bSHIFT + Right Click§r End rail to connect",
   "tooltip.blank_line": "",
 
   "tooltip.gensokyoontology.aya_fans": "§eRight click to release Ten-gu Wind to blow up entities away.",

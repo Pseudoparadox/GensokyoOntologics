@@ -53,32 +53,14 @@ public class RailWrench extends Item implements IRayTracer {
         this.rayTrace(world, player, start, end).ifPresent(entity -> {
             if(!(entity instanceof RailEntity)) return;
             RailEntity rail = (RailEntity) entity;
-            this.onClickFirstRail(player, rail, wrench);
-            result.set(ActionResult.resultConsume(wrench));
+            this.onClickFirstRail(player, rail);
+            result.set(ActionResult.resultSuccess(wrench));
         });
         return result.get();
     }
 
-    @Override
-    public @NotNull ActionResultType onItemUse(@NotNull ItemUseContext context) {
-        World world = context.getWorld();
-        BlockPos pos = context.getPos();
-        PlayerEntity player = context.getPlayer();
-        BlockState blockState = world.getBlockState(pos);
-        ItemStack wrench = context.getItem();
-
-        if (player == null) return ActionResultType.FAIL;
-        if (blockState.getBlock() != BlockRegistry.COASTER_RAIL.get()) return super.onItemUse(context);
-        Optional<RailTileEntity> optional = GSKOUtil.getTileByType(world, pos, TileEntityRegistry.RAIL_TILE_ENTITY.get());
-
-        if (!optional.isPresent()) return super.onItemUse(context);
-        RailTileEntity railTile = optional.get();
-
-        return this.onClickFirstRailBlock(pos, player, wrench);
-    }
-
-    private void onClickFirstRail(@NotNull PlayerEntity player, RailEntity startRail, ItemStack wrench) {
-        if (Screen.hasShiftDown() & player.world.isRemote) {
+    private void onClickFirstRail(@NotNull PlayerEntity player, RailEntity startRail) {
+        if (player.world.isRemote) {
             HermiteNodeInfo node = HermiteNodeInfo.of(startRail.getInfo(), startRail.getPosition(),
                             BlockPos.fromLong(0), startRail.getRotation(), Quaternion.ONE)
                     .setAutoSmooth(startRail.isAutoScale())
@@ -86,77 +68,6 @@ public class RailWrench extends Item implements IRayTracer {
                     .setPrevScale(startRail.getScale0())
                     .setNextScale(startRail.getScale1());
             new RailDashboardScreen(startRail.getPosition(), node, startRail.getEntityId()).open();
-            return;
         }
-        ItemStack connector = new ItemStack(ItemRegistry.RAIL_CONNECTOR.get());
-        CompoundNBT nbt = new CompoundNBT();
-        nbt.putUniqueId("uuid", startRail.getUniqueID());
-        connector.setTag(nbt);
-
-        player.addItemStackToInventory(connector);
-    }
-
-    private ActionResultType onClickFirstRailBlock(BlockPos startPos, @NotNull PlayerEntity player,
-                                              ItemStack wrench) {
-        ItemStack connector = new ItemStack(ItemRegistry.RAIL_CONNECTOR.get());
-        CompoundNBT nbt = new CompoundNBT();
-        nbt.putLong("startPos", startPos.toLong());
-        connector.setTag(nbt);
-
-        wrench.shrink(1);
-        player.addItemStackToInventory(connector);
-        return ActionResultType.SUCCESS;
-    }
-
-    public static ActionResultType onClickNextRailBlock(ItemUseContext targetCtx) {
-        World world = targetCtx.getWorld();
-        PlayerEntity player = targetCtx.getPlayer();
-        BlockState blockState = world.getBlockState(targetCtx.getPos());
-        ItemStack connector = targetCtx.getItem();
-
-        if (player == null) return ActionResultType.FAIL;
-        if (blockState.getBlock() != BlockRegistry.COASTER_RAIL.get()) return ActionResultType.PASS;
-        if (connector.getTag() == null) return ActionResultType.PASS;
-
-        BlockPos startPos = BlockPos.fromLong(connector.getTag().getLong("startPos"));
-        Optional<RailTileEntity> optional = GSKOUtil.getTileByType(world, startPos, TileEntityRegistry.RAIL_TILE_ENTITY.get());
-        if (!optional.isPresent()) return ActionResultType.PASS;
-        RailTileEntity startRail = optional.get();
-
-        startRail.setTargetPos(targetCtx.getPos());
-        startRail.setShouldRender(false);
-
-        ItemStack railItem = new ItemStack(ItemRegistry.RAIL_WRENCH.get());
-        player.addItemStackToInventory(railItem);
-        return ActionResultType.SUCCESS;
-    }
-
-    public static void onClickNextRail(World world, @NotNull PlayerEntity player,
-                                       RailEntity targetRail , ItemStack connector) {
-        if (connector.getItem() != ItemRegistry.RAIL_CONNECTOR.get()) return;
-        if (connector.getTag() == null) return;
-        if (world.isRemote) return;
-        ServerWorld serverWorld = (ServerWorld) world;
-        getStartRail(serverWorld, connector.getTag().getUniqueId("uuid")).ifPresent(entity -> {
-            if (!(entity instanceof RailEntity)) return;
-            RailEntity startRail = (RailEntity) entity;
-            startRail.setNextId(targetRail.getUniqueID());
-            startRail.setNextPos(targetRail.getPosition());
-            connector.shrink(1);
-            player.addItemStackToInventory(new ItemStack(ItemRegistry.RAIL_WRENCH.get()));
-
-            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-            GSKONetworking.sendToClientPlayer(new S2CRenderRailPacket(startRail.getEntityId(),
-                            targetRail.getEntityId()), serverPlayer);
-        });
-
-    }
-
-    public static Optional<Entity> getStartRail(ServerWorld world, UUID uuid) {
-        return Optional.ofNullable(world.getEntityByUuid(uuid));
-    }
-
-    public static ActionResultType onRemoveConnection(BlockPos pos, PlayerEntity player, ItemStack connector) {
-        return ActionResultType.SUCCESS;
     }
 }

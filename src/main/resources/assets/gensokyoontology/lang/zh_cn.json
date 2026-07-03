@@ -656,7 +656,10 @@
   "story.gensokyoontology.chapter_1_2.page_1": "That was a cold spring which I was starved to die. Snows fall until May 1st. I have wandered around on this icy land for many years ever since then. I was unreconciled, why me? why only my vitality was been taken altogether with the spring?",
   "story.gensokyoontology.chapter_1_3.page_1": "Quite a lengthy night!\nThis is the only thing that I can remember.",
 
-  "tooltip.gensokyoontology.coaster_rail.start_pos": "§d第一个轨道节点位于: §r",
+  "tooltip.gensokyoontology.coaster_rail.start_pos": "第一个轨道节点位于: ",
+  "tooltip.gensokyoontology.coaster_rail.place": "§b右键点击§r 方块来放置新的轨道节点",
+  "tooltip.gensokyoontology.coaster_rail.place_connect": "§b右键点击§r 方块来放置新的轨道并与第一个节点进行连接",
+  "tooltip.gensokyoontology.coaster_rail.connect": "§bShift + 右键点击§r 轨道节点与第一个节点进行连接",
 
   "tooltip.blank_line": "",
   "tooltip.gensokyoontology.aya_fans": "§e右键点击时释放可以将生物和弹幕吹走的天狗风",
