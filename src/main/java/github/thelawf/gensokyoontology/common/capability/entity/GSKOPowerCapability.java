@@ -1,10 +1,7 @@
 package github.thelawf.gensokyoontology.common.capability.entity;
 
-import com.github.tartaricacid.touhoulittlemaid.capability.PowerCapability;
-import com.github.tartaricacid.touhoulittlemaid.capability.PowerCapabilityProvider;
 import github.thelawf.gensokyoontology.common.compat.touhoulittlemaid.TouhouLittleMaidCompat;
 import github.thelawf.gensokyoontology.common.network.GSKONetworking;
-import github.thelawf.gensokyoontology.common.network.packet.PowerChangedPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.FloatNBT;
@@ -41,19 +38,19 @@ public class GSKOPowerCapability implements INBTSerializable<FloatNBT> {
 
         Minecraft mc = Minecraft.getInstance();
         PlayerEntity player = mc.player;
-        AtomicReference<PowerCapability> cap = new AtomicReference<>();
+//        AtomicReference<PowerCapability> cap = new AtomicReference<>();
 
         if (player == null) return;
 
-        if (TouhouLittleMaidCompat.isTouhouMaidLoaded()) {
-            player.getCapability(PowerCapabilityProvider.POWER_CAP).ifPresent(tlmCap -> {
-                cap.set(tlmCap);
-                tlmCap.set(count);
-            });
-        }
+//        if (TouhouLittleMaidCompat.isTouhouMaidLoaded()) {
+//            player.getCapability(PowerCapabilityProvider.POWER_CAP).ifPresent(tlmCap -> {
+//                cap.set(tlmCap);
+//                tlmCap.set(count);
+//            });
+//        }
 
         this.count = MathHelper.clamp(count, MIN, MAX);
-        GSKONetworking.CHANNEL.sendToServer(new PowerChangedPacket(this.count));
+//        GSKONetworking.CHANNEL.sendToServer(new PowerChangedPacket(this.count));
         this.markDirty();
     }
 

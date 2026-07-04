@@ -1,6 +1,5 @@
 package github.thelawf.gensokyoontology.common.events;
 
-import com.github.tartaricacid.touhoulittlemaid.capability.PowerCapability;
 import com.github.tartaricacid.touhoulittlemaid.capability.PowerCapabilityProvider;
 import github.thelawf.gensokyoontology.GensokyoOntology;
 import github.thelawf.gensokyoontology.api.IRayTracer;
@@ -36,7 +35,6 @@ import github.thelawf.gensokyoontology.core.init.BlockRegistry;
 import github.thelawf.gensokyoontology.core.init.EffectRegistry;
 import github.thelawf.gensokyoontology.core.init.ItemRegistry;
 import github.thelawf.gensokyoontology.data.GSKOPlayerData;
-import github.thelawf.gensokyoontology.data.world.GSKOWorldSavedData;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.block.BlockState;
@@ -86,7 +84,7 @@ public class GSKOEntityEvents {
     public static int CICADA_SOUND = 20 * 60 * 2;
     public static final int LILY_WHITE_DELAY = 80000;
 
-    @SubscribeEvent
+//    @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         event.getPlayer().getCapability(GSKOCapabilities.POWER).ifPresent(cap -> {
             GSKONetworking.sendToClientPlayer(new PowerChangedPacket(cap.getCount()), event.getPlayer());
@@ -94,7 +92,7 @@ public class GSKOEntityEvents {
         });
     }
 
-    @SubscribeEvent
+//    @SubscribeEvent
     public static void onEntityJoinWorld(EntityJoinWorldEvent event) {
         if (event.getEntity() instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity)event.getEntity();
@@ -126,7 +124,7 @@ public class GSKOEntityEvents {
                 });
     }
 
-    @SubscribeEvent
+//    @SubscribeEvent
     public static void onSyncWithTLM(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         if (!TouhouLittleMaidCompat.isTouhouMaidLoaded())return;
@@ -138,40 +136,41 @@ public class GSKOEntityEvents {
 
         player.getCapability(GSKOCapabilities.POWER).ifPresent(gskoCap -> {
             GSKONetworking.sendToClientPlayer(new PowerChangedPacket(gskoCap.getCount()), player);
+            if (!TouhouLittleMaidCompat.isTouhouMaidLoaded()) return;
             player.getCapability(PowerCapabilityProvider.POWER_CAP).ifPresent(tlmCap -> {
-                tlmCap.markDirty();
-                handleDataSaved(player.world, tlmCap, gskoCap);
-                handleDataLoaded(player.world, tlmCap, gskoCap);
+//                tlmCap.markDirty();
+//                handleDataSaved(player.world, tlmCap, gskoCap);
+//                handleDataLoaded(player.world, tlmCap, gskoCap);
             });
         });
     }
 
-    public static void handleDataSaved(World world, PowerCapability tlmCap, GSKOPowerCapability gskoCap) {
-        if (gskoCap.isDirty()) {
-            GSKOWorldSavedData.getInstance(world).writePower(gskoCap.getCount());
-            gskoCap.setDirty(false);
-            tlmCap.markDirty();
-        }
-        else if (tlmCap.isDirty()) {
-            GSKOWorldSavedData.getInstance(world).writePower(tlmCap.get());
-            tlmCap.setDirty(false);
-            gskoCap.markDirty();
-        }
-    }
+//    public static void handleDataSaved(World world, PowerCapability tlmCap, GSKOPowerCapability gskoCap) {
+//        if (gskoCap.isDirty()) {
+//            GSKOWorldSavedData.getInstance(world).writePower(gskoCap.getCount());
+//            gskoCap.setDirty(false);
+//            tlmCap.markDirty();
+//        }
+//        else if (tlmCap.isDirty()) {
+//            GSKOWorldSavedData.getInstance(world).writePower(tlmCap.get());
+//            tlmCap.setDirty(false);
+//            gskoCap.markDirty();
+//        }
+//    }
+//
+//    public static void handleDataLoaded(World world, PowerCapability tlmCap, GSKOPowerCapability gskoCap) {
+//        if (gskoCap.isDirty()) {
+//            gskoCap.setCount(GSKOWorldSavedData.getInstance(world).getPower());
+//            gskoCap.setDirty(false);
+//        }
+//        else if (tlmCap.isDirty()) {
+//            tlmCap.set(GSKOWorldSavedData.getInstance(world).getPower());
+//            tlmCap.setDirty(false);
+//        }
+//    }
 
-    public static void handleDataLoaded(World world, PowerCapability tlmCap, GSKOPowerCapability gskoCap) {
-        if (gskoCap.isDirty()) {
-            gskoCap.setCount(GSKOWorldSavedData.getInstance(world).getPower());
-            gskoCap.setDirty(false);
-        }
-        else if (tlmCap.isDirty()) {
-            tlmCap.set(GSKOWorldSavedData.getInstance(world).getPower());
-            tlmCap.setDirty(false);
-        }
-    }
-
-    @SubscribeEvent
-    @Deprecated
+//    @SubscribeEvent
+//    @Deprecated
     public static void onPlayerLife(LivingEvent.LivingUpdateEvent event) {
         if (!(event.getEntityLiving() instanceof PlayerEntity)) return;
         PlayerEntity player = (PlayerEntity) event.getEntityLiving();
@@ -307,7 +306,7 @@ public class GSKOEntityEvents {
         dropLunarDanmaku(event.getEntityLiving(), (ServerWorld) event.getEntityLiving().world);
 
         if (event.getEntityLiving() instanceof PlayerEntity) {
-            GSKOPowerCapability.INSTANCE.add(-1);
+//            GSKOPowerCapability.INSTANCE.add(-1);
             PlayerEntity player = (PlayerEntity) event.getEntityLiving();
             World world = player.getEntityWorld();
             PlayerInventory inventory = player.inventory;
