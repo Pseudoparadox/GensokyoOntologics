@@ -1,7 +1,6 @@
 package github.thelawf.gensokyoontology.data;
 
 import com.mojang.datafixers.util.Pair;
-import github.thelawf.gensokyoontology.api.Functions;
 import github.thelawf.gensokyoontology.api.INBTWriter;
 import github.thelawf.gensokyoontology.api.ISynchornizable;
 import github.thelawf.gensokyoontology.api.util.Maybe;
@@ -12,8 +11,6 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.IntNBT;
 import net.minecraft.network.PacketBuffer;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -38,25 +35,25 @@ public class CoasterPhysics implements INBTWriter, ISynchornizable<CompoundNBT, 
     }
 
     public static final CoasterPhysics ACCELERATION_STD = CoasterPhysics.of(
-            () -> Pair.of(KEY_TYPE, IntNBT.valueOf(RailEntity.Info.ACCELERATION.ordinal())),
+            () -> Pair.of(KEY_TYPE, IntNBT.valueOf(RailEntity.Type.ACCELERATION.ordinal())),
             () -> Pair.of(KEY_VELOCITY, FloatNBT.valueOf(0F)),
             () -> Pair.of(KEY_ACCELERATION, FloatNBT.valueOf(0.1F)),
             () -> Pair.of(KEY_MAX_SPEED, FloatNBT.valueOf(3F)));
 
     public static final CoasterPhysics DECELERATION_STD = CoasterPhysics.of(
-            () -> Pair.of(KEY_TYPE, IntNBT.valueOf(RailEntity.Info.DECELERATION.ordinal())),
+            () -> Pair.of(KEY_TYPE, IntNBT.valueOf(RailEntity.Type.DECELERATION.ordinal())),
             () -> Pair.of(KEY_VELOCITY, FloatNBT.valueOf(0F)),
             () -> Pair.of(KEY_ACCELERATION, FloatNBT.valueOf(0.1F)),
             () -> Pair.of(KEY_MAX_SPEED, FloatNBT.valueOf(3F)));
 
     public static final CoasterPhysics UNIFORM_STD = CoasterPhysics.of(
-            () -> Pair.of(KEY_TYPE, IntNBT.valueOf(RailEntity.Info.UNIFORM.ordinal())),
+            () -> Pair.of(KEY_TYPE, IntNBT.valueOf(RailEntity.Type.UNIFORM.ordinal())),
             () -> Pair.of(KEY_VELOCITY, FloatNBT.valueOf(0F)),
             () -> Pair.of(KEY_ACCELERATION, FloatNBT.valueOf(0F)),
             () -> Pair.of(KEY_MAX_SPEED, FloatNBT.valueOf(0.5F)));
 
     public static final CoasterPhysics INERTIAL_STD = CoasterPhysics.of(
-            () -> Pair.of(KEY_TYPE, IntNBT.valueOf(RailEntity.Info.INERTIAL.ordinal())),
+            () -> Pair.of(KEY_TYPE, IntNBT.valueOf(RailEntity.Type.INERTIAL.ordinal())),
             () -> Pair.of(KEY_VELOCITY, FloatNBT.valueOf(0F)),
             () -> Pair.of(KEY_ACCELERATION, FloatNBT.valueOf(0F)),
             () -> Pair.of(KEY_MAX_SPEED, FloatNBT.valueOf(0.5F)));

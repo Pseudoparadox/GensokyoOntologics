@@ -7,7 +7,6 @@ import github.thelawf.gensokyoontology.common.util.math.RotMatrix;
 import github.thelawf.gensokyoontology.core.init.EntityRegistry;
 import github.thelawf.gensokyoontology.common.util.math.DerivativeInfo;
 import github.thelawf.gensokyoontology.data.GSKOSerializers;
-import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -80,7 +79,7 @@ public class RailEntity extends Entity {
         this.dataManager.register(DATA_TARGET_UUID, Optional.empty());
         this.dataManager.register(DATA_ROT, new Quaternion(0f, 0f, 0f, 1f));
         this.dataManager.register(DATA_NEXT_POS, new BlockPos(0,0,0));
-        this.dataManager.register(DATA_INFO, Info.UNIFORM.ordinal());
+        this.dataManager.register(DATA_INFO, Type.UNIFORM.ordinal());
         this.dataManager.register(DATA_SCALE0, 10);
         this.dataManager.register(DATA_SCALE1, 10);
         this.dataManager.register(DATA_AUTO, true);
@@ -132,7 +131,7 @@ public class RailEntity extends Entity {
         compound.putInt("scale1", this.getScale1());
         compound.putBoolean("auto", this.isAutoScale());
         compound.putBoolean("flip", this.isFlipNormal());
-        compound.putInt("info", this.getInfo().ordinal());
+        compound.putInt("info", this.getRailType().ordinal());
 
         compound.putInt("targetX", this.getNextPos().getX());
         compound.putInt("targetY", this.getNextPos().getY());
@@ -264,8 +263,8 @@ public class RailEntity extends Entity {
         this.dataManager.set(DATA_INFO, infoOrdinal);
     }
 
-    public Info getInfo() {
-        return Info.values()[this.dataManager.get(DATA_INFO)];
+    public Type getRailType() {
+        return Type.values()[this.dataManager.get(DATA_INFO)];
     }
 
     public List<Vector3d> getSegmentPositions(@NotNull RailEntity nextRail) {
@@ -354,14 +353,14 @@ public class RailEntity extends Entity {
     }
 
 
-    public enum Info{
+    public enum Type {
         ACCELERATION(Color4i.GREEN),
         DECELERATION(Color4i.RED),
         UNIFORM(Color4i.BLUE),
         INERTIAL(Color4i.YELLOW);
 
         public final Color4i color;
-        Info(Color4i color) {
+        Type(Color4i color) {
             this.color = color;
         }
     }

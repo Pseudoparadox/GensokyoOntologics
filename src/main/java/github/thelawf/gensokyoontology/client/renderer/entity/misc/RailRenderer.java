@@ -62,7 +62,7 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         IVertexBuilder buffer  = bufferIn.getBuffer(GSKORenderTypes.MULTI_FACE_SOLID);
 
         Maybe<Entity> maybe = startRail.getNextRailClient(Maybe.empty());
-        Color4f railColor = startRail.getInfo().color.toColor4f();
+        Color4f railColor = startRail.getRailType().color.toColor4f();
         Predicate<PlayerEntity> holdWrench = p ->
                 p.getHeldItemMainhand().getItem() == ItemRegistry.RAIL_WRENCH.get();
         Predicate<PlayerEntity> holdConnector = p ->
@@ -127,7 +127,7 @@ public class RailRenderer extends EntityRenderer<RailEntity> {
         final int segments = 32;
         // 保存初始矩阵状态，以便在渲染完这一整条轨道后恢复
         matrixStack.push();
-        HermiteNodeInfo nodeInfo = HermiteNodeInfo.of(RailEntity.Info.DECELERATION,
+        HermiteNodeInfo nodeInfo = HermiteNodeInfo.of(RailEntity.Type.DECELERATION,
                         startRail.getPosition(), targetRail.getPosition().subtract(startRail.getPosition()),
                         startRail.getRotation(), targetRail.getRotation())
                 .setPrevScale(startRail.isAutoScale() ? (int) rescaleTangent(startPos, endPos) : startRail.getScale0())

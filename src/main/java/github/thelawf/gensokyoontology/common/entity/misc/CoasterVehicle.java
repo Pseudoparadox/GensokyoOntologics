@@ -5,6 +5,7 @@ import github.thelawf.gensokyoontology.core.init.EntityRegistry;
 import github.thelawf.gensokyoontology.core.init.ItemRegistry;
 import github.thelawf.gensokyoontology.common.util.math.DerivativeInfo;
 import github.thelawf.gensokyoontology.common.util.math.TimeDifferential;
+import github.thelawf.gensokyoontology.data.CoasterPhysics;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -45,6 +46,9 @@ public class CoasterVehicle extends Entity {
 
     public static final BlockPos NAN_POS = new BlockPos(Double.NaN, Double.NaN, Double.NaN);
     public static final BlockState AIR = Blocks.AIR.getDefaultState();
+
+    public static final DataParameter<CoasterPhysics> DATA_PHYSICS = EntityDataManager.createKey(
+            CoasterVehicle.class, CoasterPhysics.INERTIAL_STD);
 
     public static final DataParameter<Float> DATA_PROGRESS = EntityDataManager.createKey(
             CoasterVehicle.class, DataSerializers.FLOAT);

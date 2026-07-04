@@ -51,19 +51,19 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
             RESET_ROT     = GSKOUtil.fromLocaleKey("gui.", ".button.reset_rotation"),
             RESET_SCALE   = GSKOUtil.fromLocaleKey("gui.", ".button.reset_scale");
 
-    private static final Map<RailEntity.Info, TranslationTextComponent> MAP = Util.make(() -> {
-        Map<RailEntity.Info, TranslationTextComponent> map = new HashMap<>();
-        map.put(RailEntity.Info.ACCELERATION, INFO_ACC);
-        map.put(RailEntity.Info.DECELERATION, INFO_DEC);
-        map.put(RailEntity.Info.UNIFORM, INFO_UNIFORM);
-        map.put(RailEntity.Info.INERTIAL, INFO_INERTIAL);
+    private static final Map<RailEntity.Type, TranslationTextComponent> MAP = Util.make(() -> {
+        Map<RailEntity.Type, TranslationTextComponent> map = new HashMap<>();
+        map.put(RailEntity.Type.ACCELERATION, INFO_ACC);
+        map.put(RailEntity.Type.DECELERATION, INFO_DEC);
+        map.put(RailEntity.Type.UNIFORM, INFO_UNIFORM);
+        map.put(RailEntity.Type.INERTIAL, INFO_INERTIAL);
         return map;
     });
 
     public static final ITextComponent TITLE = GSKOUtil.translateText("gui.", ".rail_dashboard.title");
     private static final float[] STEPS = {90f, 10f, 1f};
     // private final Quaternion initRotation;
-    private RailEntity.Info railInfo;
+    private RailEntity.Type railType;
     private int scale0;
     private int scale1;
     private boolean autoScale = true;
@@ -74,7 +74,7 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
         this.position = pos;
         this.rotation = node.rotation0().copy();
         this.startEntityId = entityId;
-        this.railInfo = node.getRailType();
+        this.railType = node.getRailType();
         this.scale0 = node.scale0();
         this.scale1 = node.scale1();
         this.flipChirality = node.shouldFlipNormal();
@@ -119,7 +119,7 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
 
     private void sendPacketToServer() {
         GSKONetworking.CHANNEL.sendToServer(new CAdjustRailPacket(
-                HermiteNodeInfo.of(this.railInfo, this.position, BlockPos.ZERO, this.rotation, Quaternion.ONE)
+                HermiteNodeInfo.of(this.railType, this.position, BlockPos.ZERO, this.rotation, Quaternion.ONE)
                         .setPrevScale(this.scale0)
                         .setNextScale(this.scale1)
                         .setAutoSmooth(this.autoScale)
@@ -174,9 +174,9 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
     }
 
     private void switchRailType(Button button){
-        RailEntity.Info newInfo = EnumUtil.switchEnum(RailEntity.Info.class, this.railInfo);
-        this.railInfo = newInfo;
-        button.setMessage(MAP.get(newInfo));
+        RailEntity.Type newType = EnumUtil.switchEnum(RailEntity.Type.class, this.railType);
+        this.railType = newType;
+        button.setMessage(MAP.get(newType));
         this.sendPacketToServer();
     }
 

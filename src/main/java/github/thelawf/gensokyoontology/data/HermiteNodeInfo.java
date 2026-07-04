@@ -21,21 +21,21 @@ public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT,
     private boolean autoSmooth = true;
     private int scale0 = 10;
     private int scale1 = 10;
-    private RailEntity.Info info;
+    private RailEntity.Type type;
     private Quaternion prevRotation;
     private Quaternion nextRotation;
 
-    public static final HermiteNodeInfo EMPTY = new HermiteNodeInfo(RailEntity.Info.DECELERATION,
+    public static final HermiteNodeInfo EMPTY = new HermiteNodeInfo(RailEntity.Type.DECELERATION,
             0, 0, Quaternion.ONE, Quaternion.ONE);
 
-    public static HermiteNodeInfo of(RailEntity.Info info, BlockPos start, BlockPos end, Quaternion startRot, Quaternion endRot){
-        return new HermiteNodeInfo(info, start.toLong(), end.toLong(), startRot, endRot);
+    public static HermiteNodeInfo of(RailEntity.Type type, BlockPos start, BlockPos end, Quaternion startRot, Quaternion endRot){
+        return new HermiteNodeInfo(type, start.toLong(), end.toLong(), startRot, endRot);
     }
     public HermiteNodeInfo(){
 
     }
-    private HermiteNodeInfo(RailEntity.Info info, long startPos, long endPosOffset, Quaternion prevRot, Quaternion nextRot) {
-        this.info = info;
+    private HermiteNodeInfo(RailEntity.Type type, long startPos, long endPosOffset, Quaternion prevRot, Quaternion nextRot) {
+        this.type = type;
         this.startPos = startPos;
         this.endPosOffset = endPosOffset;
         this.prevRotation = prevRot;
@@ -69,7 +69,7 @@ public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT,
 
         compound.putInt("scale0", this.scale0);
         compound.putInt("scale1", this.scale1);
-        compound.putInt("info", this.info.ordinal());
+        compound.putInt("info", this.type.ordinal());
         compound.putBoolean("flip", this.flipNormal);
         compound.putBoolean("smooth", this.autoSmooth);
         return compound;
@@ -97,12 +97,12 @@ public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT,
         this.setNextScale(nbt.getInt("scale1"));
         this.setFlipNormal(nbt.getBoolean("flip"));
         this.setAutoSmooth(nbt.getBoolean("smooth"));
-        this.info = EnumUtil.readEnum(RailEntity.Info.class, nbt.getInt("info"));
+        this.type = EnumUtil.readEnum(RailEntity.Type.class, nbt.getInt("info"));
     }
 
     @Override
     public HermiteNodeInfo copy(){
-        return new HermiteNodeInfo(this.info, this.startPos, this.endPosOffset, this.prevRotation, this.nextRotation)
+        return new HermiteNodeInfo(this.type, this.startPos, this.endPosOffset, this.prevRotation, this.nextRotation)
                 .setPrevScale(this.scale0)
                 .setNextScale(this.scale1)
                 .setAutoSmooth(this.autoSmooth)
@@ -146,8 +146,8 @@ public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT,
     public Vector3d getEndPosVec(){
         return Vector3d.copy(this.getEndPos());
     }
-    public RailEntity.Info getRailType(){
-        return this.info;
+    public RailEntity.Type getRailType(){
+        return this.type;
     }
 
     public Quaternion rotation0(){
