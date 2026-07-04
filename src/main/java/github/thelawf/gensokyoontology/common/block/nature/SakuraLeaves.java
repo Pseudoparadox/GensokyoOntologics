@@ -1,13 +1,13 @@
 package github.thelawf.gensokyoontology.common.block.nature;
 
 import github.thelawf.gensokyoontology.common.capability.GSKOCapabilities;
+import github.thelawf.gensokyoontology.data.world.GSKOWorldSavedData;
 import github.thelawf.gensokyoontology.data.world.GensokyoSeason;
 import net.minecraft.block.*;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.WorldSavedData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
@@ -25,6 +25,7 @@ public class SakuraLeaves extends LeavesBlock {
             spawnDrops(state, worldIn, pos);
             worldIn.removeBlock(pos, false);
         }
+        GSKOWorldSavedData gskoWorldData = GSKOWorldSavedData.getInstance(worldIn);
     }
 
     @Override

@@ -60,9 +60,9 @@ public class SeigaHairpin extends Item {
             player.noClip = true;
             player.setNoGravity(true);
 
-//            player.getCapability(GSKOCapabilities.POWER).ifPresent(gskoCap -> {
-//                GSKONetworking.sendToClientPlayer(new PowerChangedPacket(gskoCap.getCount() - 0.01f), player);
-//            });
+            player.getCapability(GSKOCapabilities.POWER).ifPresent(gskoCap -> {
+                GSKONetworking.sendToClientPlayer(new PowerChangedPacket(gskoCap.getCount() - 0.01f), player);
+            });
 
         }
         else {

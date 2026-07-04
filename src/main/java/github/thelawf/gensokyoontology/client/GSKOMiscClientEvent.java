@@ -136,7 +136,7 @@ public class GSKOMiscClientEvent {
      * Copy from Touhou Little Maid: {@link com.github.tartaricacid.touhoulittlemaid.client.event.ShowPowerEvent ShowPowerEvent}
      *
      */
-//    @SubscribeEvent
+    @SubscribeEvent
     public static void onRenderPowerDisplay(RenderGameOverlayEvent event) {
         if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR) {
             ClientPlayerEntity player = Minecraft.getInstance().player;

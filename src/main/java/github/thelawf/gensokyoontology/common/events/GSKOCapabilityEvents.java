@@ -42,7 +42,7 @@ public class GSKOCapabilityEvents {
     private static ClientWorld clientWorld;
     private static ServerWorld serverWorld;
 
-    // @SubscribeEvent
+    @SubscribeEvent
     public static void onCapabilityAttachToWorld(AttachCapabilitiesEvent<World> event) {
         if (event.getObject() instanceof World) {
             List<String> biomes = new ArrayList<>();
@@ -59,7 +59,7 @@ public class GSKOCapabilityEvents {
         }
     }
 
-//    @SubscribeEvent
+    @SubscribeEvent
     public static void onCapabilityAttachToEntity(AttachCapabilitiesEvent<Entity> event) {
         Entity entity = event.getObject();
         if (entity instanceof PlayerEntity) {
@@ -75,14 +75,14 @@ public class GSKOCapabilityEvents {
     }
 
 
-//    @SubscribeEvent
+    @SubscribeEvent
     public static void onPlayerCloned(PlayerEvent.Clone event) {
         updateBelief(event);
         updatePower(event);
         updateLife(event);
     }
 
-//    @SubscribeEvent
+    @SubscribeEvent
     public static void onWorldTickDuringIncident(WorldEvent.Load event) {
         if (event.getWorld() instanceof ServerWorld) {
             ServerWorld serverWorld = ((ServerWorld) event.getWorld()).getServer().getWorld(GSKODimensions.GENSOKYO);
@@ -102,7 +102,7 @@ public class GSKOCapabilityEvents {
      * The effect of3D this method is to sync the power counts from Touhou Little Maid to this Mod.
      *
      */
-//    @SubscribeEvent
+    @SubscribeEvent
     public static void onCapabilitySync(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         if (event.player.world.isRemote) return; // 只在服务端执行
@@ -171,7 +171,7 @@ public class GSKOCapabilityEvents {
                 }));
     }
 
-//    @SubscribeEvent
+    @SubscribeEvent
     public static void onPacketSendToClient(TickEvent.PlayerTickEvent event) {
         PlayerEntity player = event.player;
         if (event.side == LogicalSide.CLIENT && event.phase == TickEvent.Phase.END) {
