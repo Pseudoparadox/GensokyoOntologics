@@ -42,7 +42,7 @@ public class RailWrench extends Item implements IRayTracer {
         return result.get();
     }
 
-    private void onClickFirstRail(@NotNull PlayerEntity player, RailEntity startRail) {
+    public void onClickFirstRail(@NotNull PlayerEntity player, RailEntity startRail) {
         if (player.world.isRemote) {
             HermiteNodeInfo node = HermiteNodeInfo.of(startRail.getRailType(), startRail.getPosition(),
                             BlockPos.fromLong(0), startRail.getRotation(), Quaternion.ONE)

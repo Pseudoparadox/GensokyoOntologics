@@ -1,6 +1,7 @@
 package github.thelawf.gensokyoontology.api;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.StructureBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.*;
@@ -77,14 +78,6 @@ public interface IRayTracer {
         return isIntersecting(start, end,
                 new Vector3d(aabb.minX, aabb.minY, aabb.minZ),
                 new Vector3d(aabb.maxX, aabb.maxY, aabb.maxZ));
-    }
-
-
-    default BlockState rayTraceBlock(World world, Entity originEntity, float radius, Vector3d offset){
-        Vector3d start = originEntity.getEyePosition(0f).add(offset);
-        Vector3d end = originEntity.getLookVec().normalize().scale(radius).add(start);
-        BlockRayTraceResult btr = world.rayTraceBlocks(new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, originEntity));
-        return world.getBlockState(btr.getPos());
     }
 
     default List<Entity> rayTrace(World world, Entity originEntity, float radius, Vector3d offset){
@@ -276,5 +269,15 @@ public interface IRayTracer {
         return worldIn.getEntitiesWithinAABB(entityClass, aabb).stream()
                 .filter(t -> aabb.getCenter().distanceTo(t.getPositionVec()) <= radius && predicate.test(t))
                 .collect(Collectors.toList());
+    }
+
+    default boolean checkRayHitBox(AxisAlignedBB aabb, Vector3d from, Vector3d to){
+        double max = Double.MAX_VALUE;
+        Optional<Vector3d> optional = aabb.rayTrace(from, to);
+        if (optional.isPresent()) {
+            double distance = from.squareDistanceTo(optional.get());
+            return distance < max;
+        }
+        return false;
     }
 }

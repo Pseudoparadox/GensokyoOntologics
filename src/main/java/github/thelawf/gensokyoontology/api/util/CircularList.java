@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class CircularList<T> {
@@ -37,6 +38,18 @@ public class CircularList<T> {
         return circular;
     }
 
+    public Maybe<CircularNode<T>> tryFind(CircularNode<T> node){
+        Maybe<CircularNode<T>> maybe = Maybe.empty();
+        this.nodes.stream().filter(n -> n == node).findFirst().ifPresent(maybe::set);
+        return maybe;
+    }
+
+    public Maybe<T> tryFindValue(Predicate<T> predicate){
+        Maybe<T> maybe = Maybe.empty();
+        this.nodes.stream().map(CircularNode::value).filter(predicate).findFirst().ifPresent(maybe::set);
+        return maybe;
+    }
+
     public void add(T value)
     {
         CircularNode<T> node = new CircularNode<>(value);
@@ -60,7 +73,7 @@ public class CircularList<T> {
     /// <summary>
     /// 遍历链表（示例方法，循环输出元素，防止无限循环）
     /// </summary>
-    public void forEach(int maxIterations)
+    public void forEach(Consumer<T> action)
     {
         if (this.head == null)
         {
@@ -71,9 +84,10 @@ public class CircularList<T> {
         int count = 0;
         do
         {
+            action.accept(this.head.value());
             current = current.next();
             count++;
-        } while (current != this.head && count < maxIterations); // 回到头节点时停止
+        } while (current != this.head && count < this.depth); // 回到头节点时停止
     }
 
     public void forEach(Consumer<T> action, int maxIterations)

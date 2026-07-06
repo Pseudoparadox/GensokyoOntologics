@@ -1,5 +1,6 @@
 package github.thelawf.gensokyoontology.common.entity;
 
+import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.misc.Laser;
 import github.thelawf.gensokyoontology.core.init.EntityRegistry;
 import net.minecraft.entity.Entity;
@@ -56,6 +57,18 @@ public abstract class AffiliatedEntity extends Entity {
 
     public Optional<UUID> getOwnerID() {
         return this.dataManager.get(DATA_OWNER);
+    }
+
+    public Maybe<Entity> tryGetOwner(){
+        if (!(this.world instanceof ServerWorld)) return Maybe.empty();
+        if (!this.getOwnerID().isPresent()) return Maybe.empty();
+        ServerWorld serverWorld = (ServerWorld) this.world;
+        return Maybe.ofNullable(serverWorld.getEntityByUuid(this.getOwnerID().get()));
+    }
+
+    public Maybe<UUID> tryGetOwnerId(){
+        if (!this.getOwnerID().isPresent()) return Maybe.empty();
+        return Maybe.ofNullable(this.getOwnerID().get());
     }
 
     @Nullable

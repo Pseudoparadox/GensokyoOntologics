@@ -56,4 +56,5 @@ public class Maybe<T> {
     public <T1> Maybe<T1> map(Function<T, T1> mapper){
         return Maybe.ofNullable(mapper.apply(this.value));
     }
+
 }

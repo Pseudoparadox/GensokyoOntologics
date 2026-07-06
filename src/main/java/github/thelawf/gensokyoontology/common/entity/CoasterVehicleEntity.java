@@ -1,33 +1,34 @@
 package github.thelawf.gensokyoontology.common.entity;
 
+import com.mojang.datafixers.util.Pair;
+import github.thelawf.gensokyoontology.api.Functions;
+import github.thelawf.gensokyoontology.api.INBTWriter;
+import github.thelawf.gensokyoontology.api.entity.IEntityDataAccessible;
+import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.util.math.CurveUtil;
-import net.minecraft.entity.Entity;
+import github.thelawf.gensokyoontology.data.CoasterPhysics;
+import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
+import github.thelawf.gensokyoontology.data.TrackInfo;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.FloatNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.network.IPacket;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 
-public class CoasterVehicleEntity extends Entity {
+public class CoasterVehicleEntity extends AffiliatedEntity implements INBTWriter, IEntityDataAccessible {
 
-    // 当前所在的轨道实体
-    private RailEntity currentRail;
-    // 在轨道上的进度 (0.0 - 1.0)
-    private float progress = 0.0f;
-    // 当前速度 (blocks/tick)
-    private float velocity = 0.0f;
-    // 最大速度限制
-    private float maxVelocity = 2.0f;
-    // 当前加速度
-    private float acceleration = 0.0f;
-    // 进入匀速轨道时的初始速度（用于保持恒定）
-    private float constantSpeedEntryVelocity = 0.0f;
-    // 是否在匀速轨道上
-    private boolean isOnConstantSpeedRail = false;
+    public static final DataParameter<CoasterPhysics> DATA_PHYSICS = EntityDataManager.createKey(
+            CoasterVehicleEntity.class, CoasterPhysics.INERTIAL_STD);
+    public static final DataParameter<HermiteNodeInfo> DATA_SPLINE = EntityDataManager.createKey(
+            CoasterVehicleEntity.class, HermiteNodeInfo.EMPTY);
 
     // 轨道物理参数
     private static final float ACCEL_GRAVITY = 0.05f;      // 重力加速度
@@ -35,31 +36,31 @@ public class CoasterVehicleEntity extends Entity {
     private static final float AIR_RESISTANCE = 0.99f;     // 空气阻力
     private static final float CONSTANT_SPEED_THRESHOLD = 0.01f; // 匀速轨道速度保持阈值
 
+
     public CoasterVehicleEntity(EntityType<?> type, World world) {
         super(type, world);
     }
 
     @Override
     protected void registerData() {
-        // 注册实体数据
+        this.dataManager.register(DATA_SPLINE, HermiteNodeInfo.EMPTY);
+        this.dataManager.register(DATA_PHYSICS, CoasterPhysics.INERTIAL_STD);
     }
 
     @Override
     protected void readAdditional(CompoundNBT compound) {
-        this.progress = compound.getFloat("progress");
-        this.velocity = compound.getFloat("velocity");
-        this.acceleration = compound.getFloat("acceleration");
-        this.constantSpeedEntryVelocity = compound.getFloat("constantSpeedEntryVelocity");
-        this.isOnConstantSpeedRail = compound.getBoolean("isOnConstantSpeedRail");
+        super.readAdditional(compound);
+        HermiteNodeInfo node = HermiteNodeInfo.EMPTY.copy();
+        node.deserializeNBT(compound.getCompound("node"));
+        this.setPhysics(CoasterPhysics.from(compound.getCompound("physics")));
+        this.setCurrentNode(node);
     }
 
     @Override
     protected void writeAdditional(CompoundNBT compound) {
-        compound.putFloat("progress", this.progress);
-        compound.putFloat("velocity", this.velocity);
-        compound.putFloat("acceleration", this.acceleration);
-        compound.putFloat("constantSpeedEntryVelocity", this.constantSpeedEntryVelocity);
-        compound.putBoolean("isOnConstantSpeedRail", this.isOnConstantSpeedRail);
+        super.writeAdditional(compound);
+        compound.put("node", this.getCurrentNode().serializeNBT());
+        compound.put("physics", this.getPhysics().serializeNBT());
     }
 
     @Override
@@ -67,44 +68,68 @@ public class CoasterVehicleEntity extends Entity {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 
+    @SafeVarargs
+    public final <T extends INBT> void physicsSetter(Pair<String, T>... setter){
+        this.setPhysics(this.getPhysics().copyAndSet(setter));
+    }
+    public void setPhysics(CoasterPhysics physics){
+        this.dataManager.set(DATA_PHYSICS, physics);
+    }
+    public CoasterPhysics getPhysics(){
+        return this.dataManager.get(DATA_PHYSICS);
+    }
+    public HermiteNodeInfo getCurrentNode(){
+        return this.dataManager.get(DATA_SPLINE);
+    }
+    public void setCurrentNode(HermiteNodeInfo node){
+        this.dataManager.set(DATA_SPLINE, node);
+    }
+
     @Override
     public void tick() {
         super.tick();
 
-        if (this.currentRail == null || this.world.isRemote) {
+        if (this.world.isRemote) {
             return;
         }
 
-        // 获取当前轨道类型
-
-        // 根据轨道类型更新物理
         this.updatePhysics();
-
-        // 更新位置
         this.updatePosition();
-
-        // 检查是否到达轨道末端
         this.checkNextRail();
     }
 
     private void updatePhysics() {
-        switch (this.currentRail.getRailType()) {
+        switch (this.getCurrentNode().getRailType()) {
             case ACCELERATION:
                 this.updateAccelerateRail();
-                isOnConstantSpeedRail = false;
                 break;
             case DECELERATION:
                 this.updateDecelerateRail();
-                isOnConstantSpeedRail = false;
                 break;
             case INERTIAL:
                 this.updateInertiaRail();
-                isOnConstantSpeedRail = false;
                 break;
             case UNIFORM:
                 this.updateConstantSpeedRail();
                 break;
         }
+    }
+
+    public void setMotionSpeed(float speed){
+        this.setMotion(this.getMotion().normalize().scale(speed));
+    }
+    public void accelerate(float acceleration){
+        Vector3d unit = new Vector3d(1,1,1).scale(acceleration);
+        this.setMotion(this.getMotion().add(unit));
+    }
+    public float progress(){
+        return this.readFloatOr(CoasterPhysics.KEY_PROGRESS, this.getPhysics().serializeNBT(), 0F);
+    }
+    public float motionSpeed(){
+        return (float) this.getMotion().length();
+    }
+    public float velocity(){
+        return this.readFloatOr(CoasterPhysics.KEY_VELOCITY, this.getPhysics().serializeNBT(), 0F);
     }
 
     /**
@@ -115,44 +140,34 @@ public class CoasterVehicleEntity extends Entity {
         float trackAcceleration = 0.1f; // 可以从轨道实体获取
         float maxSpeed = 2.0f;         // 可以从轨道实体获取
 
-        // 应用加速度
-        this.acceleration = trackAcceleration;
-        this.velocity += this.acceleration;
+        this.accelerate(trackAcceleration);
 
         // 限制最大速度
-        if (this.velocity > maxSpeed) {
-            this.velocity = maxSpeed;
+        if (this.getMotion().length() > maxSpeed) {
+            this.setMotionSpeed(maxSpeed);
         }
 
         // 应用摩擦和空气阻力
-        this.velocity *= FRICTION_COEFFICIENT;
-        this.velocity *= AIR_RESISTANCE;
+        this.setMotionSpeed(maxSpeed * FRICTION_COEFFICIENT);
+        this.setMotionSpeed(maxSpeed * AIR_RESISTANCE);
     }
 
     /**
      * 减速轨道：根据轨道长度衰减速度，使载具停在末端
      */
     private void updateDecelerateRail() {
-        if (this.currentRail == null) return;
-
-        // 计算剩余距离
-        float remainingDistance = (1.0f - this.progress) * getRailLength();
+        float remainingDistance = (1.0f - this.progress()) * getRailLength();
 
         // 计算需要的减速度，使载具刚好停在末端
         if (remainingDistance > 0.1f) {
-            this.acceleration = -(this.velocity * this.velocity) / (2 * remainingDistance);
-            this.velocity += this.acceleration;
+            float deceleration = -(this.motionSpeed() * this.motionSpeed()) / (2 * remainingDistance);
+            this.accelerate(deceleration);
         } else {
             // 接近末端，强制减速到0
-            this.velocity *= 0.9f;
-            if (Math.abs(this.velocity) < CONSTANT_SPEED_THRESHOLD) {
-                this.velocity = 0.0f;
+            this.setMotionSpeed(this.motionSpeed() * 0.9f);
+            if (Math.abs(this.motionSpeed()) < CONSTANT_SPEED_THRESHOLD) {
+                this.setMotionSpeed(0);
             }
-        }
-
-        // 确保速度不为负
-        if (this.velocity < 0) {
-            this.velocity = 0;
         }
     }
 
@@ -160,29 +175,21 @@ public class CoasterVehicleEntity extends Entity {
      * 惯性轨道：根据真实物理效果加速和减速
      */
     private void updateInertiaRail() {
-        if (this.currentRail == null) return;
-
-        // 计算轨道斜率（用于重力加速/减速）
-        Vector3d startPos = this.currentRail.getPositionVec();
-        Vector3d endPos = this.currentRail.getNextRail().map(Entity::getPositionVec).orElse(startPos);
+        Vector3d startPos = this.getCurrentNode().getStartVec(Vector3d.ZERO);
+        Vector3d endPos = this.getCurrentNode().getEndPosVec();
         Vector3d direction = endPos.subtract(startPos);
 
         // 计算坡度（y方向变化）
         float slope = (float) (direction.y / direction.length());
 
         // 重力影响：下坡加速，上坡减速
-        this.acceleration = ACCEL_GRAVITY * slope;
-
-        // 应用加速度
-        this.velocity += this.acceleration;
-
-        // 应用摩擦和空气阻力
-        this.velocity *= FRICTION_COEFFICIENT;
-        this.velocity *= AIR_RESISTANCE;
+        float acceleration = ACCEL_GRAVITY * slope;
+        float velocity = (this.motionSpeed() + acceleration) * AIR_RESISTANCE * FRICTION_COEFFICIENT;
+        this.setMotionSpeed(velocity);
 
         // 防止反向滑动（在平坦轨道上）
-        if (Math.abs(slope) < 0.1f && Math.abs(this.velocity) < CONSTANT_SPEED_THRESHOLD) {
-            this.velocity = 0;
+        if (Math.abs(slope) < 0.1f && Math.abs(this.motionSpeed()) < CONSTANT_SPEED_THRESHOLD) {
+            this.setMotionSpeed(0);
         }
     }
 
@@ -190,67 +197,48 @@ public class CoasterVehicleEntity extends Entity {
      * 匀速轨道：保持进入时的速度不变
      */
     private void updateConstantSpeedRail() {
-        if (this.currentRail == null) return;
-
-        // 第一次进入匀速轨道时，记录进入速度
-        if (!isOnConstantSpeedRail) {
-            this.constantSpeedEntryVelocity = this.velocity;
-            isOnConstantSpeedRail = true;
+        if (this.getCurrentNode().getRailType() == RailEntity.Type.UNIFORM) {
+            this.physicsSetter(Pair.of(CoasterPhysics.KEY_VELOCITY, FloatNBT.valueOf(this.motionSpeed())));
         }
 
         // 保持进入时的速度不变
-        this.velocity = this.constantSpeedEntryVelocity;
-
-        // 匀速轨道上不应用任何加速度或力
-        this.acceleration = 0.0f;
-
-        // 轻微应用摩擦和空气阻力，但保持速度恒定
-        float dampedVelocity = this.velocity * FRICTION_COEFFICIENT * AIR_RESISTANCE;
-
-        // 如果速度衰减超过阈值，则恢复到进入速度
-        if (Math.abs(dampedVelocity - this.constantSpeedEntryVelocity) > CONSTANT_SPEED_THRESHOLD) {
-            this.velocity = this.constantSpeedEntryVelocity;
-        }
+        this.setMotionSpeed(this.velocity());
     }
 
     private void updatePosition() {
-        if (this.currentRail == null) return;
-
-        // 更新进度
-        float deltaProgress = this.velocity / getRailLength();
-        this.progress += deltaProgress;
+        float delta = this.motionSpeed() / this.getRailLength();
+        float progress = this.progress() + delta;
 
         // 限制进度在 [0, 1] 范围内
-        if (this.progress < 0) this.progress = 0;
-        if (this.progress > 1) this.progress = 1;
+        if (progress < 0) progress = 0;
+        if (progress > 1) progress = 1;
 
         // 计算Hermite曲线上的位置
-        Vector3d newPosition = calculatePositionOnRail(this.currentRail, this.progress);
+        Vector3d newPosition = this.calculatePositionOnRail(progress);
         this.setPosition(newPosition.x, newPosition.y, newPosition.z);
 
         // 计算并应用旋转（使载具面向运动方向）
         this.updateRotation();
     }
 
-    private Vector3d calculatePositionOnRail(RailEntity rail, float t) {
-        Vector3d startPos = rail.getPositionVec();
-        Vector3d endPos = rail.getNextRail().map(Entity::getPositionVec).orElse(startPos);
+    private Vector3d calculatePositionOnRail(float t) {
+        Vector3d startPos = this.getCurrentNode().getStartVec(Vector3d.ZERO);
+        Vector3d endPos = this.getCurrentNode().getEndPosVec();
 
         // 获取方向向量
-        Vector3f startDir = rail.getOrientation().copy();
-        Vector3f endDir = rail.getNextRail()
-                .map(r -> r.getOrientation().copy())
-                .orElse(startDir);
+        Vector3f startDir = this.getCurrentNode().prevOrientation().copy();
+        Vector3f endDir = this.getCurrentNode().nextOrientation().copy();
 
         // 使用Hermite插值
+        this.physicsSetter(Pair.of(CoasterPhysics.KEY_PROGRESS, FloatNBT.valueOf(t)));
         return CurveUtil.hermite3(startPos, endPos, startDir, endDir, t);
     }
 
     private void updateRotation() {
-        if (this.currentRail == null || this.velocity == 0) return;
-
-        // 计算切线方向
-        Vector3d tangent = calculateTangentOnRail(this.currentRail, this.progress);
+        CoasterPhysics physics = this.getPhysics();
+        CompoundNBT tag = physics.serializeNBT();
+        float progress = this.getPhysics().readFloatOr(CoasterPhysics.KEY_PROGRESS, tag, 0F);
+        Vector3d tangent = this.calculateTangentOnRail(progress);
 
         // 将切线转换为旋转
         float yaw = (float) Math.toDegrees(Math.atan2(tangent.z, tangent.x));
@@ -258,87 +246,66 @@ public class CoasterVehicleEntity extends Entity {
 
         this.rotationYaw = yaw;
         this.rotationPitch = pitch;
+
     }
 
-    private Vector3d calculateTangentOnRail(RailEntity rail, float t) {
-        Vector3d startPos = rail.getPositionVec();
-        Vector3d endPos = rail.getNextRail().map(Entity::getPositionVec).orElse(startPos);
+    private Vector3d calculateTangentOnRail(float t) {
 
-        Vector3f startDir = rail.getOrientation().copy();
-        Vector3f endDir = rail.getNextRail()
-                .map(r -> r.getOrientation().copy())
-                .orElse(startDir);
+        Vector3d startPos = this.getCurrentNode().getStartVec(Vector3d.ZERO);
+        Vector3d endPos = this.getCurrentNode().getEndPosVec();
 
-        // 使用Hermite曲线的导数作为切线
+        // 获取方向向量
+        Vector3f startDir = this.getCurrentNode().prevOrientation().copy();
+        Vector3f endDir = this.getCurrentNode().nextOrientation().copy();
+
         return CurveUtil.hermiteTangent(startPos, endPos, new Vector3d(startDir), new Vector3d(endDir), t).normalize();
     }
 
     private float getRailLength() {
-        if (this.currentRail == null) return 1.0f;
 
-        Vector3d startPos = this.currentRail.getPositionVec();
-        Vector3d endPos = this.currentRail.getNextRail().map(Entity::getPositionVec).orElse(startPos);
+        Vector3d startPos = this.getCurrentNode().getStartVec(Vector3d.ZERO);
+        Vector3d endPos = this.getCurrentNode().getEndPosVec();
         return (float) startPos.distanceTo(endPos);
     }
 
-    private void checkNextRail() {
-        if (this.progress >= 1.0f && this.currentRail != null) {
-            // 尝试切换到下一个轨道
-            this.currentRail.getNextRail().ifPresent(nextRail -> {
-                if (nextRail instanceof RailEntity) {
-                    this.currentRail = nextRail;
-                    this.progress = 0.0f;
+    public Maybe<Float> tryGetProgress(){
+        Maybe<Float> maybe = Maybe.empty();
+        CoasterPhysics physics = this.getPhysics();
+        CompoundNBT tag = physics.serializeNBT();
+        physics.tryGetValue(CoasterPhysics.KEY_PROGRESS, tag, Functions.NBT_2_FLOAT)
+                .ifPresent(may -> may.ifPresent(maybe::set));
+        return maybe;
+    }
 
-                    // 根据新轨道类型调整速度
-                    adjustVelocityForNewRail();
-                }
-            });
-        }
+    private void checkNextRail() {
+        this.tryGetProgress().ifPresent(progress -> {
+            if (progress < 1.0F) return;
+            TrackInfo.tryGetInstance(this.world).ifPresent(trackInfo -> this.tryGetOwnerId().ifPresent(uuid ->
+                    trackInfo.tracks().get(uuid).tryFindValue(node ->
+                            node.getStartPos() == this.getCurrentNode().getStartPos()).ifPresent(node -> {
+                        this.setCurrentNode(node);
+                        this.adjustVelocityForNewRail();
+                        this.physicsSetter(Pair.of(CoasterPhysics.KEY_PROGRESS, FloatNBT.valueOf(0F)));
+                    })));
+        });
     }
 
     private void adjustVelocityForNewRail() {
-        RailEntity.Type newType = this.currentRail.getRailType();
+        RailEntity.Type newType = this.getCurrentNode().getRailType();
 
         switch (newType) {
             case ACCELERATION:
-                // 加速轨道，保持或增加速度
+                this.updateAccelerateRail();
                 break;
             case DECELERATION:
-                // 减速轨道，准备减速
+                this.updateDecelerateRail();
                 break;
             case INERTIAL:
-                // 惯性轨道，保持当前速度
+                this.updateInertiaRail();
                 break;
             case UNIFORM:
-                // 匀速轨道，记录进入速度
-                this.constantSpeedEntryVelocity = this.velocity;
-                this.isOnConstantSpeedRail = true;
+                this.updateConstantSpeedRail();
                 break;
         }
-    }
-
-    // 公共方法：设置当前轨道
-    public void setCurrentRail(RailEntity rail) {
-        this.currentRail = rail;
-        this.progress = 0.0f;
-    }
-
-    public float getVelocity() {
-        return this.velocity;
-    }
-
-    public void setVelocity(float velocity) {
-        this.velocity = velocity;
-    }
-
-
-    // 公共方法：检查是否在匀速轨道上
-    public boolean isOnConstantSpeedRail() {
-        return this.isOnConstantSpeedRail;
-    }
-
-    // 公共方法：获取匀速轨道进入速度
-    public float getConstantSpeedEntryVelocity() {
-        return this.constantSpeedEntryVelocity;
     }
 }

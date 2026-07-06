@@ -12,20 +12,21 @@ import net.minecraft.nbt.IntNBT;
 import net.minecraft.network.PacketBuffer;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class CoasterPhysics implements INBTWriter, ISynchornizable<CompoundNBT, CoasterPhysics> {
     private final CompoundNBT properties = new CompoundNBT();
-    public static final String KEY_TYPE = "railType";
+    /** 匀速速度 */
     public static final String KEY_VELOCITY = "velocity";
+    public static final String KEY_PROGRESS = "progress";
     public static final String KEY_ACCELERATION = "acceleration";
     public static final String KEY_MAX_SPEED = "maxSpeed";
 
     @SafeVarargs
-    public static <T extends INBT> CoasterPhysics of(Supplier<Pair<String, T>>... setters){
+    public static <T extends INBT> CoasterPhysics of(Pair<String, T>... setters){
         CoasterPhysics physics = new CoasterPhysics();
-        for (Supplier<Pair<String, T>> setter : setters) {
-            physics.set(setter.get().getFirst(), setter.get().getSecond());
+        for (Pair<String, T> setter : setters) {
+            physics.set(setter.getFirst(), setter.getSecond());
         }
         return physics;
     }
@@ -35,32 +36,38 @@ public class CoasterPhysics implements INBTWriter, ISynchornizable<CompoundNBT, 
     }
 
     public static final CoasterPhysics ACCELERATION_STD = CoasterPhysics.of(
-            () -> Pair.of(KEY_TYPE, IntNBT.valueOf(RailEntity.Type.ACCELERATION.ordinal())),
-            () -> Pair.of(KEY_VELOCITY, FloatNBT.valueOf(0F)),
-            () -> Pair.of(KEY_ACCELERATION, FloatNBT.valueOf(0.1F)),
-            () -> Pair.of(KEY_MAX_SPEED, FloatNBT.valueOf(3F)));
+            Pair.of(KEY_PROGRESS, FloatNBT.valueOf(0F)),
+            Pair.of(KEY_VELOCITY, FloatNBT.valueOf(0F)),
+            Pair.of(KEY_ACCELERATION, FloatNBT.valueOf(0.1F)),
+            Pair.of(KEY_MAX_SPEED, FloatNBT.valueOf(3F)));
 
     public static final CoasterPhysics DECELERATION_STD = CoasterPhysics.of(
-            () -> Pair.of(KEY_TYPE, IntNBT.valueOf(RailEntity.Type.DECELERATION.ordinal())),
-            () -> Pair.of(KEY_VELOCITY, FloatNBT.valueOf(0F)),
-            () -> Pair.of(KEY_ACCELERATION, FloatNBT.valueOf(0.1F)),
-            () -> Pair.of(KEY_MAX_SPEED, FloatNBT.valueOf(3F)));
+            Pair.of(KEY_PROGRESS, FloatNBT.valueOf(0F)),
+            Pair.of(KEY_VELOCITY, FloatNBT.valueOf(0F)),
+            Pair.of(KEY_ACCELERATION, FloatNBT.valueOf(0.1F)),
+            Pair.of(KEY_MAX_SPEED, FloatNBT.valueOf(3F)));
 
     public static final CoasterPhysics UNIFORM_STD = CoasterPhysics.of(
-            () -> Pair.of(KEY_TYPE, IntNBT.valueOf(RailEntity.Type.UNIFORM.ordinal())),
-            () -> Pair.of(KEY_VELOCITY, FloatNBT.valueOf(0F)),
-            () -> Pair.of(KEY_ACCELERATION, FloatNBT.valueOf(0F)),
-            () -> Pair.of(KEY_MAX_SPEED, FloatNBT.valueOf(0.5F)));
+            Pair.of(KEY_PROGRESS, FloatNBT.valueOf(0F)),
+            Pair.of(KEY_VELOCITY, FloatNBT.valueOf(0F)),
+            Pair.of(KEY_ACCELERATION, FloatNBT.valueOf(0F)),
+            Pair.of(KEY_MAX_SPEED, FloatNBT.valueOf(0.5F)));
 
     public static final CoasterPhysics INERTIAL_STD = CoasterPhysics.of(
-            () -> Pair.of(KEY_TYPE, IntNBT.valueOf(RailEntity.Type.INERTIAL.ordinal())),
-            () -> Pair.of(KEY_VELOCITY, FloatNBT.valueOf(0F)),
-            () -> Pair.of(KEY_ACCELERATION, FloatNBT.valueOf(0F)),
-            () -> Pair.of(KEY_MAX_SPEED, FloatNBT.valueOf(0.5F)));
+            Pair.of(KEY_PROGRESS, FloatNBT.valueOf(0F)),
+            Pair.of(KEY_VELOCITY, FloatNBT.valueOf(0F)),
+            Pair.of(KEY_ACCELERATION, FloatNBT.valueOf(0F)),
+            Pair.of(KEY_MAX_SPEED, FloatNBT.valueOf(0.5F)));
 
     @Override
     public CoasterPhysics copy() {
         return new CoasterPhysics().setProperties(this.properties);
+    }
+    @SafeVarargs
+    public final <T extends INBT> CoasterPhysics copyAndSet(Pair<String, T>... setter){
+        CoasterPhysics physics = new CoasterPhysics().setProperties(this.properties);
+        Stream.of(setter).forEach(p -> this.set(p.getFirst(), p.getSecond()));
+        return this;
     }
 
     @Override
@@ -96,9 +103,5 @@ public class CoasterPhysics implements INBTWriter, ISynchornizable<CompoundNBT, 
     public <T extends INBT> CoasterPhysics set(String key, T inbt){
         this.properties.put(key, inbt);
         return this;
-    }
-
-    public <A> Maybe<A> tryGetValue(String key, Function<INBT, A> nbt2Any){
-        return Maybe.ofNullable(this.properties.get(key)).map(nbt2Any);
     }
 }

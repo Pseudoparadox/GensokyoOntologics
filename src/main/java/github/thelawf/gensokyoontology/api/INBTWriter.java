@@ -1,5 +1,6 @@
 package github.thelawf.gensokyoontology.api;
 
+import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.nbt.GSKONBTUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -8,6 +9,7 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.LongNBT;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -134,4 +136,8 @@ public interface INBTWriter extends INBTReader {
             stack.setTag(nbt);
         }
     }
+    default  <A> Maybe<A> tryGetValue(String key, CompoundNBT nbt, Function<INBT, A> nbt2Any){
+        return Maybe.ofNullable(nbt.get(key)).map(nbt2Any);
+    }
+
 }

@@ -1,5 +1,6 @@
 package github.thelawf.gensokyoontology.api;
 
+import github.thelawf.gensokyoontology.api.util.Maybe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 import net.minecraft.util.math.BlockPos;
@@ -76,6 +77,14 @@ public interface INBTReader {
         return list;
     }
 
+    default Maybe<Float> readFloat(String key, CompoundNBT nbt){
+        return Functions.NBT_2_FLOAT.apply(nbt.get(key));
+    }
+
+    default float readFloatOr(String key, CompoundNBT nbt, float or)
+    {
+        return this.readFloat(key, nbt).isPresent() ? this.readFloat(key, nbt).get() : or;
+    }
     default <T extends INBT, S extends ISynchornizable<T, S>> List<S> readList(String key, CompoundNBT nbt, S instance, Function<INBT, T> function){
         if (!nbt.contains(key)) return new ArrayList<>();
         if (!(nbt.get(key) instanceof ListNBT)) return new ArrayList<>();
