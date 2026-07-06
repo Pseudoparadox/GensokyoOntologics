@@ -258,7 +258,6 @@ public class GSKOMiscClientEvent {
         if (!(entity instanceof CoasterVehicle)) return;
         CoasterVehicle vehicle = (CoasterVehicle) entity;
 
-        if (vehicle.shouldMove()) return;
         if (minecraft.gameSettings.keyBindJump.isKeyDown()) {
             GSKONetworking.CHANNEL.sendToServer(new CInteractCoasterPacket(
                     CInteractCoasterPacket.DRIVING, vehicle.getUniqueID()));

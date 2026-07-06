@@ -1,11 +1,20 @@
 package github.thelawf.gensokyoontology.common.entity.misc;
 
+import com.mojang.datafixers.util.Pair;
+import github.thelawf.gensokyoontology.api.Functions;
+import github.thelawf.gensokyoontology.api.INBTWriter;
+import github.thelawf.gensokyoontology.api.util.Maybe;
+import github.thelawf.gensokyoontology.common.entity.AffiliatedEntity;
+import github.thelawf.gensokyoontology.common.entity.CoasterVehicleEntity;
+import github.thelawf.gensokyoontology.common.util.math.CurveUtil;
 import github.thelawf.gensokyoontology.common.util.math.GSKOMathUtil;
 import github.thelawf.gensokyoontology.core.init.EntityRegistry;
 import github.thelawf.gensokyoontology.core.init.ItemRegistry;
 import github.thelawf.gensokyoontology.common.util.math.DerivativeInfo;
 import github.thelawf.gensokyoontology.common.util.math.TimeDifferential;
 import github.thelawf.gensokyoontology.data.CoasterPhysics;
+import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
+import github.thelawf.gensokyoontology.data.TrackInfo;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -15,6 +24,8 @@ import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.FloatNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -24,6 +35,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
@@ -32,100 +44,292 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CoasterVehicle extends Entity {
-
-    public static final float GRAVITY = 0.04f;
-    public static final float FRICTION = 1.0F;
-
-    private int positionInterpSteps;
-    private int progInterpSteps;
-
-
-    private final Quaternion lastClientOrientation = Quaternion.ONE;
-    private final Quaternion clientOrientation = Quaternion.ONE;
-
-    public static final BlockPos NAN_POS = new BlockPos(Double.NaN, Double.NaN, Double.NaN);
-    public static final BlockState AIR = Blocks.AIR.getDefaultState();
+public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
 
     public static final DataParameter<CoasterPhysics> DATA_PHYSICS = EntityDataManager.createKey(
             CoasterVehicle.class, CoasterPhysics.INERTIAL_STD);
+    public static final DataParameter<HermiteNodeInfo> DATA_SPLINE = EntityDataManager.createKey(
+            CoasterVehicle.class, HermiteNodeInfo.EMPTY);
 
-    public static final DataParameter<Float> DATA_PROGRESS = EntityDataManager.createKey(
-            CoasterVehicle.class, DataSerializers.FLOAT);
-    public static final DataParameter<Integer> DATA_PREV_RAIL = EntityDataManager.createKey(
-            CoasterVehicle.class, DataSerializers.VARINT);
-    public static final DataParameter<Integer> DATA_NEXT_RAIL = EntityDataManager.createKey(
-            CoasterVehicle.class, DataSerializers.VARINT);
-    public static final DataParameter<Boolean> DATA_MOVING_FLAG = EntityDataManager.createKey(
-            CoasterVehicle.class, DataSerializers.BOOLEAN);
-    public static final DataParameter<Integer> DATA_MOTION_TICKER = EntityDataManager.createKey(
-            CoasterVehicle.class, DataSerializers.VARINT);
+    // 轨道物理参数
+    private static final float ACCEL_GRAVITY = 0.05f;      // 重力加速度
+    private static final float FRICTION_COEFFICIENT = 0.98f; // 摩擦系数
+    private static final float AIR_RESISTANCE = 0.99f;     // 空气阻力
+    private static final float CONSTANT_SPEED_THRESHOLD = 0.01f; // 匀速轨道速度保持阈值
+
 
     public CoasterVehicle(EntityType<?> type, World world) {
         super(type, world);
     }
 
-    public CoasterVehicle(World world) {
-        this(EntityRegistry.COASTER_VEHICLE.get(), world);
+    @Override
+    protected void registerData() {
+        this.dataManager.register(DATA_SPLINE, HermiteNodeInfo.EMPTY);
+        this.dataManager.register(DATA_PHYSICS, CoasterPhysics.INERTIAL_STD);
     }
 
     @Override
-    protected void registerData() {
-        this.dataManager.register(DATA_PROGRESS, 0.0F);
-        this.dataManager.register(DATA_PREV_RAIL, 0);
-        this.dataManager.register(DATA_NEXT_RAIL, 0);
-        this.dataManager.register(DATA_MOVING_FLAG, false);
-        this.dataManager.register(DATA_MOTION_TICKER, 0);
+    protected void readAdditional(CompoundNBT compound) {
+        super.readAdditional(compound);
+        HermiteNodeInfo node = HermiteNodeInfo.EMPTY.copy();
+        node.deserializeNBT(compound.getCompound("node"));
+        this.setPhysics(CoasterPhysics.from(compound.getCompound("physics")));
+        this.setCurrentNode(node);
     }
 
-    public void setPrevRail(RailEntity rail) {
-        this.dataManager.set(DATA_PREV_RAIL, rail.getEntityId());
-    }
-    public void setNextRail(RailEntity rail) {
-        this.dataManager.set(DATA_NEXT_RAIL, rail.getEntityId());
-    }
-    public void setPrevRail(int prevRailEntityId) {
-        this.dataManager.set(DATA_PREV_RAIL, prevRailEntityId);
-    }
-    public void setNextRail(int nextRailEntityId) {
-        this.dataManager.set(DATA_NEXT_RAIL, nextRailEntityId);
-    }
-    public Optional<RailEntity> getPrevRail() {
-        Entity entity = this.world.getEntityByID(this.dataManager.get(DATA_PREV_RAIL));
-        return entity instanceof RailEntity ? Optional.of((RailEntity) entity) : Optional.empty();
-    }
-    public Optional<RailEntity> getNextRail() {
-        return this.getPrevRail().flatMap(RailEntity::getNextRail);
+    @Override
+    protected void writeAdditional(CompoundNBT compound) {
+        super.writeAdditional(compound);
+        compound.put("node", this.getCurrentNode().serializeNBT());
+        compound.put("physics", this.getPhysics().serializeNBT());
     }
 
-    public void setShouldMove(boolean flag) {
-        this.dataManager.set(DATA_MOVING_FLAG, flag);
-    }
-    public boolean shouldMove() {
-        return this.dataManager.get(DATA_MOVING_FLAG);
+    @Override
+    public @NotNull IPacket<?> createSpawnPacket() {
+        return super.createSpawnPacket();
     }
 
-    public int getMotionTicker() {
-        return this.dataManager.get(DATA_MOTION_TICKER);
+    @SafeVarargs
+    public final <T extends INBT> void physicsSetter(Pair<String, T>... setter){
+        this.setPhysics(this.getPhysics().copyAndSet(setter));
     }
 
-    public void setMotionTicker(int tick) {
-        this.dataManager.set(DATA_MOTION_TICKER, tick);
+    public void setPhysics(CoasterPhysics physics){
+        this.dataManager.set(DATA_PHYSICS, physics);
+    }
+    public CoasterPhysics getPhysics(){
+        return this.dataManager.get(DATA_PHYSICS);
+    }
+    public HermiteNodeInfo getCurrentNode(){
+        return this.dataManager.get(DATA_SPLINE);
+    }
+    public void setCurrentNode(HermiteNodeInfo node){
+        this.dataManager.set(DATA_SPLINE, node);
     }
 
-    public double getAcceleration() {
-        return 0;
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (this.world.isRemote) {
+            return;
+        }
+
+        this.updatePhysics();
+        this.updatePosition();
+        this.checkNextRail();
     }
 
-    public void setAcceleration(double acceleration) {}
-
-    public float getProgress() {
-        return this.dataManager.get(DATA_PROGRESS);
+    private void updatePhysics() {
+        switch (this.getCurrentNode().getRailType()) {
+            case ACCELERATION:
+                this.updateAccelerateRail();
+                break;
+            case DECELERATION:
+                this.updateDecelerateRail();
+                break;
+            case INERTIAL:
+                this.updateInertiaRail();
+                break;
+            case UNIFORM:
+                this.updateConstantSpeedRail();
+                break;
+        }
     }
-    public void setProgress(float progress) {
-        this.dataManager.set(DATA_PROGRESS, progress);
+
+    public void setMotionSpeed(float speed){
+        this.setMotion(this.getMotion().normalize().scale(speed));
+    }
+    public void accelerate(float acceleration){
+        Vector3d unit = new Vector3d(1,1,1).scale(acceleration);
+        this.setMotion(this.getMotion().add(unit));
+    }
+    public float progress(){
+        return this.readFloatOr(CoasterPhysics.KEY_PROGRESS, this.getPhysics().serializeNBT(), 0F);
+    }
+    public float motionSpeed(){
+        return (float) this.getMotion().length();
+    }
+    public float velocity(){
+        return this.readFloatOr(CoasterPhysics.KEY_VELOCITY, this.getPhysics().serializeNBT(), 0F);
     }
 
+    /**
+     * 加速轨道：按加速度加速直到达到最高限速
+     */
+    private void updateAccelerateRail() {
+        // 获取轨道的加速参数
+        float trackAcceleration = 0.1f; // 可以从轨道实体获取
+        float maxSpeed = 2.0f;         // 可以从轨道实体获取
+
+        this.accelerate(trackAcceleration);
+
+        // 限制最大速度
+        if (this.getMotion().length() > maxSpeed) {
+            this.setMotionSpeed(maxSpeed);
+        }
+
+        // 应用摩擦和空气阻力
+        this.setMotionSpeed(maxSpeed * FRICTION_COEFFICIENT);
+        this.setMotionSpeed(maxSpeed * AIR_RESISTANCE);
+    }
+
+    /**
+     * 减速轨道：根据轨道长度衰减速度，使载具停在末端
+     */
+    private void updateDecelerateRail() {
+        float remainingDistance = (1.0f - this.progress()) * getRailLength();
+
+        // 计算需要的减速度，使载具刚好停在末端
+        if (remainingDistance > 0.1f) {
+            float deceleration = -(this.motionSpeed() * this.motionSpeed()) / (2 * remainingDistance);
+            this.accelerate(deceleration);
+        } else {
+            // 接近末端，强制减速到0
+            this.setMotionSpeed(this.motionSpeed() * 0.9f);
+            if (Math.abs(this.motionSpeed()) < CONSTANT_SPEED_THRESHOLD) {
+                this.setMotionSpeed(0);
+            }
+        }
+    }
+
+    /**
+     * 惯性轨道：根据真实物理效果加速和减速
+     */
+    private void updateInertiaRail() {
+        Vector3d startPos = this.getCurrentNode().getStartVec(Vector3d.ZERO);
+        Vector3d endPos = this.getCurrentNode().getEndPosVec();
+        Vector3d direction = endPos.subtract(startPos);
+
+        // 计算坡度（y方向变化）
+        float slope = (float) (direction.y / direction.length());
+
+        // 重力影响：下坡加速，上坡减速
+        float acceleration = ACCEL_GRAVITY * slope;
+        float velocity = (this.motionSpeed() + acceleration) * AIR_RESISTANCE * FRICTION_COEFFICIENT;
+        this.setMotionSpeed(velocity);
+
+        // 防止反向滑动（在平坦轨道上）
+        if (Math.abs(slope) < 0.1f && Math.abs(this.motionSpeed()) < CONSTANT_SPEED_THRESHOLD) {
+            this.setMotionSpeed(0);
+        }
+    }
+
+    /**
+     * 匀速轨道：保持进入时的速度不变
+     */
+    private void updateConstantSpeedRail() {
+        if (this.getCurrentNode().getRailType() == RailEntity.Type.UNIFORM) {
+            this.physicsSetter(Pair.of(CoasterPhysics.KEY_VELOCITY, FloatNBT.valueOf(this.motionSpeed())));
+        }
+
+        // 保持进入时的速度不变
+        this.setMotionSpeed(this.velocity());
+    }
+
+    private void updatePosition() {
+        float delta = this.motionSpeed() / this.getRailLength();
+        float progress = this.progress() + delta;
+
+        // 限制进度在 [0, 1] 范围内
+        if (progress < 0) progress = 0;
+        if (progress > 1) progress = 1;
+
+        // 计算Hermite曲线上的位置
+        Vector3d newPosition = this.calculatePositionOnRail(progress);
+        this.setPosition(newPosition.x, newPosition.y, newPosition.z);
+
+        // 计算并应用旋转（使载具面向运动方向）
+        this.updateRotation();
+    }
+
+    private Vector3d calculatePositionOnRail(float t) {
+        Vector3d startPos = this.getCurrentNode().getStartVec(Vector3d.ZERO);
+        Vector3d endPos = this.getCurrentNode().getEndPosVec();
+
+        // 获取方向向量
+        Vector3f startDir = this.getCurrentNode().prevOrientation().copy();
+        Vector3f endDir = this.getCurrentNode().nextOrientation().copy();
+
+        // 使用Hermite插值
+        this.physicsSetter(Pair.of(CoasterPhysics.KEY_PROGRESS, FloatNBT.valueOf(t)));
+        return CurveUtil.hermite3(startPos, endPos, startDir, endDir, t);
+    }
+
+    private void updateRotation() {
+        CoasterPhysics physics = this.getPhysics();
+        CompoundNBT tag = physics.serializeNBT();
+        float progress = this.getPhysics().readFloatOr(CoasterPhysics.KEY_PROGRESS, tag, 0F);
+        Vector3d tangent = this.calculateTangentOnRail(progress);
+
+        // 将切线转换为旋转
+        float yaw = (float) Math.toDegrees(Math.atan2(tangent.z, tangent.x));
+        float pitch = (float) Math.toDegrees(Math.asin(tangent.y / tangent.length()));
+
+        this.rotationYaw = yaw;
+        this.rotationPitch = pitch;
+
+    }
+
+    private Vector3d calculateTangentOnRail(float t) {
+
+        Vector3d startPos = this.getCurrentNode().getStartVec(Vector3d.ZERO);
+        Vector3d endPos = this.getCurrentNode().getEndPosVec();
+
+        // 获取方向向量
+        Vector3f startDir = this.getCurrentNode().prevOrientation().copy();
+        Vector3f endDir = this.getCurrentNode().nextOrientation().copy();
+
+        return CurveUtil.hermiteTangent(startPos, endPos, new Vector3d(startDir), new Vector3d(endDir), t).normalize();
+    }
+
+    private float getRailLength() {
+
+        Vector3d startPos = this.getCurrentNode().getStartVec(Vector3d.ZERO);
+        Vector3d endPos = this.getCurrentNode().getEndPosVec();
+        return (float) startPos.distanceTo(endPos);
+    }
+
+    public Maybe<Float> tryGetProgress(){
+        Maybe<Float> maybe = Maybe.empty();
+        CoasterPhysics physics = this.getPhysics();
+        CompoundNBT tag = physics.serializeNBT();
+        physics.tryGetValue(CoasterPhysics.KEY_PROGRESS, tag, Functions.NBT_2_FLOAT)
+                .ifPresent(may -> may.ifPresent(maybe::set));
+        return maybe;
+    }
+
+    private void checkNextRail() {
+        this.tryGetProgress().ifPresent(progress -> {
+            if (progress < 1.0F) return;
+            TrackInfo.tryGetInstance(this.world).ifPresent(trackInfo -> this.tryGetOwnerId().ifPresent(uuid ->
+                    trackInfo.tracks().get(uuid).tryFindValue(node ->
+                            node.getStartPos() == this.getCurrentNode().getStartPos()).ifPresent(node -> {
+                        this.setCurrentNode(node);
+                        this.adjustVelocityForNewRail();
+                        this.physicsSetter(Pair.of(CoasterPhysics.KEY_PROGRESS, FloatNBT.valueOf(0F)));
+                    })));
+        });
+    }
+
+    private void adjustVelocityForNewRail() {
+        RailEntity.Type newType = this.getCurrentNode().getRailType();
+
+        switch (newType) {
+            case ACCELERATION:
+                this.updateAccelerateRail();
+                break;
+            case DECELERATION:
+                this.updateDecelerateRail();
+                break;
+            case INERTIAL:
+                this.updateInertiaRail();
+                break;
+            case UNIFORM:
+                this.updateConstantSpeedRail();
+                break;
+        }
+    }
     @Override
     public boolean hitByEntity(Entity entityIn) {
         if (!(entityIn instanceof ServerPlayerEntity)) return false;
@@ -146,88 +350,6 @@ public class CoasterVehicle extends Entity {
         return ActionResultType.SUCCESS;
     }
 
-    @Override
-    public void tick() {
-        super.tick();
-
-        if (!this.shouldMove() || this.getPassengers().isEmpty()) {
-            this.setMotion(Vector3d.ZERO);
-            this.setShouldMove(false);
-            this.setMotionTicker(-1);
-            return;
-        }
-
-        this.tickOnServer();
-//        if (this.world.isRemote) {
-//            Entity passenger = this.getPassengers().get(0);
-//            if (this.positionInterpSteps > 0) {
-////                this.interpPosOnly(this.positionInterpSteps);
-//                this.positionInterpSteps--;
-//            } else {
-//                this.resetPositionToBB();
-//            }
-//
-////            this.lastClientTrackProgress = this.clientTrackProgress;
-//            this.lastClientOrientation.set(this.clientOrientation.getX(), this.clientOrientation.getY(),
-//                    this.clientOrientation.getZ(), this.clientOrientation.getW());
-//
-//            float progInterpDelta = 1;
-//            if (this.progInterpSteps > 0) {
-//                progInterpDelta = 1 / (float) progInterpSteps;
-//
-//                this.progInterpSteps--;
-//            }
-//
-//            Vector3d clientPos = new Vector3d(this.getPosX(), this.getPosY(), this.getPosZ());
-//
-////            boolean updatePos = this.clientTrackProgress.getOrientation(this.lastClientTrackProgress, progInterpDelta, clientPos, this.clientOrientation);
-////            if (updatePos) {
-////                this.setPosition(clientPos.x(), clientPos.y(), clientPos.z());
-////            }
-//        }
-        if (!this.world.isRemote) this.tickOnServer();
-
-//        Optional<Entity> nextRailOpt = this.getPrevRail().flatMap(RailEntity::getNextRail);
-//        if (!nextRailOpt.isPresent()) return;
-//        Entity entity = nextRailOpt.get();
-//        if (!(entity instanceof RailEntity)) return;
-//
-//        RailEntity nextRail = (RailEntity) entity;
-//        List<TimeDifferential> integral = this.getIntegralOfDistanceAndTime(nextRail);
-//
-//        // 查找当前时间对应的轨道段
-//        DerivativeInfo derivative = null;
-//
-//        if (!this.getPassengers().isEmpty() && this.getPassengers().get(0) instanceof ServerPlayerEntity) {
-//            GSKONetworking.sendToClientPlayer(
-//                    new SInteractCoasterPacket(SInteractCoasterPacket.RIDING, this.getEntityId()),
-//                    (ServerPlayerEntity) this.getPassengers().get(0));
-//        }
-//
-//        for (TimeDifferential dt : integral) {
-//            if (this.getMotionTicker() <= dt.timePartial) {
-//                derivative = dt.derivativeInfo;
-//                break;
-//            }
-//        }
-//
-//        if (derivative == null) {
-//            // 已到达轨道末端
-//            this.setShouldMove(false);
-//            return;
-//        }
-//
-//        Vector3d velocity = derivative.tangent;
-//        this.moveCoaster(velocity);
-//
-//        // 更新朝向
-//        this.rotationYaw = (float)Math.toDegrees(Math.atan2(velocity.z, velocity.x)) - 90;
-//        this.rotationPitch = (float)Math.toDegrees(Math.atan2(velocity.y,
-//                Math.sqrt(velocity.x*velocity.x + velocity.z*velocity.z)));
-//        // 增加运动计时器（模拟时间流逝）
-//        int currentTicker = this.getMotionTicker() + 1;
-//        this.setMotionTicker(currentTicker);
-    }
 
     @Override
     public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {
@@ -242,54 +364,6 @@ public class CoasterVehicle extends Entity {
     @Override
     public void notifyDataManagerChange(DataParameter<?> key) {
         super.notifyDataManagerChange(key);
-
-        if (key.equals(DATA_PROGRESS)) {
-
-        }
-    }
-
-    public void tickOnServer(){
-        for (Entity passenger : this.getPassengers()) passenger.fallDistance = 0;
-        Entity passenger = this.getPassengers().get(0);
-        if (passenger == null) return;
-
-        Vector3d motion;
-
-        RailEntity start = this.getPrevRail().isPresent() ? this.getPrevRail().get(): null;
-        RailEntity end = this.getNextRail().isPresent() ? this.getNextRail().get() : null;
-
-        if (start == null) return;
-        if (end == null) return;
-
-        // 计算位置和导数
-        int index = this.getMotionTicker() / 3;
-        if (this.getMotionTicker() >= start.getDerivatives(end).size() * 3 - 1) return;
-        DerivativeInfo derivative = start.getDerivatives(end).get(this.getMotionTicker() / 3 + 1);
-        if (derivative == null) return;
-
-        // 更新进度
-        double arcLength = derivative.tangent.length();
-        double motionScale = (arcLength > 1e-5) ? 1.0 / arcLength : 0;
-        this.setProgress((float) (this.getMotion().length() * motionScale));
-
-        // 轨道段切换
-        if (this.getProgress() >= 1.0) {
-            Optional<RailEntity> next = end.getNextRail();
-            if (next.isPresent()) {
-                this.setPrevRail(end);
-                this.setNextRail(next.get());
-                this.setProgress(this.getProgress() - 1);
-            }
-        }
-
-        // 物理计算
-        Vector3d tangent = derivative.tangent.normalize();
-//        double velocity = -tangent.y * GRAVITY; // 每tick重力分量
-
-        // 应用运动
-        motion = tangent.scale(motionScale);
-        this.setMotionTicker(this.getMotionTicker() + 1);
-        this.setPositionAndUpdate(derivative.position.x,  derivative.position.y, derivative.position.z);
     }
 
     private DerivativeInfo interpolate(RailEntity start, RailEntity end,
@@ -328,94 +402,6 @@ public class CoasterVehicle extends Entity {
         );
 
         return new DerivativeInfo(pos, deriv, Vector3d.ZERO);
-    }
-
-    /**
-     * 获取路程对时间的积分，即通过分段曲线的长度除以瞬时速度来获取载具在通过某个分段时所需的时间，将其累加来确定过山车在哪个游戏刻抵达哪个区段。
-     * @return 路程对时间的积分
-     */
-    public List<TimeDifferential> getIntegralOfDistanceAndTime(@NotNull RailEntity nextRail) {
-        List<TimeDifferential> integral = new ArrayList<>();
-        this.getPrevRail().ifPresent(prev -> {
-            List<Double> lengths = prev.getSegmentsLength(nextRail);
-//            List<Vector3d> tangents = prev.getTangents(nextRail);
-//
-//            double accumulatedTime = 0;
-//            for (Vector3d tangent : tangents) {
-//                double segTime = tangent.length() / 200;
-//                accumulatedTime += segTime;
-//                integral.add(new TimeDifferential(segTime, accumulatedTime, new DerivativeInfo(
-//                        Vector3d.ZERO, tangent, Vector3d.ZERO)));
-//            }
-//            for (int i = 0; i < tangents.size() - 1; i++) {
-//                // 避免除以零
-//                double segmentTime = tangents.get(i).length() / 10;
-//                accumulatedTime += segmentTime;
-//
-//                integral.add(new TimeDifferential(segmentTime, accumulatedTime, new DerivativeInfo(Vector3d.ZERO, tangents.get(i), Vector3d.ZERO)));
-//            }
-            List<DerivativeInfo> derivatives = prev.getDerivatives(nextRail);
-
-            double accumulatedTime = 0;
-            for (int i = 0; i < derivatives.size() - 1; i++) {
-                DerivativeInfo derivative = derivatives.get(i);
-                double segmentLength = lengths.get(i);
-                // 避免除以零
-                double speed = Math.max(0.01, derivative.tangent.length());
-                double segmentTime = segmentLength / speed;
-                accumulatedTime += segmentTime;
-
-                integral.add(new TimeDifferential(segmentTime, accumulatedTime, derivative));
-            }
-        });
-        return integral;
-    }
-
-    @Override
-    protected void readAdditional(@NotNull CompoundNBT compound) {
-        this.setPrevRail(compound.getInt("prevId"));
-        this.setNextRail(compound.getInt("nextId"));
-        this.setShouldMove(compound.getBoolean("shouldMove"));
-        this.setMotionTicker(compound.getInt("movingTick"));
-    }
-
-    @Override
-    protected void writeAdditional(@NotNull CompoundNBT compound) {
-        compound.putInt("prevId", this.dataManager.get(DATA_PREV_RAIL));
-        compound.putInt("nextId", this.dataManager.get(DATA_NEXT_RAIL));
-        compound.putBoolean("shouldMove", this.dataManager.get(DATA_MOVING_FLAG));
-        compound.putInt("movingTick", this.dataManager.get(DATA_MOTION_TICKER));
-    }
-
-    @Override
-    public @NotNull IPacket<?> createSpawnPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
-    }
-
-    public void moveCoaster(Vector3d velocity) {
-        this.setBoundingBox(this.getBoundingBox().offset(velocity));
-        this.resetPositionToBB();
-    }
-
-    public static class Progress{
-        public final RailEntity startRail;
-        public final RailEntity endRail;
-        public final boolean orientationOnly;
-        public final double t;
-
-        public Progress(RailEntity endRail, RailEntity startRail, boolean orientationOnly, double t) {
-            this.endRail = endRail;
-            this.startRail = startRail;
-            this.orientationOnly = orientationOnly;
-            this.t = t;
-        }
-
-        public boolean getOrientation(Progress last, float delta,
-                                      Vector3d posOut, Quaternion orientOut) {
-            // 实现轨道位置和朝向插值计算
-            return false;
-        }
-
     }
 
 }

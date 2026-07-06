@@ -61,8 +61,6 @@ public class CInteractCoasterPacket {
 
         COMMANDS.put(DRIVING, (packet, serverPlayer, serverWorld) -> {
             CoasterVehicle vehicle = (CoasterVehicle) serverWorld.getEntityByUuid(packet.coasterUUID);
-            if (vehicle == null) return;
-            vehicle.getPrevRail().ifPresent(railEntity -> vehicle.setShouldMove(true));
         });
     }
 }

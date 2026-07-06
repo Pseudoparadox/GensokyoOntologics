@@ -34,6 +34,25 @@ public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT,
     public HermiteNodeInfo(){
 
     }
+
+    public static HermiteNodeInfo from(RailEntity rail){
+        return of(rail.getRailType(), rail.getPosition(), rail.getNextPos().subtract(rail.getPosition()), rail.getRotation(),
+                rail.getNextRail().isPresent() ? rail.getNextRail().get().getRotation() : Quaternion.ONE)
+                .setPrevScale(rail.getScale0())
+                .setNextScale(rail.getScale1())
+                .setAutoSmooth(rail.isAutoScale())
+                .setFlipNormal(rail.isFlipNormal());
+    }
+
+    public static HermiteNodeInfo copyFrom(HermiteNodeInfo node){
+        return of(node.getRailType(), BlockPos.fromLong(node.startPos), BlockPos.fromLong(node.startPos),
+                node.rotation0(), node.rotation1())
+                .setPrevScale(node.scale0)
+                .setNextScale(node.scale1)
+                .setAutoSmooth(node.autoSmooth)
+                .setFlipNormal(node.flipNormal);
+    }
+
     private HermiteNodeInfo(RailEntity.Type type, long startPos, long endPosOffset, Quaternion prevRot, Quaternion nextRot) {
         this.type = type;
         this.startPos = startPos;

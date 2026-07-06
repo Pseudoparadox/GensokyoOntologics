@@ -3,6 +3,10 @@ package github.thelawf.gensokyoontology.common.item;
 import github.thelawf.gensokyoontology.api.IRayTracer;
 import github.thelawf.gensokyoontology.common.entity.misc.CoasterVehicle;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
+import github.thelawf.gensokyoontology.core.init.EntityRegistry;
+import github.thelawf.gensokyoontology.data.CoasterPhysics;
+import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -37,13 +41,16 @@ public class CoasterItem extends Item implements IRayTracer {
 
             ServerWorld serverWorld = (ServerWorld) world;
             RailEntity rail = (RailEntity) entity;
-            CoasterVehicle coaster = new CoasterVehicle(serverWorld);
 
-            coaster.setPosition(rail.getPosX(), rail.getPosY() + 0.5, rail.getPosZ());
-            coaster.setPrevRail(rail);
-            rail.getNextRail().ifPresent(coaster::setNextRail);
-            serverWorld.addEntity(coaster);
+            CoasterVehicle coaster = (CoasterVehicle) EntityRegistry.COASTER_VEHICLE.get().spawn(
+                    serverWorld, stack, player, rail.getPosition(), SpawnReason.TRIGGERED, false, false);
+
+            if (coaster == null) return;
+            coaster.setOwnerId(player.getUniqueID());
+            coaster.setPhysics(CoasterPhysics.PHYSICS_MAP.get(rail.getRailType()));
+            coaster.setCurrentNode(HermiteNodeInfo.copyFrom(coaster.getCurrentNode()));
             result.set(ActionResult.resultConsume(stack));
+
         });
         return result.get();
     }

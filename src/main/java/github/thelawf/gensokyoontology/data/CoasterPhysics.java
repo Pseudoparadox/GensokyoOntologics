@@ -4,13 +4,17 @@ import com.mojang.datafixers.util.Pair;
 import github.thelawf.gensokyoontology.api.INBTWriter;
 import github.thelawf.gensokyoontology.api.ISynchornizable;
 import github.thelawf.gensokyoontology.api.util.Maybe;
+import github.thelawf.gensokyoontology.common.entity.misc.CoasterVehicle;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.FloatNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.IntNBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.Util;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -21,19 +25,6 @@ public class CoasterPhysics implements INBTWriter, ISynchornizable<CompoundNBT, 
     public static final String KEY_PROGRESS = "progress";
     public static final String KEY_ACCELERATION = "acceleration";
     public static final String KEY_MAX_SPEED = "maxSpeed";
-
-    @SafeVarargs
-    public static <T extends INBT> CoasterPhysics of(Pair<String, T>... setters){
-        CoasterPhysics physics = new CoasterPhysics();
-        for (Pair<String, T> setter : setters) {
-            physics.set(setter.getFirst(), setter.getSecond());
-        }
-        return physics;
-    }
-
-    public static CoasterPhysics from(CompoundNBT properties){
-        return new CoasterPhysics().setProperties(properties);
-    }
 
     public static final CoasterPhysics ACCELERATION_STD = CoasterPhysics.of(
             Pair.of(KEY_PROGRESS, FloatNBT.valueOf(0F)),
@@ -58,6 +49,30 @@ public class CoasterPhysics implements INBTWriter, ISynchornizable<CompoundNBT, 
             Pair.of(KEY_VELOCITY, FloatNBT.valueOf(0F)),
             Pair.of(KEY_ACCELERATION, FloatNBT.valueOf(0F)),
             Pair.of(KEY_MAX_SPEED, FloatNBT.valueOf(0.5F)));
+
+    public static final Map<RailEntity.Type, CoasterPhysics> PHYSICS_MAP = Util.make(() -> {
+        Map<RailEntity.Type, CoasterPhysics> map = new HashMap<>();
+        map.put(RailEntity.Type.ACCELERATION, ACCELERATION_STD);
+        map.put(RailEntity.Type.DECELERATION, DECELERATION_STD);
+        map.put(RailEntity.Type.UNIFORM, UNIFORM_STD);
+        map.put(RailEntity.Type.INERTIAL, INERTIAL_STD);
+        return map;
+    });
+
+    @SafeVarargs
+    public static <T extends INBT> CoasterPhysics of(Pair<String, T>... setters){
+        CoasterPhysics physics = new CoasterPhysics();
+        for (Pair<String, T> setter : setters) {
+            physics.set(setter.getFirst(), setter.getSecond());
+        }
+        return physics;
+    }
+
+    public static CoasterPhysics from(CompoundNBT properties){
+        return new CoasterPhysics().setProperties(properties);
+    }
+
+
 
     @Override
     public CoasterPhysics copy() {
