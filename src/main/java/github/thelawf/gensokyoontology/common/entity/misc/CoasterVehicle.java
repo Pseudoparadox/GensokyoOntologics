@@ -5,22 +5,15 @@ import github.thelawf.gensokyoontology.api.Functions;
 import github.thelawf.gensokyoontology.api.INBTWriter;
 import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.AffiliatedEntity;
-import github.thelawf.gensokyoontology.common.entity.CoasterVehicleEntity;
 import github.thelawf.gensokyoontology.common.util.math.CurveUtil;
-import github.thelawf.gensokyoontology.common.util.math.GSKOMathUtil;
-import github.thelawf.gensokyoontology.core.init.EntityRegistry;
 import github.thelawf.gensokyoontology.core.init.ItemRegistry;
 import github.thelawf.gensokyoontology.common.util.math.DerivativeInfo;
-import github.thelawf.gensokyoontology.common.util.math.TimeDifferential;
 import github.thelawf.gensokyoontology.data.CoasterPhysics;
 import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
 import github.thelawf.gensokyoontology.data.TrackInfo;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -28,21 +21,13 @@ import net.minecraft.nbt.FloatNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
 
@@ -64,12 +49,13 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
 
     @Override
     protected void registerData() {
+        super.registerData();
         this.dataManager.register(DATA_SPLINE, HermiteNodeInfo.EMPTY);
         this.dataManager.register(DATA_PHYSICS, CoasterPhysics.INERTIAL_STD);
     }
 
     @Override
-    protected void readAdditional(CompoundNBT compound) {
+    protected void readAdditional(@NotNull CompoundNBT compound) {
         super.readAdditional(compound);
         HermiteNodeInfo node = HermiteNodeInfo.EMPTY.copy();
         node.deserializeNBT(compound.getCompound("node"));
@@ -78,7 +64,7 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     }
 
     @Override
-    protected void writeAdditional(CompoundNBT compound) {
+    protected void writeAdditional(@NotNull CompoundNBT compound) {
         super.writeAdditional(compound);
         compound.put("node", this.getCurrentNode().serializeNBT());
         compound.put("physics", this.getPhysics().serializeNBT());

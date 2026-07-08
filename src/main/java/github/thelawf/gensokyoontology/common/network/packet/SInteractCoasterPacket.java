@@ -61,14 +61,12 @@ public class SInteractCoasterPacket {
         {
             CoasterVehicle vehicle = (CoasterVehicle) world.getEntityByID(packet.coasterID);
             if (vehicle == null) return;
-            vehicle.setShouldMove(false);
             player.stopRiding();
         });
 
         COMMANDS.put(DRIVING, (packet, player, world) -> {
             CoasterVehicle vehicle = (CoasterVehicle) world.getEntityByID(packet.coasterID);
             if (vehicle == null) return;
-            vehicle.getPrevRail().ifPresent(railEntity -> vehicle.setShouldMove(true));
         });
     }
 }

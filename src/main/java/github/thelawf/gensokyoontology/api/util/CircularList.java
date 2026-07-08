@@ -44,10 +44,27 @@ public class CircularList<T> {
         return maybe;
     }
 
+    public Maybe<CircularNode<T>> tryFind(Predicate<T> predicate){
+        Maybe<CircularNode<T>> maybe = Maybe.empty();
+        this.nodes.stream().filter(node -> predicate.test(node.value())).findFirst().ifPresent(maybe::set);
+        return maybe;
+    }
+
     public Maybe<T> tryFindValue(Predicate<T> predicate){
         Maybe<T> maybe = Maybe.empty();
         this.nodes.stream().map(CircularNode::value).filter(predicate).findFirst().ifPresent(maybe::set);
         return maybe;
+    }
+
+    public void removeAllPrevious(Predicate<T> matched){
+        this.tryFind(matched).ifPresent(node -> {
+            this.nodes.removeIf(n1 -> n1 == node);
+            CircularNode<T> n = node;
+            while (n.prev() != null){
+                n = n.prev();
+                n.setPrev(null);
+            }
+        });
     }
 
     public void add(T value)

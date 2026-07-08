@@ -48,7 +48,7 @@ public class CoasterItem extends Item implements IRayTracer {
             if (coaster == null) return;
             coaster.setOwnerId(player.getUniqueID());
             coaster.setPhysics(CoasterPhysics.PHYSICS_MAP.get(rail.getRailType()));
-            coaster.setCurrentNode(HermiteNodeInfo.copyFrom(coaster.getCurrentNode()));
+            coaster.setCurrentNode(HermiteNodeInfo.from(rail));
             result.set(ActionResult.resultConsume(stack));
 
         });

@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
+import org.jetbrains.annotations.NotNull;
 
 public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT, HermiteNodeInfo>{
     private long startPos = 0;
@@ -35,7 +36,7 @@ public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT,
 
     }
 
-    public static HermiteNodeInfo from(RailEntity rail){
+    public static HermiteNodeInfo from(@NotNull RailEntity rail){
         return of(rail.getRailType(), rail.getPosition(), rail.getNextPos().subtract(rail.getPosition()), rail.getRotation(),
                 rail.getNextRail().isPresent() ? rail.getNextRail().get().getRotation() : Quaternion.ONE)
                 .setPrevScale(rail.getScale0())

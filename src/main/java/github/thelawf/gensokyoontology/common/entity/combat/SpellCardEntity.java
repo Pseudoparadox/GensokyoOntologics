@@ -52,7 +52,6 @@ public class SpellCardEntity extends AffiliatedEntity implements IRendersAsItem 
     public SpellCardEntity(EntityType<SpellCardEntity> entityType, Entity owner, World world) {
         this(entityType, world);
         this.setOwnerId(owner.getUniqueID());
-        this.setDataOwner();
     }
 
     @Override

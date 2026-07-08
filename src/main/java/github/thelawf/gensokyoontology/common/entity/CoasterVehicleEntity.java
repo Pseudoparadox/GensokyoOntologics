@@ -48,7 +48,7 @@ public class CoasterVehicleEntity extends AffiliatedEntity implements INBTWriter
     }
 
     @Override
-    protected void readAdditional(CompoundNBT compound) {
+    protected void readAdditional(@NotNull CompoundNBT compound) {
         super.readAdditional(compound);
         HermiteNodeInfo node = HermiteNodeInfo.EMPTY.copy();
         node.deserializeNBT(compound.getCompound("node"));
@@ -57,7 +57,7 @@ public class CoasterVehicleEntity extends AffiliatedEntity implements INBTWriter
     }
 
     @Override
-    protected void writeAdditional(CompoundNBT compound) {
+    protected void writeAdditional(@NotNull CompoundNBT compound) {
         super.writeAdditional(compound);
         compound.put("node", this.getCurrentNode().serializeNBT());
         compound.put("physics", this.getPhysics().serializeNBT());

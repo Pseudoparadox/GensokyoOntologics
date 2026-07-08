@@ -7,7 +7,6 @@ import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.nbt.GSKONBTUtil;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.DimensionSavedDataManager;
@@ -17,7 +16,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class TrackInfo extends WorldSavedData implements INBTWriter {
-    private Map<UUID, CircularList<HermiteNodeInfo>> tracks = new HashMap<>();
+    private final Map<UUID, CircularList<HermiteNodeInfo>> tracks = new HashMap<>();
     private boolean isLooped;
     public static final String NAME = "TrackInfo";
 
@@ -27,6 +26,19 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
 
     public Map<UUID, CircularList<HermiteNodeInfo>> tracks() {
         return this.tracks;
+    }
+    public void addTracks(RailEntity startRail){
+        this.tracks.put(startRail.getUniqueID(), new CircularList<>());
+        this.write(new CompoundNBT());
+    }
+
+    public void addRailNode(UUID startRailId, RailEntity newRailNode){
+        this.tracks.get(startRailId).add(HermiteNodeInfo.from(newRailNode));
+        this.write(new CompoundNBT());
+    }
+
+    public void removeNode(UUID startRailId, RailEntity removedNode){
+        this.tracks.get(startRailId).add(HermiteNodeInfo.from(removedNode));
     }
 
     public CircularList<HermiteNodeInfo> addTrack(RailEntity rail) {
