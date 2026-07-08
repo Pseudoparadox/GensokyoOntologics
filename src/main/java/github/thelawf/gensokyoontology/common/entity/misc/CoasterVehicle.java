@@ -3,9 +3,13 @@ package github.thelawf.gensokyoontology.common.entity.misc;
 import com.mojang.datafixers.util.Pair;
 import github.thelawf.gensokyoontology.api.Functions;
 import github.thelawf.gensokyoontology.api.INBTWriter;
+import github.thelawf.gensokyoontology.api.util.CircularList;
 import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.AffiliatedEntity;
+import github.thelawf.gensokyoontology.common.item.CoasterItem;
+import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.common.util.math.CurveUtil;
+import github.thelawf.gensokyoontology.common.util.math.V3f;
 import github.thelawf.gensokyoontology.core.init.ItemRegistry;
 import github.thelawf.gensokyoontology.common.util.math.DerivativeInfo;
 import github.thelawf.gensokyoontology.data.CoasterPhysics;
@@ -41,7 +45,6 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     private static final float FRICTION_COEFFICIENT = 0.98f; // 摩擦系数
     private static final float AIR_RESISTANCE = 0.99f;     // 空气阻力
     private static final float CONSTANT_SPEED_THRESHOLD = 0.01f; // 匀速轨道速度保持阈值
-
 
     public CoasterVehicle(EntityType<?> type, World world) {
         super(type, world);
@@ -97,10 +100,8 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     public void tick() {
         super.tick();
 
-        if (this.world.isRemote) {
-            return;
-        }
-
+        if (this.world.isRemote) return;
+        GSKOUtil.log("Motion = " + this.motionSpeed());
         this.updatePhysics();
         this.updatePosition();
         this.checkNextRail();
@@ -124,10 +125,11 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     }
 
     public void setMotionSpeed(float speed){
-        this.setMotion(this.getMotion().normalize().scale(speed));
+        if (this.getMotion().length() < 1e-3) this.setMotion(this.getCurrentNode().orientation(this.progress()).scale(speed));
+        else this.setMotion(this.getMotion().normalize().scale(speed));
     }
     public void accelerate(float acceleration){
-        Vector3d unit = new Vector3d(1,1,1).scale(acceleration);
+        Vector3d unit = this.getCurrentNode().orientation(this.progress()).scale(acceleration);
         this.setMotion(this.getMotion().add(unit));
     }
     public float progress(){
@@ -145,8 +147,8 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
      */
     private void updateAccelerateRail() {
         // 获取轨道的加速参数
-        float trackAcceleration = 0.1f; // 可以从轨道实体获取
-        float maxSpeed = 2.0f;         // 可以从轨道实体获取
+        float trackAcceleration = 0.02f; // 可以从轨道实体获取
+        float maxSpeed = 1.0f;         // 可以从轨道实体获取
 
         this.accelerate(trackAcceleration);
 
@@ -254,11 +256,9 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
 
         this.rotationYaw = yaw;
         this.rotationPitch = pitch;
-
     }
 
     private Vector3d calculateTangentOnRail(float t) {
-
         Vector3d startPos = this.getCurrentNode().getStartVec(Vector3d.ZERO);
         Vector3d endPos = this.getCurrentNode().getEndPosVec();
 
@@ -270,7 +270,7 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     }
 
     private float getRailLength() {
-
+        CurveUtil.hermiteLength(this.getCurrentNode(), 0F, 1F, RailEntity.SEGMENTS);
         Vector3d startPos = this.getCurrentNode().getStartVec(Vector3d.ZERO);
         Vector3d endPos = this.getCurrentNode().getEndPosVec();
         return (float) startPos.distanceTo(endPos);
@@ -289,7 +289,7 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
         this.tryGetProgress().ifPresent(progress -> {
             if (progress < 1.0F) return;
             TrackInfo.tryGetInstance(this.world).ifPresent(trackInfo -> this.tryGetOwnerId().ifPresent(uuid ->
-                    trackInfo.tracks().get(uuid).tryFindValue(node ->
+                    trackInfo.tracks().getOrDefault(uuid, new CircularList<>()).tryFindValue(node ->
                             node.getStartPos() == this.getCurrentNode().getStartPos()).ifPresent(node -> {
                         this.setCurrentNode(node);
                         this.adjustVelocityForNewRail();

@@ -8,9 +8,9 @@ public interface ICircularNode<T, N extends ICircularNode<T, N>> {
     void setPrev(N node);
     void setNext(N node);
     default boolean hasNext() {
-        return next() == null;
+        return next() != null;
     }
     default boolean hasPrev() {
-        return prev() == null;
+        return prev() != null;
     }
 }

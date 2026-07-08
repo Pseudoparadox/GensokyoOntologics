@@ -54,6 +54,5 @@ public class CAdjustRailPacket {
         rail.setFlipNormal(packet.node.shouldFlipNormal());
         serverWorld.updateEntity(rail);
         rail.getNextRail().ifPresent(serverWorld::updateEntity);
-        GSKOUtil.log(rail.isFlipNormal());
     }
 }

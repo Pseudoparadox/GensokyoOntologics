@@ -209,6 +209,9 @@ public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT,
         v.mul(this.scale1);
         return v;
     }
+    public Vector3d orientation(float progress){
+        return CurveUtil.hermiteTangent(this.getStartVec(Vector3d.ZERO), this.getEndPosVec(), this.orientation0(), this.orientation1(), progress);
+    }
     public Vector3d orientation1(){
         Vector3f v = RotMatrix.from(this.nextRotation).tangent();
         v.mul(this.scale1);
