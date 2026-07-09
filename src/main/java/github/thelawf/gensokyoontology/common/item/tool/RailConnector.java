@@ -7,6 +7,7 @@ import github.thelawf.gensokyoontology.common.network.packet.S2CRenderRailPacket
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.core.init.EntityRegistry;
 import github.thelawf.gensokyoontology.core.init.ItemRegistry;
+import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
 import github.thelawf.gensokyoontology.data.TrackInfo;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
@@ -110,7 +111,8 @@ public class RailConnector extends Item implements IRayTracer {
             this.setNextStartRail(player, targetRail);
 
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-            TrackInfo.tryGetInstance(serverWorld).ifPresent(info -> info.addRailNode(startRail.getUniqueID(), targetRail));
+            TrackInfo.tryGetInstance(serverWorld).ifPresent(info -> info.addRailNode(startRail.getUniqueID(),
+                    HermiteNodeInfo.from(targetRail)));
             GSKONetworking.sendToClientPlayer(new S2CRenderRailPacket(startRail.getEntityId(),
                     targetRail.getEntityId()), serverPlayer);
         });

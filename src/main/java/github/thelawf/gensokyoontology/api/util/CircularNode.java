@@ -34,4 +34,8 @@ public class CircularNode<T> implements ICircularNode<T, CircularNode<T>>{
     public void setNext(CircularNode<T> node) {
         this.next = node;
     }
+
+    public boolean orderMatches(CircularList<T> list, CircularNode<T> other){
+        return list.compareTo(this) == list.compareTo(other);
+    }
 }

@@ -6,10 +6,9 @@ import github.thelawf.gensokyoontology.api.INBTWriter;
 import github.thelawf.gensokyoontology.api.util.CircularList;
 import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.AffiliatedEntity;
-import github.thelawf.gensokyoontology.common.item.CoasterItem;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.common.util.math.CurveUtil;
-import github.thelawf.gensokyoontology.common.util.math.V3f;
+import github.thelawf.gensokyoontology.common.util.math.GSKOMathUtil;
 import github.thelawf.gensokyoontology.core.init.ItemRegistry;
 import github.thelawf.gensokyoontology.common.util.math.DerivativeInfo;
 import github.thelawf.gensokyoontology.data.CoasterPhysics;
@@ -28,6 +27,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
@@ -39,6 +39,9 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
             CoasterVehicle.class, CoasterPhysics.INERTIAL_STD);
     public static final DataParameter<HermiteNodeInfo> DATA_SPLINE = EntityDataManager.createKey(
             CoasterVehicle.class, HermiteNodeInfo.EMPTY);
+
+    public float partialProgress = 0.0f;
+    public Quaternion partialRotation = Quaternion.ONE;
 
     // 轨道物理参数
     private static final float ACCEL_GRAVITY = 0.05f;      // 重力加速度
@@ -100,12 +103,15 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     public void tick() {
         super.tick();
 
-        if (this.world.isRemote) return;
+        if (this.world.isRemote) {
+            return;
+        }
         GSKOUtil.log("Motion = " + this.motionSpeed());
         this.updatePhysics();
         this.updatePosition();
         this.checkNextRail();
     }
+
 
     private void updatePhysics() {
         switch (this.getCurrentNode().getRailType()) {
@@ -224,24 +230,20 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
         if (progress > 1) progress = 1;
 
         // 计算Hermite曲线上的位置
-        Vector3d newPosition = this.calculatePositionOnRail(progress);
+        this.updateSmoothRendering();
+        Vector3d newPosition = CurveUtil.hermite3(this.getCurrentNode(), progress);
         this.setPosition(newPosition.x, newPosition.y, newPosition.z);
 
         // 计算并应用旋转（使载具面向运动方向）
         this.updateRotation();
     }
 
-    private Vector3d calculatePositionOnRail(float t) {
-        Vector3d startPos = this.getCurrentNode().getStartVec(Vector3d.ZERO);
-        Vector3d endPos = this.getCurrentNode().getEndPosVec();
-
-        // 获取方向向量
-        Vector3f startDir = this.getCurrentNode().prevOrientation().copy();
-        Vector3f endDir = this.getCurrentNode().nextOrientation().copy();
-
-        // 使用Hermite插值
-        this.physicsSetter(Pair.of(CoasterPhysics.KEY_PROGRESS, FloatNBT.valueOf(t)));
-        return CurveUtil.hermite3(startPos, endPos, startDir, endDir, t);
+    private void updateSmoothRendering() {
+        this.prevPosX = this.getPosX();
+        this.prevPosY = this.getPosY();
+        this.prevPosZ = this.getPosY();
+        this.partialProgress = this.progress();
+        this.partialRotation = GSKOMathUtil.slerp(this.getCurrentNode().rotation0(), this.getCurrentNode().rotation1(), this.partialProgress);
     }
 
     private void updateRotation() {

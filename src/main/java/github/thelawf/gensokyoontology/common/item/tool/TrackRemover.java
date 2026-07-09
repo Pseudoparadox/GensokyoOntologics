@@ -2,6 +2,7 @@ package github.thelawf.gensokyoontology.common.item.tool;
 
 import github.thelawf.gensokyoontology.api.IRayTracer;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
+import github.thelawf.gensokyoontology.data.TrackInfo;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -32,6 +33,7 @@ public class TrackRemover extends Item implements IRayTracer {
         this.rayTrace(world, player, start, end).ifPresent(entity -> {
             if(!(entity instanceof RailEntity)) return;
             RailEntity rail = (RailEntity) entity;
+            TrackInfo.tryGetInstance(world).ifPresent(trackInfo -> trackInfo.removeNode(rail.getPosition()));
             rail.remove();
             result.set(ActionResult.resultSuccess(remover));
         });

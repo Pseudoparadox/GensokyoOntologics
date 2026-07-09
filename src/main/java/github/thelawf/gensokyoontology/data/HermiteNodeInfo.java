@@ -2,6 +2,7 @@ package github.thelawf.gensokyoontology.data;
 
 import github.thelawf.gensokyoontology.api.ISynchornizable;
 import github.thelawf.gensokyoontology.api.INBTWriter;
+import github.thelawf.gensokyoontology.api.util.CircularNode;
 import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.util.EnumUtil;
@@ -14,6 +15,8 @@ import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT, HermiteNodeInfo>{
     private long startPos = 0;
@@ -236,5 +239,23 @@ public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT,
     public HermiteNodeInfo setNextScale(int scale1) {
         this.scale1 = scale1;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        HermiteNodeInfo that = (HermiteNodeInfo) obj;
+        return Objects.equals(this.startPos, that.startPos) &&
+                Objects.equals(this.getEndOffset(), that.getEndOffset()) &&
+                Objects.equals(this.prevRotation, that.prevRotation) &&
+                Objects.equals(this.nextRotation, that.nextRotation) &&
+                this.getRailType() == that.getRailType();
+    }
+
+    @Override
+    public int hashCode() {
+        super.hashCode();
+        return Objects.hash(this.startPos, this.endPosOffset, this.prevRotation, this.nextRotation, this.type);
     }
 }

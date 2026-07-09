@@ -1,5 +1,7 @@
 package github.thelawf.gensokyoontology.api.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class CircularList<T> {
+public class CircularList<T> implements Comparable<CircularNode<T>> {
     private CircularNode<T> head;
     private CircularNode<T> tail;
     private int depth;
@@ -121,6 +123,52 @@ public class CircularList<T> {
         node.setNext(null);
 
         return true;
+    }
+
+    /**
+     * 将原循环链表切断为两个循环链表
+     */
+    public Maybe<CircularList<T>> trySplit(CircularNode<T> node) {
+        if (node == null || !nodes.contains(node)) {
+            return Maybe.empty();
+        }
+
+        CircularList<T> splitList = new CircularList<>();
+        // 只有一个节点的情况
+        if (depth == 1) {
+            head = null;
+            tail = null;
+            return Maybe.empty();
+        }
+        // 删除头节点
+        else if (node == head) {
+            head = head.next();
+            head.setPrev(tail);
+            tail.setNext(head);
+            return Maybe.empty();
+        }
+        // 删除尾节点
+        else if (node == tail) {
+            tail = tail.prev();
+            tail.setNext(head);
+            head.setPrev(tail);
+            return Maybe.empty();
+        }
+        // 删除中间节点
+        else {
+            node.prev().setNext(node.next());
+            node.next().setPrev(node.prev());
+
+        }
+
+        nodes.remove(node);
+        depth--;
+
+        // 清理节点引用
+        node.setPrev(null);
+        node.setNext(null);
+
+        return Maybe.ofNullable(this);
     }
 
     /**
@@ -328,5 +376,16 @@ public class CircularList<T> {
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    public CircularList<T> copy(){
+        CircularList<T> newList = new CircularList<>();
+        this.nodes.forEach(node -> newList.add(node.value()));
+        return newList;
+    }
+
+    @Override
+    public int compareTo(@NotNull CircularNode<T> o) {
+        return nodes.indexOf(o);
     }
 }

@@ -7,6 +7,7 @@ import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.nbt.GSKONBTUtil;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.DimensionSavedDataManager;
@@ -29,22 +30,40 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
     }
     public void addTracks(RailEntity startRail){
         this.tracks.put(startRail.getUniqueID(), new CircularList<>());
+        this.markDirty();
         this.write(new CompoundNBT());
     }
 
-    public void addRailNode(UUID startRailId, RailEntity newRailNode){
-        this.tracks.get(startRailId).add(HermiteNodeInfo.from(newRailNode));
+    public void addRailNode(UUID startRailId, HermiteNodeInfo newNode){
+        this.pauliExclude(newNode.getStartPos());
+        this.tracks.get(startRailId).add(newNode);
+        this.markDirty();
         this.write(new CompoundNBT());
     }
 
-    public void removeNode(UUID startRailId, RailEntity removedNode){
-        this.tracks.get(startRailId).add(HermiteNodeInfo.from(removedNode));
+    public void removeNode(BlockPos removedPos){
+        this.getAllRegisteredPos().stream().filter(this::containsPosition).findFirst()
+                .ifPresent(blockPos -> this.tracks.forEach((uuid, circularList) ->
+                        circularList.removeIf(node -> node.getStartPos() == removedPos)));
+        this.markDirty();
+        this.write(new CompoundNBT());
     }
 
-    public CircularList<HermiteNodeInfo> addTrack(RailEntity rail) {
-        CircularList<HermiteNodeInfo> splines = new CircularList<>();
-        this.tracks.put(rail.getUniqueID(), splines);
-        return splines;
+    private boolean containsPosition(BlockPos pos){
+        return this.getAllRegisteredPos().stream().anyMatch(blockPos -> blockPos == pos);
+    }
+
+    private List<BlockPos> getAllRegisteredPos(){
+        List<BlockPos> list = new ArrayList<>();
+        this.tracks.forEach((uuid, circularList) -> circularList.forEach(node -> list.add(node.getStartPos())));
+        return list;
+    }
+
+    /**
+     * 泡利不相容原理，一个BlockPos不允许两个轨道实体出现，如果设置了同一处，则后设置的轨道覆盖前一个轨道
+     */
+    public void pauliExclude(BlockPos newPos){
+        this.removeNode(newPos);
     }
 
     public boolean isLooped() {
@@ -93,4 +112,5 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
         this.writeCompoundList(compound, "tracks", stream);
         return compound;
     }
+
 }

@@ -254,6 +254,10 @@ public class CurveUtil {
                 .add(endDirection.scale(h4));
     }
 
+    public static Vector3d hermite3(HermiteNodeInfo info, float progress) {
+        return hermite3(Vector3d.ZERO, info.getEndOffset(), info.prevOrientation(), info.nextOrientation(), progress);
+    }
+
     /**
      * 计算埃尔米特三次曲线在参数t处的切线
      */

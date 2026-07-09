@@ -8,6 +8,7 @@ import github.thelawf.gensokyoontology.common.network.packet.S2CRenderRailPacket
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.core.init.EntityRegistry;
 import github.thelawf.gensokyoontology.core.init.ItemRegistry;
+import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
 import github.thelawf.gensokyoontology.data.TrackInfo;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
@@ -104,7 +105,10 @@ public class TrackPlacer extends Item implements IRayTracer {
         nbt.putLong("prev_pos", rail.getPosition().toLong());
         connector.setTag(nbt);
 
-        Maybe<TrackInfo> maybe = TrackInfo.tryGetInstance(player.world).ifPresent(info -> info.addTracks(rail));
+        TrackInfo.tryGetInstance(player.world).ifPresent(info -> {
+            info.addTracks(rail);
+            info.addRailNode(rail.getUniqueID(), HermiteNodeInfo.from(rail));
+        });
         player.addItemStackToInventory(connector);
         return ActionResultType.CONSUME;
     }
