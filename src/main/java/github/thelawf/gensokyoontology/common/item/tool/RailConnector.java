@@ -1,6 +1,7 @@
 package github.thelawf.gensokyoontology.common.item.tool;
 
 import github.thelawf.gensokyoontology.api.IRayTracer;
+import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.network.GSKONetworking;
 import github.thelawf.gensokyoontology.common.network.packet.S2CRenderRailPacket;
@@ -111,12 +112,21 @@ public class RailConnector extends Item implements IRayTracer {
             this.setNextStartRail(player, targetRail);
 
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-            TrackInfo.tryGetInstance(serverWorld).ifPresent(info -> info.addRailNode(startRail.getUniqueID(),
-                    HermiteNodeInfo.from(targetRail)));
+            TrackInfo.tryGetInstance(serverWorld)
+                    .ifPresent(info -> this.tryGetFirstRail(serverWorld, connector)
+                            .ifPresent(first -> info.addRailNode(startRail.getUniqueID(), HermiteNodeInfo.from(first))));
             GSKONetworking.sendToClientPlayer(new S2CRenderRailPacket(startRail.getEntityId(),
                     targetRail.getEntityId()), serverPlayer);
         });
     }
+
+    private Maybe<RailEntity> tryGetFirstRail(ServerWorld serverWorld, ItemStack connector){
+        return Maybe.ofNullable(connector.getTag())
+                .map(nbt -> nbt.getUniqueId("first"))
+                .map(serverWorld::getEntityByUuid)
+                .map(entity -> (RailEntity)entity);
+    }
+
 
     private Optional<Entity> getStartRail(ServerWorld world, UUID uuid) {
         return Optional.ofNullable(world.getEntityByUuid(uuid));

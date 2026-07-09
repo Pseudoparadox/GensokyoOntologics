@@ -120,7 +120,7 @@ public class GSKOEntityEvents {
         serverWorld.getEntities().filter(entity -> entity instanceof RailEntity)
                 .forEach(entity -> {
                     RailEntity rail = (RailEntity) entity;
-                    rail.tryGetNextRail(Maybe.empty()).ifPresent(next -> {
+                    rail.tryGetNextRail().ifPresent(next -> {
                         GSKONetworking.sendToClientPlayer(new S2CRenderRailPacket(rail.getEntityId(), next.getEntityId()), player);
                     });
                 });

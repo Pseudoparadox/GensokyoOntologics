@@ -27,7 +27,7 @@ public interface INBTWriter extends INBTReader {
     }
     default <T extends INBT, S extends ISynchornizable<T, S>> void writeList(CompoundNBT nbtToWirteIn, String key, Iterable<S> list, GSKONBTUtil.NBTType nbtType){
         ListNBT listNBT = new ListNBT();
-        list.forEach(s -> listNBT.add(nbtType.typeByte, s.serializeNBT()));
+        list.forEach(s -> listNBT.add(s.serializeNBT()));
         nbtToWirteIn.put(key, listNBT);
     }
 

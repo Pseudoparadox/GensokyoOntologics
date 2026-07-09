@@ -31,14 +31,12 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
     public void addTracks(RailEntity startRail){
         this.tracks.put(startRail.getUniqueID(), new CircularList<>());
         this.markDirty();
-        this.write(new CompoundNBT());
     }
 
     public void addRailNode(UUID startRailId, HermiteNodeInfo newNode){
         this.pauliExclude(newNode.getStartPos());
         this.tracks.get(startRailId).add(newNode);
         this.markDirty();
-        this.write(new CompoundNBT());
     }
 
     public void removeNode(BlockPos removedPos){
@@ -46,7 +44,6 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
                 .ifPresent(blockPos -> this.tracks.forEach((uuid, circularList) ->
                         circularList.removeIf(node -> node.getStartPos() == removedPos)));
         this.markDirty();
-        this.write(new CompoundNBT());
     }
 
     private boolean containsPosition(BlockPos pos){

@@ -94,6 +94,10 @@ public class TrackPlacer extends Item implements IRayTracer {
         RailEntity rail = (RailEntity) entity;
 
         rail.setRotation(Quaternion.ONE);
+        TrackInfo.tryGetInstance(player.world).ifPresent(info -> {
+            info.addTracks(rail);
+            info.addRailNode(rail.getUniqueID(), HermiteNodeInfo.from(rail));
+        });
         stack.shrink(1);
         return this.setFirstRail(player, rail);
     }
@@ -101,14 +105,11 @@ public class TrackPlacer extends Item implements IRayTracer {
     private ActionResultType setFirstRail(@NotNull PlayerEntity player, RailEntity rail) {
         ItemStack connector = new ItemStack(ItemRegistry.RAIL_CONNECTOR.get());
         CompoundNBT nbt = new CompoundNBT();
+        nbt.putUniqueId("first", rail.getUniqueID());
         nbt.putUniqueId("uuid", rail.getUniqueID());
         nbt.putLong("prev_pos", rail.getPosition().toLong());
         connector.setTag(nbt);
 
-        TrackInfo.tryGetInstance(player.world).ifPresent(info -> {
-            info.addTracks(rail);
-            info.addRailNode(rail.getUniqueID(), HermiteNodeInfo.from(rail));
-        });
         player.addItemStackToInventory(connector);
         return ActionResultType.CONSUME;
     }

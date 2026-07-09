@@ -25,9 +25,7 @@ public class CircularList<T> implements Comparable<CircularNode<T>> {
     }
 
     public List<T> toList() {
-        return nodes.stream()
-                .map(CircularNode::value)
-                .collect(Collectors.toList());
+        return nodes.stream().map(CircularNode::value).collect(Collectors.toList());
     }
 
     public List<CircularNode<T>> toNodeList() {

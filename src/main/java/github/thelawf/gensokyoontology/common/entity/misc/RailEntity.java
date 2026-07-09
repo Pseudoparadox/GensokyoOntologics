@@ -155,15 +155,16 @@ public class RailEntity extends Entity {
         return ref;
     }
 
-    public Maybe<Entity> tryGetNextRail(Maybe<Entity> ref) {
+    public Maybe<Entity> tryGetNextRail() {
+        Maybe<Entity> maybe = Maybe.empty();
         if (this.world instanceof ClientWorld) {
-            return ref;
+            return maybe;
         }
         ServerWorld serverWorld = (ServerWorld) this.world;
         Maybe.from(this.getNextId())
                 .map(serverWorld::getEntityByUuid)
-                .ifPresent(ref::set);
-        return ref;
+                .ifPresent(maybe::set);
+        return maybe;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -246,11 +247,11 @@ public class RailEntity extends Entity {
         if (world.isRemote) return Optional.empty();
 
         ServerWorld serverWorld = (ServerWorld) world;
-        AtomicReference<Optional<RailEntity>> nextRail = new AtomicReference<>();
+        AtomicReference<RailEntity> nextRail = new AtomicReference<>();
 
         this.dataManager.get(DATA_TARGET_UUID).ifPresent(uuid ->
-                nextRail.set(Optional.ofNullable((RailEntity) serverWorld.getEntityByUuid(uuid))));
-        return nextRail.get();
+                nextRail.set((RailEntity) serverWorld.getEntityByUuid(uuid)));
+        return nextRail.get() == null ? Optional.empty() : Optional.ofNullable(nextRail.get());
     }
 
     public void setAutoScale(boolean autoScale){
