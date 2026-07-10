@@ -17,6 +17,7 @@ import github.thelawf.gensokyoontology.data.TrackInfo;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -33,6 +34,8 @@ import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.stream.Stream;
+
 public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
 
     public static final DataParameter<CoasterPhysics> DATA_PHYSICS = EntityDataManager.createKey(
@@ -44,6 +47,8 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     public Quaternion partialRotation = Quaternion.ONE;
 
     // 轨道物理参数
+    public static final float ACCELERATION = 0.0001F;
+    public static final float MAX_SPEED = 1F;
     private static final float ACCEL_GRAVITY = 0.05f;      // 重力加速度
     private static final float FRICTION_COEFFICIENT = 0.98f; // 摩擦系数
     private static final float AIR_RESISTANCE = 0.99f;     // 空气阻力
@@ -83,7 +88,11 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
 
     @SafeVarargs
     public final <T extends INBT> void physicsSetter(Pair<String, T>... setter){
-        this.setPhysics(this.getPhysics().copyAndSet(setter));
+        CompoundNBT nbt = this.getPhysics().serializeNBT();
+        Stream.of(setter).forEach(pair -> nbt.put(pair.getFirst(), pair.getSecond()));
+
+        CoasterPhysics physics = CoasterPhysics.from(nbt);
+        this.setPhysics(physics);
     }
 
     public void setPhysics(CoasterPhysics physics){
@@ -103,7 +112,7 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     public void tick() {
         super.tick();
 
-        GSKOUtil.log("Pos = " + this.getPosition());
+        if (this.world.isRemote) return;
         this.updatePhysics();
         this.updatePosition();
         this.checkNextRail();
@@ -150,19 +159,18 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
      */
     private void updateAccelerateRail() {
         // 获取轨道的加速参数
-        float trackAcceleration = 0.02f; // 可以从轨道实体获取
-        float maxSpeed = 1.0f;         // 可以从轨道实体获取
 
-        this.accelerate(trackAcceleration);
+        this.accelerate(ACCELERATION);
 
         // 限制最大速度
-        if (this.getMotion().length() > maxSpeed) {
-            this.setMotionSpeed(maxSpeed);
+        if (this.getMotion().length() > MAX_SPEED) {
+            this.setMotionSpeed(MAX_SPEED);
         }
 
         // 应用摩擦和空气阻力
-        this.setMotionSpeed(maxSpeed * FRICTION_COEFFICIENT);
-        this.setMotionSpeed(maxSpeed * AIR_RESISTANCE);
+        this.setMotionSpeed(MAX_SPEED * FRICTION_COEFFICIENT);
+        this.setMotionSpeed(MAX_SPEED * AIR_RESISTANCE);
+        this.physicsSetter(Pair.of(CoasterPhysics.KEY_VELOCITY, FloatNBT.valueOf(this.motionSpeed())));
     }
 
     /**
@@ -219,7 +227,7 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     }
 
     private void updatePosition() {
-        float delta = this.motionSpeed() / this.getRailLength();
+        float delta = this.velocity() / this.getRailLength();
         float progress = this.progress() + delta;
 
         // 限制进度在 [0, 1] 范围内
@@ -228,8 +236,10 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
 
         // 计算Hermite曲线上的位置
         this.updateSmoothRendering();
-        Vector3d newPosition = CurveUtil.hermite3(this.getCurrentNode(), progress);
-        this.setPosition(newPosition.x, newPosition.y, newPosition.z);
+        Vector3d prev = CurveUtil.hermite3(this.getCurrentNode(), partialProgress);
+        Vector3d next = CurveUtil.hermite3(this.getCurrentNode(), progress);
+        this.physicsSetter(Pair.of(CoasterPhysics.KEY_PROGRESS, FloatNBT.valueOf(progress)));
+        this.move(MoverType.SELF, next.subtract(prev));
 
         // 计算并应用旋转（使载具面向运动方向）
         this.updateRotation();
@@ -239,6 +249,9 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
         this.prevPosX = this.getPosX();
         this.prevPosY = this.getPosY();
         this.prevPosZ = this.getPosY();
+        this.lastTickPosX = this.prevPosX;
+        this.lastTickPosY = this.prevPosY;
+        this.lastTickPosZ = this.prevPosZ;
         this.partialProgress = this.progress();
         this.partialRotation = GSKOMathUtil.slerp(this.getCurrentNode().rotation0(), this.getCurrentNode().rotation1(), this.partialProgress);
     }
@@ -269,10 +282,7 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     }
 
     private float getRailLength() {
-        CurveUtil.hermiteLength(this.getCurrentNode(), 0F, 1F, RailEntity.SEGMENTS);
-        Vector3d startPos = this.getCurrentNode().getStartVec(Vector3d.ZERO);
-        Vector3d endPos = this.getCurrentNode().getEndPosVec();
-        return (float) startPos.distanceTo(endPos);
+        return CurveUtil.hermiteLength(this.getCurrentNode(), 0F, 1F, RailEntity.SEGMENTS);
     }
 
     public Maybe<Float> tryGetProgress(){
@@ -287,13 +297,20 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     private void checkNextRail() {
         this.tryGetProgress().ifPresent(progress -> {
             if (progress < 1.0F) return;
-            TrackInfo.tryGetInstance(this.world).ifPresent(trackInfo -> this.tryGetOwnerId().ifPresent(uuid ->
-                    trackInfo.tracks().getOrDefault(uuid, new CircularList<>()).tryFindValue(node ->
-                            node.getStartPos() == this.getCurrentNode().getStartPos()).ifPresent(node -> {
-                        this.setCurrentNode(node);
-                        this.adjustVelocityForNewRail();
-                        this.physicsSetter(Pair.of(CoasterPhysics.KEY_PROGRESS, FloatNBT.valueOf(0F)));
-                    })));
+            TrackInfo.tryGetInstance(this.world).ifPresent(track -> this.tryGetOwnerId()
+                    .ifPresent(uuid -> track.tryGetNextNode(uuid, this.getCurrentNode().getStartPos())
+                            .ifPresent(node -> {
+                                this.setCurrentNode(node);
+                                this.adjustVelocityForNewRail();
+                                this.setPhysics(node.getRailType().physics());
+                            })));
+//            TrackInfo.tryGetInstance(this.world).ifPresent(trackInfo -> this.tryGetOwnerId().ifPresent(uuid ->
+//                    trackInfo.tracks().getOrDefault(uuid, new CircularList<>()).tryFindValue(node ->
+//                            node.getStartPos() == this.getCurrentNode().getStartPos()).ifPresent(node -> {
+//                        this.setCurrentNode(node);
+//                        this.adjustVelocityForNewRail();
+//                        this.physicsSetter(Pair.of(CoasterPhysics.KEY_PROGRESS, FloatNBT.valueOf(0F)));
+//                    })));
         });
     }
 

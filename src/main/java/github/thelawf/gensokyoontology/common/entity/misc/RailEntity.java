@@ -6,6 +6,7 @@ import github.thelawf.gensokyoontology.common.util.math.CurveUtil;
 import github.thelawf.gensokyoontology.common.util.math.RotMatrix;
 import github.thelawf.gensokyoontology.core.init.EntityRegistry;
 import github.thelawf.gensokyoontology.common.util.math.DerivativeInfo;
+import github.thelawf.gensokyoontology.data.CoasterPhysics;
 import github.thelawf.gensokyoontology.data.GSKOSerializers;
 import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
 import net.minecraft.client.world.ClientWorld;
@@ -364,6 +365,9 @@ public class RailEntity extends Entity {
         public final Color4i color;
         Type(Color4i color) {
             this.color = color;
+        }
+        public CoasterPhysics physics(){
+            return CoasterPhysics.PHYSICS_MAP.get(this);
         }
     }
 

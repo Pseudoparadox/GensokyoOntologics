@@ -3,6 +3,7 @@ package github.thelawf.gensokyoontology.data;
 import com.mojang.datafixers.util.Pair;
 import github.thelawf.gensokyoontology.api.INBTWriter;
 import github.thelawf.gensokyoontology.api.util.CircularList;
+import github.thelawf.gensokyoontology.api.util.CircularNode;
 import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.nbt.GSKONBTUtil;
@@ -45,6 +46,10 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
         this.markDirty();
     }
 
+    public Maybe<HermiteNodeInfo> tryGetNextNode(UUID first, BlockPos prevNode){
+        return this.tracks.get(first).tryFind(node -> node.getStartPos().toLong() == prevNode.toLong())
+                .map(CircularNode::value);
+    }
 
     public void removeNode(BlockPos removedPos){
         this.getAllRegisteredPos().stream().filter(this::containsPosition).findFirst()

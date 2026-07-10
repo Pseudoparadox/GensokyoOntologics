@@ -1,10 +1,11 @@
-package github.thelawf.gensokyoontology.common.entity;
+package github.thelawf.gensokyoontology.common.entity.trade;
 
 import com.mojang.datafixers.util.Pair;
 import github.thelawf.gensokyoontology.api.Functions;
 import github.thelawf.gensokyoontology.api.INBTWriter;
 import github.thelawf.gensokyoontology.api.entity.IEntityDataAccessible;
 import github.thelawf.gensokyoontology.api.util.Maybe;
+import github.thelawf.gensokyoontology.common.entity.AffiliatedEntity;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.util.math.CurveUtil;
 import github.thelawf.gensokyoontology.data.CoasterPhysics;

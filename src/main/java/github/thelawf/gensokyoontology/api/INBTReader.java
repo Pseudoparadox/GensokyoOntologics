@@ -86,6 +86,7 @@ public interface INBTReader {
         Float f = maybe.get();
         return f == null ? or : f;
     }
+
     default <T extends INBT, S extends ISynchornizable<T, S>> List<S> readList(String key, CompoundNBT nbt, S instance, Function<INBT, T> function){
         if (!nbt.contains(key)) return new ArrayList<>();
         if (!(nbt.get(key) instanceof ListNBT)) return new ArrayList<>();

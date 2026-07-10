@@ -73,7 +73,6 @@ public class CoasterPhysics implements INBTWriter, ISynchornizable<CompoundNBT, 
     }
 
 
-
     @Override
     public CoasterPhysics copy() {
         return new CoasterPhysics().setProperties(this.properties);
@@ -81,8 +80,12 @@ public class CoasterPhysics implements INBTWriter, ISynchornizable<CompoundNBT, 
     @SafeVarargs
     public final <T extends INBT> CoasterPhysics copyAndSet(Pair<String, T>... setter){
         CoasterPhysics physics = new CoasterPhysics().setProperties(this.properties);
-        Stream.of(setter).forEach(p -> this.set(p.getFirst(), p.getSecond()));
-        return this;
+        CompoundNBT nbt = new CompoundNBT();
+        Stream.of(setter).forEach(p -> {
+            nbt.put(p.getFirst(), p.getSecond());
+        });
+        physics.setProperties(nbt);
+        return physics;
     }
 
     @Override
