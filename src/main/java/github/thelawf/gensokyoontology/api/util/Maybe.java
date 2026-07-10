@@ -1,5 +1,7 @@
 package github.thelawf.gensokyoontology.api.util;
 
+import net.minecraftforge.common.util.NonNullFunction;
+
 import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -53,7 +55,7 @@ public class Maybe<T> {
         return this;
     }
 
-    public <T1> Maybe<T1> map(Function<T, T1> mapper){
+    public <T1> Maybe<T1> map(NonNullFunction<T, T1> mapper){
         if (this.value == null) return Maybe.empty();
         return Maybe.ofNullable(mapper.apply(this.value));
     }

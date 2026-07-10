@@ -74,6 +74,8 @@ public class RailConnector extends Item implements IRayTracer {
 
         if (player == null) return ActionResultType.PASS;
         if (world.isRemote) return ActionResultType.PASS;
+        if (stack.getTag() == null) return ActionResultType.PASS;
+
         ServerWorld serverWorld = (ServerWorld) world;
         Entity entity = EntityRegistry.RAIL_ENTITY.get().spawn(serverWorld, stack, player, pos.up(), SpawnReason.TRIGGERED, false, false);
 
@@ -81,20 +83,6 @@ public class RailConnector extends Item implements IRayTracer {
         RailEntity rail = (RailEntity) entity;
         this.onPlaceNextRail(world, player, rail, stack);
         return ActionResult.func_233538_a_(stack, false).getType();
-    }
-
-    @Override
-    public void addInformation(@NotNull ItemStack stack, World worldIn, @NotNull List<ITextComponent> tooltip, @NotNull ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
-        if (stack.getTag() == null) return;
-        if (worldIn == null) return;
-        if (stack.getTag().contains("prev_pos")) {
-            BlockPos pos = BlockPos.fromLong(stack.getTag().getLong("prev_pos"));
-            tooltip.add(GSKOUtil.translateText("tooltip.", ".coaster_rail.place_connect"));
-            tooltip.add(GSKOUtil.translateText("tooltip.", ".coaster_rail.connect"));
-            tooltip.add(GSKOUtil.translateText("tooltip.", ".coaster_rail.start_pos").appendSibling(
-                    GSKOUtil.stringText("§a(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ")")));
-        }
     }
 
     private void onPlaceNextRail(World world, @NotNull PlayerEntity player,
@@ -108,13 +96,13 @@ public class RailConnector extends Item implements IRayTracer {
             RailEntity startRail = (RailEntity) entity;
             startRail.setNextId(targetRail.getUniqueID());
             startRail.setNextPos(targetRail.getPosition());
-            connector.shrink(1);
-            this.setNextStartRail(player, targetRail);
 
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-            TrackInfo.tryGetInstance(serverWorld)
-                    .ifPresent(info -> this.tryGetFirstRail(serverWorld, connector)
-                            .ifPresent(first -> info.addRailNode(startRail.getUniqueID(), HermiteNodeInfo.from(first))));
+            TrackInfo.tryGetInstance(serverWorld).ifPresent(info ->
+                    this.tryGetFirstRail(serverWorld, connector).ifPresent(first -> {
+                        info.addRailNode(first.getUniqueID(), HermiteNodeInfo.from(targetRail));
+                        this.setNextStartRail(connector, connector.getTag(), targetRail);
+                    }));
             GSKONetworking.sendToClientPlayer(new S2CRenderRailPacket(startRail.getEntityId(),
                     targetRail.getEntityId()), serverPlayer);
         });
@@ -127,18 +115,13 @@ public class RailConnector extends Item implements IRayTracer {
                 .map(entity -> (RailEntity)entity);
     }
 
-
     private Optional<Entity> getStartRail(ServerWorld world, UUID uuid) {
         return Optional.ofNullable(world.getEntityByUuid(uuid));
     }
 
-    private void setNextStartRail(@NotNull PlayerEntity player, RailEntity rail) {
-        ItemStack connector = new ItemStack(ItemRegistry.RAIL_CONNECTOR.get());
-        CompoundNBT nbt = new CompoundNBT();
-        nbt.putUniqueId("uuid", rail.getUniqueID());
-        connector.setTag(nbt);
-
-        player.addItemStackToInventory(connector);
+    private void setNextStartRail(ItemStack connector, @NotNull CompoundNBT tag, RailEntity rail) {
+        tag.putUniqueId("uuid", rail.getUniqueID());
+       connector.setTag(tag);
     }
 
     private void connect(@NotNull PlayerEntity player, World world, ItemStack connector, RailEntity nextRail){
@@ -156,5 +139,19 @@ public class RailConnector extends Item implements IRayTracer {
             GSKONetworking.sendToClientPlayer(new S2CRenderRailPacket(startRail.getEntityId(),
                     nextRail.getEntityId()), serverPlayer);
         });
+    }
+
+    @Override
+    public void addInformation(@NotNull ItemStack stack, World worldIn, @NotNull List<ITextComponent> tooltip, @NotNull ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+        if (stack.getTag() == null) return;
+        if (worldIn == null) return;
+        if (stack.getTag().contains("prev_pos")) {
+            BlockPos pos = BlockPos.fromLong(stack.getTag().getLong("prev_pos"));
+            tooltip.add(GSKOUtil.translateText("tooltip.", ".coaster_rail.place_connect"));
+            tooltip.add(GSKOUtil.translateText("tooltip.", ".coaster_rail.connect"));
+            tooltip.add(GSKOUtil.translateText("tooltip.", ".coaster_rail.start_pos").appendSibling(
+                    GSKOUtil.stringText("§a(" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ")")));
+        }
     }
 }

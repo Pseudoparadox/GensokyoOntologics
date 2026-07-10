@@ -79,6 +79,8 @@ public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT,
     @Override
     public CompoundNBT serializeNBT() {
         CompoundNBT compound = new CompoundNBT();
+
+        compound.putLong("start", this.startPos);
         compound.putLong("endPosOffset", this.endPosOffset);
 
         compound.putFloat("prev_qx", this.prevRotation.getX());

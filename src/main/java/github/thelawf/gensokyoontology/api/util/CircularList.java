@@ -2,10 +2,7 @@ package github.thelawf.gensokyoontology.api.util;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -178,6 +175,219 @@ public class CircularList<T> implements Comparable<CircularNode<T>> {
                 .findFirst();
 
         return nodeOpt.map(this::remove).orElse(false);
+    }
+
+    /**
+     * 替换指定节点的值
+     * @param oldNode 要替换的旧节点
+     * @param newValue 新的值
+     * @return 是否替换成功
+     */
+    public boolean replace(CircularNode<T> oldNode, T newValue) {
+        if (oldNode == null || !nodes.contains(oldNode)) {
+            return false;
+        }
+
+        // 创建新节点
+        CircularNode<T> newNode = new CircularNode<>(newValue);
+
+        // 复制旧节点的连接关系
+        newNode.setPrev(oldNode.prev());
+        newNode.setNext(oldNode.next());
+
+        // 更新前后节点的连接
+        if (oldNode.prev() != null) {
+            oldNode.prev().setNext(newNode);
+        }
+        if (oldNode.next() != null) {
+            oldNode.next().setPrev(newNode);
+        }
+
+        // 更新head和tail
+        if (oldNode == head) {
+            head = newNode;
+        }
+        if (oldNode == tail) {
+            tail = newNode;
+        }
+
+        // 更新nodes列表
+        int index = nodes.indexOf(oldNode);
+        nodes.set(index, newNode);
+
+        // 清理旧节点
+        oldNode.setPrev(null);
+        oldNode.setNext(null);
+
+        return true;
+    }
+
+    /**
+     * 替换满足条件的第一个节点的值
+     */
+    public boolean replaceIf(Predicate<T> predicate, T newValue) {
+        Optional<CircularNode<T>> nodeOpt = nodes.stream()
+                .filter(n -> predicate.test(n.value()))
+                .findFirst();
+
+        return nodeOpt.map(node -> replace(node, newValue)).orElse(false);
+    }
+
+    /**
+     * 替换指定节点为另一个节点
+     * @param oldNode 要替换的旧节点
+     * @param newNode 新节点
+     * @return 是否替换成功
+     */
+    public boolean replaceNode(CircularNode<T> oldNode, CircularNode<T> newNode) {
+        if (oldNode == null || newNode == null || !nodes.contains(oldNode)) {
+            return false;
+        }
+
+        // 确保新节点不在当前链表中
+        if (nodes.contains(newNode)) {
+            throw new IllegalArgumentException("New node already exists in the list");
+        }
+
+        // 复制旧节点的连接关系
+        newNode.setPrev(oldNode.prev());
+        newNode.setNext(oldNode.next());
+
+        // 更新前后节点的连接
+        if (oldNode.prev() != null) {
+            oldNode.prev().setNext(newNode);
+        }
+        if (oldNode.next() != null) {
+            oldNode.next().setPrev(newNode);
+        }
+
+        // 更新head和tail
+        if (oldNode == head) {
+            head = newNode;
+        }
+        if (oldNode == tail) {
+            tail = newNode;
+        }
+
+        // 更新nodes列表
+        int index = nodes.indexOf(oldNode);
+        nodes.set(index, newNode);
+
+        // 清理旧节点
+        oldNode.setPrev(null);
+        oldNode.setNext(null);
+
+        return true;
+    }
+
+    /**
+     * 替换满足条件的第一个节点为另一个节点
+     */
+    public boolean replaceIf(Predicate<T> predicate, CircularNode<T> newNode) {
+        Optional<CircularNode<T>> nodeOpt = nodes.stream()
+                .filter(n -> predicate.test(n.value()))
+                .findFirst();
+
+        return nodeOpt.map(node -> replaceNode(node, newNode)).orElse(false);
+    }
+
+    /**
+     * 批量替换节点值
+     * @param predicate 匹配条件
+     * @param newValue 新值
+     * @return 替换的节点数量
+     */
+    public int replaceAll(Predicate<T> predicate, T newValue) {
+        int count = 0;
+        List<CircularNode<T>> toReplace = nodes.stream()
+                .filter(n -> predicate.test(n.value()))
+                .collect(Collectors.toList());
+
+        for (CircularNode<T> node : toReplace) {
+            if (replace(node, newValue)) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * 交换两个节点的位置
+     * @param node1 第一个节点
+     * @param node2 第二个节点
+     * @return 是否交换成功
+     */
+    public boolean swap(CircularNode<T> node1, CircularNode<T> node2) {
+        if (node1 == null || node2 == null || node1 == node2 ||
+                !nodes.contains(node1) || !nodes.contains(node2)) {
+            return false;
+        }
+
+        // 保存节点1的连接信息
+        CircularNode<T> prev1 = node1.prev();
+        CircularNode<T> next1 = node1.next();
+
+        // 保存节点2的连接信息
+        CircularNode<T> prev2 = node2.prev();
+        CircularNode<T> next2 = node2.next();
+
+        // 处理特殊情况：相邻节点
+        boolean adjacent = (next1 == node2) || (next2 == node1);
+
+        if (adjacent) {
+            // node1和node2相邻
+            if (next1 == node2) {
+                // node1 -> node2
+                node1.setNext(next2);
+                node2.setPrev(prev1);
+                node2.setNext(node1);
+                node1.setPrev(node2);
+
+                if (prev1 != null) prev1.setNext(node2);
+                if (next2 != null) next2.setPrev(node1);
+            } else {
+                // node2 -> node1
+                node2.setNext(next1);
+                node1.setPrev(prev2);
+                node1.setNext(node2);
+                node2.setPrev(node1);
+
+                if (prev2 != null) prev2.setNext(node1);
+                if (next1 != null) next1.setPrev(node2);
+            }
+        } else {
+            // 非相邻节点
+            node1.setPrev(prev2);
+            node1.setNext(next2);
+            node2.setPrev(prev1);
+            node2.setNext(next1);
+
+            if (prev1 != null) prev1.setNext(node2);
+            if (next1 != null) next1.setPrev(node2);
+            if (prev2 != null) prev2.setNext(node1);
+            if (next2 != null) next2.setPrev(node1);
+        }
+
+        // 更新head和tail
+        if (node1 == head) {
+            head = node2;
+        } else if (node2 == head) {
+            head = node1;
+        }
+
+        if (node1 == tail) {
+            tail = node2;
+        } else if (node2 == tail) {
+            tail = node1;
+        }
+
+        // 更新nodes列表中的顺序
+        int index1 = nodes.indexOf(node1);
+        int index2 = nodes.indexOf(node2);
+        Collections.swap(nodes, index1, index2);
+
+        return true;
     }
 
     /**

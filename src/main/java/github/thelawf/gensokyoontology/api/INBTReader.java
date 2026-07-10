@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public interface INBTReader {
@@ -77,13 +78,13 @@ public interface INBTReader {
         return list;
     }
 
-    default Maybe<Float> readFloat(String key, CompoundNBT nbt){
-        return Functions.NBT_2_FLOAT.apply(nbt.get(key));
-    }
-
     default float readFloatOr(String key, CompoundNBT nbt, float or)
     {
-        return this.readFloat(key, nbt).isPresent() ? this.readFloat(key, nbt).get() : or;
+        INBT inbt = nbt.get(key);
+        if (inbt == null) return or;
+        Maybe<Float> maybe = Functions.NBT_2_FLOAT.apply(inbt);
+        Float f = maybe.get();
+        return f == null ? or : f;
     }
     default <T extends INBT, S extends ISynchornizable<T, S>> List<S> readList(String key, CompoundNBT nbt, S instance, Function<INBT, T> function){
         if (!nbt.contains(key)) return new ArrayList<>();

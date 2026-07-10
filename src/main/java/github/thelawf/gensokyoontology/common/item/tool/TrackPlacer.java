@@ -94,10 +94,7 @@ public class TrackPlacer extends Item implements IRayTracer {
         RailEntity rail = (RailEntity) entity;
 
         rail.setRotation(Quaternion.ONE);
-        TrackInfo.tryGetInstance(player.world).ifPresent(info -> {
-            info.addTracks(rail);
-            info.addRailNode(rail.getUniqueID(), HermiteNodeInfo.from(rail));
-        });
+        TrackInfo.tryGetInstance(player.world).ifPresent(info -> info.addTracks(rail));
         stack.shrink(1);
         return this.setFirstRail(player, rail);
     }

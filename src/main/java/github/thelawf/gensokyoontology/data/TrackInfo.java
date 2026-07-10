@@ -39,6 +39,13 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
         this.markDirty();
     }
 
+    public void replaceNodeValue(BlockPos nodePos, HermiteNodeInfo newValue){
+        this.tracks.values().stream().anyMatch(list ->
+                list.replaceIf(node -> node.getStartPos() == nodePos, newValue));
+        this.markDirty();
+    }
+
+
     public void removeNode(BlockPos removedPos){
         this.getAllRegisteredPos().stream().filter(this::containsPosition).findFirst()
                 .ifPresent(blockPos -> this.tracks.forEach((uuid, circularList) ->
@@ -49,6 +56,7 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
     private boolean containsPosition(BlockPos pos){
         return this.getAllRegisteredPos().stream().anyMatch(blockPos -> blockPos == pos);
     }
+
 
     private List<BlockPos> getAllRegisteredPos(){
         List<BlockPos> list = new ArrayList<>();

@@ -215,10 +215,7 @@ public class CoasterVehicleEntity extends AffiliatedEntity implements INBTWriter
 
         // 计算Hermite曲线上的位置
         Vector3d newPosition = this.calculatePositionOnRail(progress);
-        this.setPosition(newPosition.x, newPosition.y, newPosition.z);
-
-        // 计算并应用旋转（使载具面向运动方向）
-        this.updateRotation();
+        this.setPositionAndUpdate(newPosition.x, newPosition.y, newPosition.z);
     }
 
     private Vector3d calculatePositionOnRail(float t) {
