@@ -25,6 +25,10 @@ public class CircularNode<T> implements ICircularNode<T, CircularNode<T>>{
         return this.value;
     }
 
+    public Maybe<CircularNode<T>> tryGetNext(){
+        return this.next == null ? Maybe.empty() : Maybe.ofNullable(this.next);
+    }
+
     @Override
     public void setPrev(CircularNode<T> node) {
         this.prev = node;

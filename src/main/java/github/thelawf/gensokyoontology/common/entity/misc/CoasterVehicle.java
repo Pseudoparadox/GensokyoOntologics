@@ -297,13 +297,12 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     private void checkNextRail() {
         this.tryGetProgress().ifPresent(progress -> {
             if (progress < 1.0F) return;
-            TrackInfo.tryGetInstance(this.world).ifPresent(track -> this.tryGetOwnerId()
-                    .ifPresent(uuid -> track.tryGetNextNode(uuid, this.getCurrentNode().getStartPos())
-                            .ifPresent(node -> {
-                                this.setCurrentNode(node);
-                                this.adjustVelocityForNewRail();
-                                this.setPhysics(node.getRailType().physics());
-                            })));
+            TrackInfo.tryGetInstance(this.world).ifPresent(track ->
+                    track.tryGetNextNode(this.getCurrentNode().getEndPos()).ifPresent(node -> {
+                        this.setCurrentNode(node.next().value());
+                        this.adjustVelocityForNewRail();
+                        this.setPhysics(node.next().value().getRailType().physics());
+                    }));
 //            TrackInfo.tryGetInstance(this.world).ifPresent(trackInfo -> this.tryGetOwnerId().ifPresent(uuid ->
 //                    trackInfo.tracks().getOrDefault(uuid, new CircularList<>()).tryFindValue(node ->
 //                            node.getStartPos() == this.getCurrentNode().getStartPos()).ifPresent(node -> {

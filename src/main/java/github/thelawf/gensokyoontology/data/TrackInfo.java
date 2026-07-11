@@ -50,6 +50,10 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
         return this.tracks.get(first).tryFind(node -> node.getStartPos().toLong() == prevNode.toLong())
                 .map(CircularNode::value);
     }
+    public Maybe<CircularNode<HermiteNodeInfo>> tryGetNextNode(BlockPos prevPos){
+        return Maybe.from(this.tracks.entrySet().stream().flatMap(entry -> entry.getValue().toNodeList().stream())
+                .filter(node -> node.value().getStartPos().toLong() == prevPos.toLong()).findFirst());
+    }
 
     public void removeNode(BlockPos removedPos){
         this.getAllRegisteredPos().stream().filter(this::containsPosition).findFirst()
