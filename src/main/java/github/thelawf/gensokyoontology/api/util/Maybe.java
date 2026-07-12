@@ -28,12 +28,16 @@ public class Maybe<T> {
         return true;
     }
 
-    public void set(T value){
+    public void set(@Nullable T value){
         this.value = value;
     }
 
     public @Nullable T get(){
         return this.value;
+    }
+
+    public boolean where(){
+        return false;
     }
 
     public boolean isPresent(){

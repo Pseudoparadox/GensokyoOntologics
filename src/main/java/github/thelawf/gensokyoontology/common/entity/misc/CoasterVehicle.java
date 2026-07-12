@@ -3,14 +3,12 @@ package github.thelawf.gensokyoontology.common.entity.misc;
 import com.mojang.datafixers.util.Pair;
 import github.thelawf.gensokyoontology.api.Functions;
 import github.thelawf.gensokyoontology.api.INBTWriter;
-import github.thelawf.gensokyoontology.api.util.CircularList;
 import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.AffiliatedEntity;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.common.util.math.CurveUtil;
 import github.thelawf.gensokyoontology.common.util.math.GSKOMathUtil;
 import github.thelawf.gensokyoontology.core.init.ItemRegistry;
-import github.thelawf.gensokyoontology.common.util.math.DerivativeInfo;
 import github.thelawf.gensokyoontology.data.CoasterPhysics;
 import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
 import github.thelawf.gensokyoontology.data.TrackInfo;
@@ -113,6 +111,7 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
         super.tick();
 
         if (this.world.isRemote) return;
+        GSKOUtil.log("time = " + this.progress() + ", This: " + this.getCurrentNode().getStartPos() + ", Next: " + this.getCurrentNode().getEndPos());
         this.updatePhysics();
         this.updatePosition();
         this.checkNextRail();
@@ -168,8 +167,7 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
         }
 
         // 应用摩擦和空气阻力
-        this.setMotionSpeed(MAX_SPEED * FRICTION_COEFFICIENT);
-        this.setMotionSpeed(MAX_SPEED * AIR_RESISTANCE);
+        this.setMotionSpeed(MAX_SPEED * AIR_RESISTANCE * FRICTION_COEFFICIENT);
         this.physicsSetter(Pair.of(CoasterPhysics.KEY_VELOCITY, FloatNBT.valueOf(this.motionSpeed())));
     }
 
@@ -298,18 +296,15 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
         this.tryGetProgress().ifPresent(progress -> {
             if (progress < 1.0F) return;
             TrackInfo.tryGetInstance(this.world).ifPresent(track ->
-                    track.tryGetNextNode(this.getCurrentNode().getEndPos()).ifPresent(node -> {
-                        this.setCurrentNode(node.next().value());
-                        this.adjustVelocityForNewRail();
-                        this.setPhysics(node.next().value().getRailType().physics());
-                    }));
-//            TrackInfo.tryGetInstance(this.world).ifPresent(trackInfo -> this.tryGetOwnerId().ifPresent(uuid ->
-//                    trackInfo.tracks().getOrDefault(uuid, new CircularList<>()).tryFindValue(node ->
-//                            node.getStartPos() == this.getCurrentNode().getStartPos()).ifPresent(node -> {
-//                        this.setCurrentNode(node);
-//                        this.adjustVelocityForNewRail();
-//                        this.physicsSetter(Pair.of(CoasterPhysics.KEY_PROGRESS, FloatNBT.valueOf(0F)));
-//                    })));
+                    track.tryFindFirst(this.world, this.getCurrentNode()).ifPresent(first -> {
+                GSKOUtil.log(track.tryFindNext(this.getCurrentNode()).isPresent());
+                        track.tryFindNext(this.getCurrentNode()).ifPresent(next -> {
+                            this.setCurrentNode(next);
+                            this.adjustVelocityForNewRail();
+                            this.setPhysics(next.getRailType().physics());
+                        });
+                    }
+                    ));
         });
     }
 
@@ -365,44 +360,6 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     @Override
     public void notifyDataManagerChange(DataParameter<?> key) {
         super.notifyDataManagerChange(key);
-    }
-
-    private DerivativeInfo interpolate(RailEntity start, RailEntity end,
-                             double t) {
-        Vector3d p0 = start.getPositionVec();
-        Vector3d p1 = end.getPositionVec();
-        Vector3d m0 = new Vector3d(start.getOrientation());
-        Vector3d m1 = new Vector3d(end.getOrientation());
-
-        // 使用Hermite插值
-        double t2 = t * t;
-        double t3 = t2 * t;
-
-        double h1 = 2*t3 - 3*t2 + 1;
-        double h2 = -2*t3 + 3*t2;
-        double h3 = t3 - 2*t2 + t;
-        double h4 = t3 - t2;
-
-        // 位置计算
-        Vector3d pos = new Vector3d(
-                h1 * p0.x + h2 * p1.x + h3 * m0.x + h4 * m1.x,
-                h1 * p0.y + h2 * p1.y + h3 * m0.y + h4 * m1.y,
-                h1 * p0.z + h2 * p1.z + h3 * m0.z + h4 * m1.z
-        );
-
-        // 导数计算（一阶）
-        double dh1 = 6*t2 - 6*t;
-        double dh2 = -6*t2 + 6*t;
-        double dh3 = 3*t2 - 4*t + 1;
-        double dh4 = 3*t2 - 2*t;
-
-        Vector3d deriv = new Vector3d(
-                dh1 * p0.x + dh2 * p1.x + dh3 * m0.x + dh4 * m1.x,
-                dh1 * p0.y + dh2 * p1.y + dh3 * m0.y + dh4 * m1.y,
-                dh1 * p0.z + dh2 * p1.z + dh3 * m0.z + dh4 * m1.z
-        );
-
-        return new DerivativeInfo(pos, deriv, Vector3d.ZERO);
     }
 
 }

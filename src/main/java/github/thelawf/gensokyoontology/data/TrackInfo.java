@@ -7,6 +7,7 @@ import github.thelawf.gensokyoontology.api.util.CircularNode;
 import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.nbt.GSKONBTUtil;
+import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -45,15 +46,70 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
                 list.replaceIf(node -> node.getStartPos() == nodePos, newValue));
         this.markDirty();
     }
-
-    public Maybe<HermiteNodeInfo> tryGetNextNode(UUID first, BlockPos prevNode){
+    public Maybe<HermiteNodeInfo> tryFindNext(UUID first, HermiteNodeInfo prevNode){
+        return this.tracks.get(first).tryFind(node -> node.getStartPos().toLong() == prevNode.getStartPos().toLong())
+                .map(CircularNode::value);
+    }
+    public Maybe<HermiteNodeInfo> tryFindNext(UUID first, BlockPos prevNode){
         return this.tracks.get(first).tryFind(node -> node.getStartPos().toLong() == prevNode.toLong())
                 .map(CircularNode::value);
     }
-    public Maybe<CircularNode<HermiteNodeInfo>> tryGetNextNode(BlockPos prevPos){
+    public Maybe<CircularNode<HermiteNodeInfo>> tryFindNext(BlockPos prevPos){
         return Maybe.from(this.tracks.entrySet().stream().flatMap(entry -> entry.getValue().toNodeList().stream())
                 .filter(node -> node.value().getStartPos().toLong() == prevPos.toLong()).findFirst());
     }
+
+    public Optional<CircularList<HermiteNodeInfo>> getCircularListWhichContains(HermiteNodeInfo nodeInfo){
+        return this.tracks.values().stream().filter(list -> {
+                    boolean flag = list.toNodeList().stream().anyMatch(node ->
+                            node.value().getStartPos().toLong() == nodeInfo.getEndPos().toLong());
+
+                    return flag;
+        }).findAny();
+    }
+    public Optional<CircularList<HermiteNodeInfo>> getCircularListWhichContains(BlockPos nodePos){
+        return this.tracks.values().stream().filter(list -> list.tryFind(node -> {
+
+            return node.getStartPos().toLong() == nodePos.toLong();
+        }).isPresent()).findFirst();
+    }
+
+    public Maybe<RailEntity> tryFindFirst(World world, HermiteNodeInfo node){
+        if (!(world instanceof ServerWorld)) return Maybe.empty();
+        ServerWorld serverWorld = (ServerWorld) world;
+        Maybe<UUID> maybe = Maybe.empty();
+        Maybe<RailEntity> entity = Maybe.empty();
+        this.getCircularListWhichContains(node).ifPresent(list ->
+                this.tracks.forEach((key, value) -> {
+                    if (value.equals(list)) maybe.set(key);
+        }));
+
+        maybe.ifPresent(uuid -> entity.set((RailEntity) serverWorld.getEntityByUuid(uuid)));
+        return entity;
+    }
+
+    public Maybe<HermiteNodeInfo> tryFindNext(HermiteNodeInfo prevNode){
+        Maybe<HermiteNodeInfo> maybe = Maybe.empty();
+        this.getCircularListWhichContains(prevNode.getEndPos()).ifPresent(list ->
+        {
+            GSKOUtil.log("Try Find: " + list.tryFind(node -> node.getStartPos().toLong() == prevNode.getEndPos().toLong()).isPresent());
+            GSKOUtil.log("Node Start: " + prevNode.getStartPos() + ", Node End: " + prevNode.getEndPos());
+            list.tryFind(node -> node.getStartPos().toLong() == prevNode.getEndPos().toLong())
+                    .ifPresent(node -> node.tryGetNext().ifPresent(current -> {
+                        current.tryGetNext().ifPresent(next -> maybe.set(
+                                HermiteNodeInfo.of(current.value().getRailType(),
+                                        current.value().getStartPos(), next.value().getStartPos(),
+                                        current.value().rotation0(), next.value().rotation0())
+                                        .setPrevScale(current.value().scale0())
+                                        .setNextScale(next.value().scale0())
+                                        .setAutoSmooth(current.value().shouldAutoSmooth())
+                                        .setFlipNormal(current.value().shouldFlipNormal())
+                        ));
+                    }));
+        });
+        return maybe;
+    }
+
 
     public void removeNode(BlockPos removedPos){
         this.getAllRegisteredPos().stream().filter(this::containsPosition).findFirst()
@@ -106,7 +162,8 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
         List<Pair<UUID, List<HermiteNodeInfo>>> entries = this.readCompoundList("tracks", nbt, compound -> {
             HermiteNodeInfo info = HermiteNodeInfo.EMPTY;
             info.deserializeNBT(compound);
-            return Pair.of(compound.getUniqueId("startRail"), this.readList("splines", compound, info, inbt -> (CompoundNBT) inbt));
+            return Pair.of(compound.getUniqueId("startRail"),
+                    this.readList("splines", compound, info, inbt -> (CompoundNBT) inbt));
         });
         if (entries.isEmpty()) return;
         this.tracks.clear();
