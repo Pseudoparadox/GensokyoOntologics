@@ -111,7 +111,6 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
         super.tick();
 
         if (this.world.isRemote) return;
-        GSKOUtil.log("time = " + this.progress() + ", This: " + this.getCurrentNode().getStartPos() + ", Next: " + this.getCurrentNode().getEndPos());
         this.updatePhysics();
         this.updatePosition();
         this.checkNextRail();

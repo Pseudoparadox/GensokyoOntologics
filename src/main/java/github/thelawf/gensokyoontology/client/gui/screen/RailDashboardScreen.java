@@ -29,7 +29,9 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
 
     private final int startEntityId;
     private final BlockPos position;
-    private Quaternion rotation;
+    private final BlockPos endPosOffset;
+    private Quaternion rotation0;
+    private Quaternion rotation1;
 
     private final java.util.Map<Integer, TextFieldWidget> axisFieldMap = new java.util.HashMap<>();
     private TextFieldWidget startScale;
@@ -72,7 +74,9 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
     public RailDashboardScreen(BlockPos pos, HermiteNodeInfo node, int entityId) {
         super(TITLE);
         this.position = pos;
-        this.rotation = node.rotation0().copy();
+        this.endPosOffset = node.getEndPos().subtract(node.getStartPos());
+        this.rotation0 = node.rotation0().copy();
+        this.rotation1 = node.rotation1().copy();
         this.startEntityId = entityId;
         this.railType = node.getRailType();
         this.scale0 = node.scale0();
@@ -88,8 +92,8 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
 
         qz.multiply(qx);
         qz.multiply(qy);      // Qz * Qx * Qy
-        qz.multiply(rotation);
-        this.rotation = qz;
+        qz.multiply(rotation0);
+        this.rotation0 = qz;
     }
 
     private void step(int axis, float sign, float mag) {
@@ -105,7 +109,7 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
     }
 
     private void setRotationText() {
-        EulerAngle e = RotMatrix.from(this.rotation).toEulerAngle();
+        EulerAngle e = RotMatrix.from(this.rotation0).toEulerAngle();
         float p = e.pitch(), y = e.yaw(), r = e.roll();
 
         TextFieldWidget fp = axisFieldMap.get(0);
@@ -119,7 +123,7 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
 
     private void sendPacketToServer() {
         GSKONetworking.CHANNEL.sendToServer(new CAdjustRailPacket(
-                HermiteNodeInfo.of(this.railType, this.position, BlockPos.ZERO, this.rotation, Quaternion.ONE)
+                HermiteNodeInfo.of(this.railType, this.position, this.endPosOffset, this.rotation0, this.rotation1)
                         .setPrevScale(this.scale0)
                         .setNextScale(this.scale1)
                         .setAutoSmooth(this.autoScale)
@@ -167,7 +171,7 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
             this.sendPacketToServer();
         }));
         this.addButton(new Button(x + labelWidth + 55, y, labelWidth + 40, 20, RESET_ROT, b -> {
-            this.rotation = Quaternion.ONE;
+            this.rotation0 = Quaternion.ONE;
             this.setRotationText();
             this.sendPacketToServer();
         }));
@@ -194,7 +198,7 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
         field.setTextColor(0xFFFFFF);
 
         // 初始值：从当前四元数反算
-        EulerAngle e = RotMatrix.from(rotation).toEulerAngle();
+        EulerAngle e = RotMatrix.from(rotation0).toEulerAngle();
         float initVal;
         switch (axis) {
             case 0 : initVal = e.pitch(); break;
@@ -292,13 +296,13 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
             return;
         }
 
-        EulerAngle cur = RotMatrix.from(rotation).toEulerAngle();
+        EulerAngle cur = RotMatrix.from(rotation0).toEulerAngle();
         EulerAngle next;
         if (axis == 0)      next = EulerAngle.of(cur.yaw(),   val, cur.roll());
         else if (axis == 1) next = EulerAngle.of(val,         cur.pitch(), cur.roll());
         else                next = EulerAngle.of(cur.yaw(),   cur.pitch(), val);
 
-        this.rotation = next.toQuaternion();
+        this.rotation0 = next.toQuaternion();
         sendPacketToServer();
     }
 }
