@@ -3,6 +3,7 @@ package github.thelawf.gensokyoontology.data;
 import com.mojang.datafixers.util.Pair;
 import github.thelawf.gensokyoontology.api.INBTWriter;
 import github.thelawf.gensokyoontology.api.util.CircularList;
+import github.thelawf.gensokyoontology.api.util.CircularNode;
 import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.nbt.GSKONBTUtil;
@@ -15,12 +16,19 @@ import net.minecraft.world.storage.DimensionSavedDataManager;
 import net.minecraft.world.storage.WorldSavedData;
 
 import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
 public class TrackInfo extends WorldSavedData implements INBTWriter {
     private final Map<UUID, CircularList<HermiteNodeInfo>> tracks = new HashMap<>();
     private boolean isLooped;
     public static final String NAME = "TrackInfo";
+    public static final BiPredicate<BlockPos, BlockPos> SAME_POS =
+            (pos0, pos1) -> pos0.toLong() == pos1.toLong();
+    public static final BiPredicate<HermiteNodeInfo, HermiteNodeInfo> SAME_RAIL =
+            (info0, info1) -> SAME_POS.test(info0.getStartPos(), info1.getStartPos());
+    public static final BiPredicate<CircularNode<HermiteNodeInfo>, CircularNode<HermiteNodeInfo>> SAME_NODE =
+            (node0, node1) -> SAME_RAIL.test(node0.value(), node1.value());
 
     public TrackInfo(){
         super(NAME);
@@ -35,29 +43,34 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
     }
 
     public void addRailNode(ServerWorld serverWorld, UUID startRailId, HermiteNodeInfo newNode){
-        this.tracks.get(startRailId).addValue(newNode);
+        this.tracks.get(startRailId).addLast(newNode);
         this.markDirty();
     }
+
+//    public void replaceNode(ServerWorld serverWorld, UUID first, HermiteNodeInfo newValue){
+//        boolean b = this.tracks.values().stream().anyMatch(list ->
+//                list.replaceIf(node -> {
+//                    GSKOUtil.log(node.getStartPos().toLong() == nodePos.toLong());
+//                    return node.getStartPos().toLong() == nodePos.toLong();
+//                }, newValue));
+//        this.markDirty();
+//    }
 
     public void replaceNode(BlockPos nodePos, HermiteNodeInfo newValue){
         boolean b = this.tracks.values().stream().anyMatch(list ->
                 list.replaceIf(node -> {
-                    GSKOUtil.log(node.getStartPos().toLong() == nodePos.toLong());
+                    // GSKOUtil.log("ui pos: " + nodePos.toLong() + ", newly set pos: " + newValue.longId() + ", saved pos: " + node.longId());
                     return node.getStartPos().toLong() == nodePos.toLong();
                 }, newValue));
         this.markDirty();
     }
 
     public Optional<CircularList<HermiteNodeInfo>> findTracksBy(HermiteNodeInfo nodeInfo){
-        return this.tracks.values().stream().filter(list -> {
-            return list.toNodeList().stream().anyMatch(node ->{
-                boolean b = node.value().getStartPos().toLong() == nodeInfo.getStartPos().toLong();
-                        GSKOUtil.log(b);
-                        return b;
-                    }
-                    );
-        }).findAny();
+        return this.tracks.values().stream().filter(list -> list.toNodeList().stream().anyMatch(node ->{
+            return node.value().getStartPos().toLong() == nodeInfo.getStartPos().toLong();
+                })).findAny();
     }
+
     public Optional<CircularList<HermiteNodeInfo>> findTracksBy(BlockPos nodePos){
         return this.tracks.values().stream().filter(list ->
                 list.tryFind(node -> node.getStartPos().toLong() == nodePos.toLong()).isPresent()).findFirst();
@@ -71,7 +84,6 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
         this.findTracksBy(node).ifPresent(list ->
         {
             this.tracks.forEach((key, value) -> {
-                GSKOUtil.log(value.equals(list));
                 if (value.equals(list)) maybe.set(key);
             });
         });
@@ -84,20 +96,16 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
     public Maybe<HermiteNodeInfo> tryFindNext(HermiteNodeInfo prevNode){
         Maybe<HermiteNodeInfo> maybe = Maybe.empty();
         this.findTracksBy(prevNode.getStartPos()).ifPresent(list ->
-        {
-            GSKOUtil.log("Prev: " + prevNode);
-            list.tryFind(node -> node.getStartPos().toLong() == prevNode.getStartPos().toLong())
-                    .ifPresent(current -> current.tryGetNext().ifPresent(next -> {
-                        GSKOUtil.log("next: " + current.value().getStartPos());
-                        maybe.set(HermiteNodeInfo.of(current.value().getRailType(),
-                                        current.value().getStartPos(), next.value().getStartPos().subtract(current.value().getStartPos()),
-                                        current.value().rotation0(), next.value().rotation0())
-                                .setPrevScale(current.value().scale0())
-                                .setNextScale(next.value().scale0())
-                                .setAutoSmooth(current.value().shouldAutoSmooth())
-                                .setFlipNormal(current.value().shouldFlipNormal()));
-                    }));
-        });
+                list.tryFind(node -> node.getStartPos().toLong() == prevNode.getEndPos().toLong())
+                        .ifPresent(current -> current.tryGetNext().ifPresent(next -> {
+                            maybe.set(HermiteNodeInfo.of(current.value().getRailType(),
+                                            current.value().getStartPos(), next.value().getStartPos().subtract(current.value().getStartPos()),
+                                            current.value().rotation0(), next.value().rotation0())
+                                    .setPrevScale(current.value().scale0())
+                                    .setNextScale(next.value().scale0())
+                                    .setAutoSmooth(current.value().shouldAutoSmooth())
+                                    .setFlipNormal(current.value().shouldFlipNormal()));
+                        })));
         return maybe;
     }
 

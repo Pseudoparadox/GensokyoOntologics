@@ -3,6 +3,7 @@ package github.thelawf.gensokyoontology.common.entity.misc;
 import com.mojang.datafixers.util.Pair;
 import github.thelawf.gensokyoontology.api.Functions;
 import github.thelawf.gensokyoontology.api.INBTWriter;
+import github.thelawf.gensokyoontology.api.util.CircularList;
 import github.thelawf.gensokyoontology.api.util.CircularNode;
 import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.AffiliatedEntity;
@@ -301,15 +302,36 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
     private void checkNextRail() {
         this.tryGetProgress().ifPresent(progress -> {
             if (progress < 1.0F) return;
-            TrackInfo.tryGetInstance(this.world).ifPresent(track ->
-                    track.tryFindFirst(this.world, this.getCurrentNode()).ifPresent(first -> {
-                GSKOUtil.log(track.tryFindNext(this.getCurrentNode()).isPresent());
-                        track.tryFindNext(this.getCurrentNode()).ifPresent(next -> {
-                            this.setCurrentNode(next);
-                            this.adjustVelocityForNewRail();
-                            this.setPhysics(next.getRailType().physics());
-                        });
-                    }));
+            this.tryGetOwner().map(entity -> (RailEntity)entity).ifPresent(rail -> {
+                rail.getNextRail().ifPresent(next -> {
+                    HermiteNodeInfo nodeInfo = HermiteNodeInfo.from(next);
+                    GSKOUtil.log("?");
+                    GSKOUtil.log(nodeInfo.getStartPos() + " -> " + nodeInfo.getEndPos());
+                    this.setOwnerId(next.getUniqueID());
+                    this.setCurrentNode(nodeInfo);
+                    this.adjustVelocityForNewRail();
+                    this.setPhysics(nodeInfo.getRailType().physics());
+                });
+            });
+            // -4 80 24
+            // -18 80 0
+//            TrackInfo.tryGetInstance(this.world).ifPresent(track ->
+//                    this.getOwnerID().ifPresent(uuid -> {
+//                        CircularList<HermiteNodeInfo> list = track.tracks().get(uuid);
+//                        list.forEach(n -> GSKOUtil.log("id: " + n.value().longId() + ", this is: " + this.getCurrentNode().longId()));
+//                        list.stream().filter(node -> TrackInfo.SAME_POS.test(node.value().getStartPos(),
+//                                this.getCurrentNode().getEndPos())).findFirst().ifPresent(thisNode -> {
+//                            GSKOUtil.log("this is " + thisNode.value().longId() + ", next is " + thisNode.next().value().longId());
+//                            this.setCurrentNode(thisNode.next().value());
+//                            this.adjustVelocityForNewRail();
+//                            this.setPhysics(thisNode.next().value().getRailType().physics());
+//                        });
+//                        track.tryFindNext(this.getCurrentNode()).ifPresent(next -> {
+//                            this.setCurrentNode(next);
+//                            this.adjustVelocityForNewRail();
+//                            this.setPhysics(next.getRailType().physics());
+//                        });
+//                    }));
         });
     }
 

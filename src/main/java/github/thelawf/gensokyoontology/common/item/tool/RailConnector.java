@@ -97,6 +97,7 @@ public class RailConnector extends Item implements IRayTracer {
             RailEntity startRail = (RailEntity) entity;
             startRail.setNextId(targetRail.getUniqueID());
             startRail.setNextPos(targetRail.getPosition());
+            GSKOUtil.log(targetRail.getPosition());
 
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
             TrackInfo.tryGetInstance(serverWorld).ifPresent(info ->

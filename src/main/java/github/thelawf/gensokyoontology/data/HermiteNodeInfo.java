@@ -256,6 +256,10 @@ public class HermiteNodeInfo implements INBTWriter, ISynchornizable<CompoundNBT,
                 this.getRailType() == that.getRailType();
     }
 
+    public long longId(){
+        return this.startPos;
+    }
+
     @Override
     public int hashCode() {
         super.hashCode();

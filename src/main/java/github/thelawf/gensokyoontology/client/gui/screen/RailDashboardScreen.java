@@ -84,13 +84,12 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
         this.flipChirality = node.shouldFlipNormal();
         this.autoScale = node.shouldAutoSmooth();
 
-        this.sendPacketToServer();
     }
 
     @Override
     public void closeScreen() {
-        super.closeScreen();
         this.sendPacketToServer();
+        super.closeScreen();
     }
 
     private void applyDelta(float dYaw, float dPitch, float dRoll) {

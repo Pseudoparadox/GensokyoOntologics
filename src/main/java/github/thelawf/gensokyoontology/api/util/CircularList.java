@@ -51,10 +51,9 @@ public class CircularList<T> implements Collection<CircularNode<T>>, Comparable<
         return this.toNodeList().contains(o);
     }
 
-
     public static <T> CircularList<T> from(Iterable<T> list) {
         CircularList<T> circular = new CircularList<>();
-        list.forEach(circular::addValue);
+        list.forEach(circular::addLast);
         return circular;
     }
 
@@ -508,30 +507,111 @@ public class CircularList<T> implements Collection<CircularNode<T>>, Comparable<
         tryFind(predicate).ifPresent(this::removeAllNext);
     }
 
-    public void addValue(T value) {
-        CircularNode<T> node = new CircularNode<>(value);
-        nodes.add(node);
+    public void addFirst(T value) {
+        CircularNode<T> newNode = new CircularNode<>(value);
 
-        if (head == null) { // 链表为空时
-            head = node;
-            tail = node;
-            node.setNext(node); // 关键：让第一个节点指向自己，形成循环
-            node.setPrev(node); // 设置prev指向自己
-            depth = 1;
-        } else { // 链表已有节点
-            // 设置新节点的prev为当前尾节点
-            node.setPrev(tail);
-            // 设置新节点的next为头节点
-            node.setNext(head);
-            // 当前尾节点的next指向新节点
-            tail.setNext(node);
-            // 头节点的prev指向新节点
-            head.setPrev(node);
-            // 更新尾节点为新节点
-            tail = node;
-            depth++;
+        if (isEmpty()) {
+            // 空链表情况
+            head = newNode;
+            tail = newNode;
+            newNode.setNext(newNode);
+            newNode.setPrev(newNode);
+        } else {
+            // 非空链表情况
+            newNode.setNext(head);
+            newNode.setPrev(tail);
+            head.setPrev(newNode);
+            tail.setNext(newNode);
+            head = newNode;
         }
+
+        nodes.add(0, newNode);
+        depth++;
     }
+
+    /**
+     * 在链表尾部添加节点
+     */
+    public void addLast(T value) {
+        CircularNode<T> newNode = new CircularNode<>(value);
+
+        if (isEmpty()) {
+            // 空链表情况
+            head = newNode;
+            tail = newNode;
+            newNode.setNext(newNode);
+            newNode.setPrev(newNode);
+        } else {
+            // 非空链表情况
+            newNode.setNext(head);
+            newNode.setPrev(tail);
+            tail.setNext(newNode);
+            head.setPrev(newNode);
+            tail = newNode;
+        }
+
+        nodes.add(newNode);
+        depth++;
+    }
+
+    /**
+     * 在指定节点之前插入新节点
+     */
+    public void addBefore(CircularNode<T> targetNode, T value) {
+        if (targetNode == null || !nodes.contains(targetNode)) {
+            throw new IllegalArgumentException("Target node is not in the list");
+        }
+
+        CircularNode<T> newNode = new CircularNode<>(value);
+
+        // 设置新节点的连接
+        newNode.setPrev(targetNode.prev());
+        newNode.setNext(targetNode);
+
+        // 更新相邻节点的连接
+        targetNode.prev().setNext(newNode);
+        targetNode.setPrev(newNode);
+
+        // 如果是在头节点之前插入，更新头节点
+        if (targetNode == head) {
+            head = newNode;
+        }
+
+        // 更新nodes列表
+        int index = nodes.indexOf(targetNode);
+        nodes.add(index, newNode);
+        depth++;
+    }
+
+    /**
+     * 在指定节点之后插入新节点
+     */
+    public void addAfter(CircularNode<T> targetNode, T value) {
+        if (targetNode == null || !nodes.contains(targetNode)) {
+            throw new IllegalArgumentException("Target node is not in the list");
+        }
+
+        CircularNode<T> newNode = new CircularNode<>(value);
+
+        // 设置新节点的连接
+        newNode.setPrev(targetNode);
+        newNode.setNext(targetNode.next());
+
+        // 更新相邻节点的连接
+        targetNode.next().setPrev(newNode);
+        targetNode.setNext(newNode);
+
+        // 如果是在尾节点之后插入，更新尾节点
+        if (targetNode == tail) {
+            tail = newNode;
+        }
+
+        // 更新nodes列表
+        int index = nodes.indexOf(targetNode);
+        nodes.add(index + 1, newNode);
+        depth++;
+    }
+
 
     /**
      * 遍历链表
@@ -595,7 +675,7 @@ public class CircularList<T> implements Collection<CircularNode<T>>, Comparable<
 
     public CircularList<T> copy(){
         CircularList<T> newList = new CircularList<>();
-        this.nodes.forEach(node -> newList.addValue(node.value()));
+        this.nodes.forEach(node -> newList.addLast(node.value()));
         return newList;
     }
 

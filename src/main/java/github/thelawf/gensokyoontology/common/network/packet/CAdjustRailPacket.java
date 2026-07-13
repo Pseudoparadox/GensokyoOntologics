@@ -52,7 +52,6 @@ public class CAdjustRailPacket {
         serverWorld.updateEntity(rail);
         rail.getNextRail().ifPresent(serverWorld::updateEntity);
 
-        TrackInfo.tryGetInstance(serverWorld).ifPresent(track ->
-                track.replaceNode(rail.getPosition(), packet.node));
+        TrackInfo.tryGetInstance(serverWorld).ifPresent(track -> track.replaceNode(rail.getPosition(), packet.node));
     }
 }
