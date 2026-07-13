@@ -3,7 +3,6 @@ package github.thelawf.gensokyoontology.data;
 import com.mojang.datafixers.util.Pair;
 import github.thelawf.gensokyoontology.api.INBTWriter;
 import github.thelawf.gensokyoontology.api.util.CircularList;
-import github.thelawf.gensokyoontology.api.util.CircularNode;
 import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
 import github.thelawf.gensokyoontology.common.nbt.GSKONBTUtil;
@@ -35,43 +34,33 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
         this.markDirty();
     }
 
-    public void addRailNode(UUID startRailId, HermiteNodeInfo newNode){
-        this.pauliExclude(newNode.getStartPos());
-        this.tracks.get(startRailId).add(newNode);
+    public void addRailNode(ServerWorld serverWorld, UUID startRailId, HermiteNodeInfo newNode){
+        this.tracks.get(startRailId).addValue(newNode);
         this.markDirty();
     }
 
-    public void replaceNodeValue(BlockPos nodePos, HermiteNodeInfo newValue){
-        this.tracks.values().stream().anyMatch(list ->
-                list.replaceIf(node -> node.getStartPos() == nodePos, newValue));
+    public void replaceNode(BlockPos nodePos, HermiteNodeInfo newValue){
+        boolean b = this.tracks.values().stream().anyMatch(list ->
+                list.replaceIf(node -> {
+                    GSKOUtil.log(node.getStartPos().toLong() == nodePos.toLong());
+                    return node.getStartPos().toLong() == nodePos.toLong();
+                }, newValue));
         this.markDirty();
     }
-    public Maybe<HermiteNodeInfo> tryFindNext(UUID first, HermiteNodeInfo prevNode){
-        return this.tracks.get(first).tryFind(node -> node.getStartPos().toLong() == prevNode.getStartPos().toLong())
-                .map(CircularNode::value);
-    }
-    public Maybe<HermiteNodeInfo> tryFindNext(UUID first, BlockPos prevNode){
-        return this.tracks.get(first).tryFind(node -> node.getStartPos().toLong() == prevNode.toLong())
-                .map(CircularNode::value);
-    }
-    public Maybe<CircularNode<HermiteNodeInfo>> tryFindNext(BlockPos prevPos){
-        return Maybe.from(this.tracks.entrySet().stream().flatMap(entry -> entry.getValue().toNodeList().stream())
-                .filter(node -> node.value().getStartPos().toLong() == prevPos.toLong()).findFirst());
-    }
 
-    public Optional<CircularList<HermiteNodeInfo>> getCircularListWhichContains(HermiteNodeInfo nodeInfo){
+    public Optional<CircularList<HermiteNodeInfo>> findTracksBy(HermiteNodeInfo nodeInfo){
         return this.tracks.values().stream().filter(list -> {
-                    boolean flag = list.toNodeList().stream().anyMatch(node ->
-                            node.value().getStartPos().toLong() == nodeInfo.getEndPos().toLong());
-
-                    return flag;
+            return list.toNodeList().stream().anyMatch(node ->{
+                boolean b = node.value().getStartPos().toLong() == nodeInfo.getStartPos().toLong();
+                        GSKOUtil.log(b);
+                        return b;
+                    }
+                    );
         }).findAny();
     }
-    public Optional<CircularList<HermiteNodeInfo>> getCircularListWhichContains(BlockPos nodePos){
-        return this.tracks.values().stream().filter(list -> list.tryFind(node -> {
-
-            return node.getStartPos().toLong() == nodePos.toLong();
-        }).isPresent()).findFirst();
+    public Optional<CircularList<HermiteNodeInfo>> findTracksBy(BlockPos nodePos){
+        return this.tracks.values().stream().filter(list ->
+                list.tryFind(node -> node.getStartPos().toLong() == nodePos.toLong()).isPresent()).findFirst();
     }
 
     public Maybe<RailEntity> tryFindFirst(World world, HermiteNodeInfo node){
@@ -79,32 +68,34 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
         ServerWorld serverWorld = (ServerWorld) world;
         Maybe<UUID> maybe = Maybe.empty();
         Maybe<RailEntity> entity = Maybe.empty();
-        this.getCircularListWhichContains(node).ifPresent(list ->
-                this.tracks.forEach((key, value) -> {
-                    if (value.equals(list)) maybe.set(key);
-        }));
+        this.findTracksBy(node).ifPresent(list ->
+        {
+            this.tracks.forEach((key, value) -> {
+                GSKOUtil.log(value.equals(list));
+                if (value.equals(list)) maybe.set(key);
+            });
+        });
 
         maybe.ifPresent(uuid -> entity.set((RailEntity) serverWorld.getEntityByUuid(uuid)));
         return entity;
     }
 
+
     public Maybe<HermiteNodeInfo> tryFindNext(HermiteNodeInfo prevNode){
         Maybe<HermiteNodeInfo> maybe = Maybe.empty();
-        this.getCircularListWhichContains(prevNode.getEndPos()).ifPresent(list ->
+        this.findTracksBy(prevNode.getStartPos()).ifPresent(list ->
         {
-            GSKOUtil.log("Try Find: " + list.tryFind(node -> node.getStartPos().toLong() == prevNode.getEndPos().toLong()).isPresent());
-            GSKOUtil.log("Node Start: " + prevNode.getStartPos() + ", Node End: " + prevNode.getEndPos());
-            list.tryFind(node -> node.getStartPos().toLong() == prevNode.getEndPos().toLong())
-                    .ifPresent(node -> node.tryGetNext().ifPresent(current -> {
-                        current.tryGetNext().ifPresent(next -> maybe.set(
-                                HermiteNodeInfo.of(current.value().getRailType(),
-                                        current.value().getStartPos(), next.value().getStartPos(),
+            GSKOUtil.log("Prev: " + prevNode);
+            list.tryFind(node -> node.getStartPos().toLong() == prevNode.getStartPos().toLong())
+                    .ifPresent(current -> current.tryGetNext().ifPresent(next -> {
+                        GSKOUtil.log("next: " + current.value().getStartPos());
+                        maybe.set(HermiteNodeInfo.of(current.value().getRailType(),
+                                        current.value().getStartPos(), next.value().getStartPos().subtract(current.value().getStartPos()),
                                         current.value().rotation0(), next.value().rotation0())
-                                        .setPrevScale(current.value().scale0())
-                                        .setNextScale(next.value().scale0())
-                                        .setAutoSmooth(current.value().shouldAutoSmooth())
-                                        .setFlipNormal(current.value().shouldFlipNormal())
-                        ));
+                                .setPrevScale(current.value().scale0())
+                                .setNextScale(next.value().scale0())
+                                .setAutoSmooth(current.value().shouldAutoSmooth())
+                                .setFlipNormal(current.value().shouldFlipNormal()));
                     }));
         });
         return maybe;
@@ -112,29 +103,15 @@ public class TrackInfo extends WorldSavedData implements INBTWriter {
 
 
     public void removeNode(BlockPos removedPos){
-        this.getAllRegisteredPos().stream().filter(this::containsPosition).findFirst()
-                .ifPresent(blockPos -> this.tracks.forEach((uuid, circularList) ->
-                        circularList.removeIf(node -> node.getStartPos() == removedPos)));
+        this.findTracksBy(removedPos).ifPresent(blockPos -> this.tracks.forEach(
+                (uuid, circularList) -> circularList.removeWhen(
+                        node -> node.getStartPos() == removedPos)));
         this.markDirty();
-    }
-
-    private boolean containsPosition(BlockPos pos){
-        return this.getAllRegisteredPos().stream().anyMatch(blockPos -> blockPos == pos);
-    }
-
-
-    private List<BlockPos> getAllRegisteredPos(){
-        List<BlockPos> list = new ArrayList<>();
-        this.tracks.forEach((uuid, circularList) -> circularList.forEach(node -> list.add(node.getStartPos())));
-        return list;
     }
 
     /**
      * 泡利不相容原理，一个BlockPos不允许两个轨道实体出现，如果设置了同一处，则后设置的轨道覆盖前一个轨道
      */
-    public void pauliExclude(BlockPos newPos){
-        this.removeNode(newPos);
-    }
 
     public boolean isLooped() {
         return this.isLooped;

@@ -31,7 +31,7 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
     private final BlockPos position;
     private final BlockPos endPosOffset;
     private Quaternion rotation0;
-    private Quaternion rotation1;
+    private final Quaternion rotation1;
 
     private final java.util.Map<Integer, TextFieldWidget> axisFieldMap = new java.util.HashMap<>();
     private TextFieldWidget startScale;
@@ -83,6 +83,14 @@ public class RailDashboardScreen extends LineralLayoutScreen implements IInputPa
         this.scale1 = node.scale1();
         this.flipChirality = node.shouldFlipNormal();
         this.autoScale = node.shouldAutoSmooth();
+
+        this.sendPacketToServer();
+    }
+
+    @Override
+    public void closeScreen() {
+        super.closeScreen();
+        this.sendPacketToServer();
     }
 
     private void applyDelta(float dYaw, float dPitch, float dRoll) {

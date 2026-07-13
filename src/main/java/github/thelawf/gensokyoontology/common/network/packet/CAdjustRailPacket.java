@@ -1,14 +1,10 @@
 package github.thelawf.gensokyoontology.common.network.packet;
 
 import github.thelawf.gensokyoontology.common.entity.misc.RailEntity;
-import github.thelawf.gensokyoontology.common.util.EnumUtil;
-import github.thelawf.gensokyoontology.common.util.GSKOUtil;
 import github.thelawf.gensokyoontology.data.HermiteNodeInfo;
 import github.thelawf.gensokyoontology.data.TrackInfo;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -57,6 +53,6 @@ public class CAdjustRailPacket {
         rail.getNextRail().ifPresent(serverWorld::updateEntity);
 
         TrackInfo.tryGetInstance(serverWorld).ifPresent(track ->
-                track.replaceNodeValue(rail.getPosition(), packet.node));
+                track.replaceNode(rail.getPosition(), packet.node));
     }
 }

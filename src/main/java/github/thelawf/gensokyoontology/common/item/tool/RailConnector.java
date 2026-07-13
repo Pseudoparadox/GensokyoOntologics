@@ -101,7 +101,7 @@ public class RailConnector extends Item implements IRayTracer {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
             TrackInfo.tryGetInstance(serverWorld).ifPresent(info ->
                     this.tryGetFirstRail(serverWorld, connector).ifPresent(first -> {
-                        info.addRailNode(first.getUniqueID(), HermiteNodeInfo.from(targetRail));
+                        info.addRailNode(serverWorld, first.getUniqueID(), HermiteNodeInfo.from(targetRail));
                         this.setNextStartRail(connector, connector.getTag(), targetRail);
                     }));
             GSKONetworking.sendToClientPlayer(new S2CRenderRailPacket(startRail.getEntityId(),

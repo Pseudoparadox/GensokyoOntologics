@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class CircularList<T> implements Comparable<CircularNode<T>> {
+public class CircularList<T> implements Collection<CircularNode<T>>, Comparable<CircularNode<T>> {
     private CircularNode<T> head;
     private CircularNode<T> tail;
     private int depth;
@@ -46,9 +46,15 @@ public class CircularList<T> implements Comparable<CircularNode<T>> {
         return depth == 0;
     }
 
+    @Override
+    public boolean contains(Object o) {
+        return this.toNodeList().contains(o);
+    }
+
+
     public static <T> CircularList<T> from(Iterable<T> list) {
         CircularList<T> circular = new CircularList<>();
-        list.forEach(circular::add);
+        list.forEach(circular::addValue);
         return circular;
     }
 
@@ -170,7 +176,7 @@ public class CircularList<T> implements Comparable<CircularNode<T>> {
     /**
      * 删除满足条件的第一个节点
      */
-    public boolean removeIf(Predicate<T> predicate) {
+    public boolean removeWhen(Predicate<T> predicate) {
         Optional<CircularNode<T>> nodeOpt = nodes.stream()
                 .filter(n -> predicate.test(n.value()))
                 .findFirst();
@@ -502,7 +508,7 @@ public class CircularList<T> implements Comparable<CircularNode<T>> {
         tryFind(predicate).ifPresent(this::removeAllNext);
     }
 
-    public void add(T value) {
+    public void addValue(T value) {
         CircularNode<T> node = new CircularNode<>(value);
         nodes.add(node);
 
@@ -530,7 +536,7 @@ public class CircularList<T> implements Comparable<CircularNode<T>> {
     /**
      * 遍历链表
      */
-    public void forEach(Consumer<T> action) {
+    public void iterate(Consumer<T> action) {
         if (head == null) {
             return;
         }
@@ -547,7 +553,7 @@ public class CircularList<T> implements Comparable<CircularNode<T>> {
     /**
      * 带最大迭代次数的遍历
      */
-    public void forEach(Consumer<T> action, int maxIterations) {
+    public void iterate(Consumer<T> action, int maxIterations) {
         if (head == null) {
             return;
         }
@@ -578,7 +584,7 @@ public class CircularList<T> implements Comparable<CircularNode<T>> {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        forEach(value -> sb.append(value).append(", "));
+        // forEach(value -> sb.append(value).append(", "));
         // 移除最后的逗号和空格
         if (sb.length() > 1) {
             sb.setLength(sb.length() - 2);
@@ -589,12 +595,57 @@ public class CircularList<T> implements Comparable<CircularNode<T>> {
 
     public CircularList<T> copy(){
         CircularList<T> newList = new CircularList<>();
-        this.nodes.forEach(node -> newList.add(node.value()));
+        this.nodes.forEach(node -> newList.addValue(node.value()));
         return newList;
     }
 
     @Override
     public int compareTo(@NotNull CircularNode<T> o) {
         return nodes.indexOf(o);
+    }
+
+    @Override
+    public @NotNull Iterator<CircularNode<T>> iterator() {
+        return this.toNodeList().iterator();
+    }
+
+    @Override
+    public @NotNull Object[] toArray() {
+        return new Object[0];
+    }
+
+    @Override
+    public @NotNull <T> T[] toArray(@NotNull T[] a) {
+        return null;
+    }
+
+    @Override
+    public boolean add(CircularNode<T> node) {
+        return false;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return false;
+    }
+
+    @Override
+    public boolean containsAll(@NotNull Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean addAll(@NotNull Collection<? extends CircularNode<T>> c) {
+        return false;
+    }
+
+    @Override
+    public boolean removeAll(@NotNull Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean retainAll(@NotNull Collection<?> c) {
+        return false;
     }
 }

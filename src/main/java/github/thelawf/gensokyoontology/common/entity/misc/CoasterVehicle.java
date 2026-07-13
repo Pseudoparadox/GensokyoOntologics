@@ -3,6 +3,7 @@ package github.thelawf.gensokyoontology.common.entity.misc;
 import com.mojang.datafixers.util.Pair;
 import github.thelawf.gensokyoontology.api.Functions;
 import github.thelawf.gensokyoontology.api.INBTWriter;
+import github.thelawf.gensokyoontology.api.util.CircularNode;
 import github.thelawf.gensokyoontology.api.util.Maybe;
 import github.thelawf.gensokyoontology.common.entity.AffiliatedEntity;
 import github.thelawf.gensokyoontology.common.util.GSKOUtil;
@@ -32,6 +33,7 @@ import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
@@ -43,6 +45,9 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
 
     public float partialProgress = 0.0f;
     public Quaternion partialRotation = Quaternion.ONE;
+
+    private final Predicate<CircularNode<HermiteNodeInfo>> CONTAINS_NEXT_POS =
+            node -> node.value().getStartPos().toLong() == this.getCurrentNode().getEndPos().toLong();
 
     // 轨道物理参数
     public static final float ACCELERATION = 0.0001F;
@@ -238,6 +243,8 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
         this.physicsSetter(Pair.of(CoasterPhysics.KEY_PROGRESS, FloatNBT.valueOf(progress)));
         this.move(MoverType.SELF, next.subtract(prev));
 
+        GSKOUtil.log(this.getCurrentNode().getStartPos() + " -> " + this.getCurrentNode().getEndPos());
+
         // 计算并应用旋转（使载具面向运动方向）
         this.updateRotation();
     }
@@ -302,8 +309,7 @@ public class CoasterVehicle extends AffiliatedEntity implements INBTWriter {
                             this.adjustVelocityForNewRail();
                             this.setPhysics(next.getRailType().physics());
                         });
-                    }
-                    ));
+                    }));
         });
     }
 
